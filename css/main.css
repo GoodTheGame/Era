@@ -1,0 +1,40 @@
+/* Основные сбросы и фундаментальные стили */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0b0b1a;
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  color: #e0e0e0;
+}
+
+#game-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
