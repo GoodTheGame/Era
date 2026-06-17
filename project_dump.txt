@@ -1,7 +1,32 @@
 
 
 === ФАЙЛ: .\index.html ===
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Era - Factory</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <div id="toolbar"></div>
+        <div id="info-panel">
+            <span class="key-badge">WASD</span> Движение
+            <span class="key-badge">Колесо</span> Зум
+            <span class="key-badge">R / ПКМ</span> Поворот
+            <span class="key-badge">1-3</span> Выбор
+        </div>
+    </div>
 
+    <!-- Подключаем главный модуль -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
 
 === ФАЙЛ: .\merge.py ===
 import os
@@ -16,34 +41,2246 @@ with open("project_dump.txt", "w", encoding="utf-8") as out:
                         out.write(f.read())
                 except: pass
 
-=== ФАЙЛ: .\css\main.css ===
+=== ФАЙЛ: .\assets\storage\sprites\res_built\atlas\atlas0_hq.json ===
+{"frames":{"sprites/belt/built/forward_1.png":{"frame":{"x":512,"y":476,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_10.png":{"frame":{"x":1130,"y":507,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_11.png":{"frame":{"x":1181,"y":361,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_12.png":{"frame":{"x":1182,"y":215,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_13.png":{"frame":{"x":1182,"y":69,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_2.png":{"frame":{"x":554,"y":622,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_3.png":{"frame":{"x":630,"y":476,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_4.png":{"frame":{"x":894,"y":477,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_5.png":{"frame":{"x":506,"y":186,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_6.png":{"frame":{"x":630,"y":330,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_7.png":{"frame":{"x":969,"y":1320,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_8.png":{"frame":{"x":1012,"y":480,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_9.png":{"frame":{"x":1269,"y":1465,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_1.png":{"frame":{"x":1509,"y":1201,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_10.png":{"frame":{"x":1572,"y":43,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_11.png":{"frame":{"x":1704,"y":175,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_12.png":{"frame":{"x":1704,"y":43,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_13.png":{"frame":{"x":1708,"y":455,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_2.png":{"frame":{"x":1524,"y":1069,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_3.png":{"frame":{"x":1526,"y":937,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_4.png":{"frame":{"x":1641,"y":1201,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_5.png":{"frame":{"x":1656,"y":1069,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_6.png":{"frame":{"x":1658,"y":937,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_7.png":{"frame":{"x":1576,"y":439,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_8.png":{"frame":{"x":1576,"y":307,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_9.png":{"frame":{"x":1572,"y":175,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_1.png":{"frame":{"x":1708,"y":323,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_10.png":{"frame":{"x":1788,"y":1097,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_11.png":{"frame":{"x":1790,"y":965,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_12.png":{"frame":{"x":1883,"y":1625,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_13.png":{"frame":{"x":1790,"y":833,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_2.png":{"frame":{"x":624,"y":53,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_3.png":{"frame":{"x":1619,"y":1625,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_4.png":{"frame":{"x":1694,"y":1493,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_5.png":{"frame":{"x":1751,"y":1625,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_6.png":{"frame":{"x":1826,"y":1493,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_7.png":{"frame":{"x":1744,"y":1361,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_8.png":{"frame":{"x":1876,"y":1361,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_9.png":{"frame":{"x":1773,"y":1229,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/analyzer.png":{"frame":{"x":841,"y":1612,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/balancer.png":{"frame":{"x":291,"y":1060,"w":257,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":0,"w":257,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/balancer-merger.png":{"frame":{"x":894,"y":337,"w":139,"h":138},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":2,"w":139,"h":138},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/balancer-merger-inverse.png":{"frame":{"x":892,"y":197,"w":142,"h":138},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":142,"h":138},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/balancer-splitter.png":{"frame":{"x":1383,"y":1049,"w":139,"h":138},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":2,"w":139,"h":138},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/balancer-splitter-inverse.png":{"frame":{"x":892,"y":57,"w":142,"h":138},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":142,"h":138},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/belt_left.png":{"frame":{"x":1444,"y":402,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/belt_right.png":{"frame":{"x":1440,"y":138,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/belt_top.png":{"frame":{"x":839,"y":915,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/block.png":{"frame":{"x":1922,"y":971,"w":123,"h":125},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":11,"w":123,"h":125},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/comparator.png":{"frame":{"x":541,"y":1331,"w":144,"h":133},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":133},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/constant_producer.png":{"frame":{"x":833,"y":1320,"w":134,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":0,"w":134,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/constant_signal.png":{"frame":{"x":1636,"y":1333,"w":106,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":0,"w":106,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/cutter.png":{"frame":{"x":291,"y":914,"w":257,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":0,"w":257,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/cutter-quad.png":{"frame":{"x":1,"y":1206,"w":526,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":24,"y":0,"w":526,"h":144},"sourceSize":{"w":576,"h":144}},"sprites/blueprints/display.png":{"frame":{"x":1379,"y":1189,"w":128,"h":136},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":8,"w":128,"h":136},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/filter.png":{"frame":{"x":1077,"y":1757,"w":268,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":16,"y":0,"w":268,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/goal_acceptor.png":{"frame":{"x":560,"y":769,"w":134,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":0,"w":134,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/item_producer.png":{"frame":{"x":759,"y":100,"w":131,"h":142},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":131,"h":142},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/lever.png":{"frame":{"x":1922,"y":853,"w":100,"h":116},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":22,"y":9,"w":100,"h":116},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/logic_gate.png":{"frame":{"x":529,"y":1207,"w":144,"h":122},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":122},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/logic_gate-not.png":{"frame":{"x":829,"y":1061,"w":123,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":123,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/logic_gate-or.png":{"frame":{"x":1379,"y":788,"w":144,"h":124},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":124},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/logic_gate-xor.png":{"frame":{"x":1380,"y":657,"w":144,"h":129},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":129},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/miner.png":{"frame":{"x":963,"y":626,"w":137,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":137,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/miner-chainable.png":{"frame":{"x":1130,"y":1466,"w":137,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":137,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/mixer.png":{"frame":{"x":291,"y":622,"w":261,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":261,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/painter.png":{"frame":{"x":1090,"y":1903,"w":288,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/painter-double.png":{"frame":{"x":1,"y":924,"w":288,"h":280},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":280},"sourceSize":{"w":288,"h":288}},"sprites/blueprints/painter-mirrored.png":{"frame":{"x":1380,"y":1903,"w":288,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/painter-quad.png":{"frame":{"x":1,"y":1352,"w":538,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":12,"y":0,"w":538,"h":144},"sourceSize":{"w":576,"h":144}},"sprites/blueprints/reader.png":{"frame":{"x":685,"y":1061,"w":142,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":142,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/rotater.png":{"frame":{"x":696,"y":769,"w":143,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/rotater-ccw.png":{"frame":{"x":818,"y":623,"w":143,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/rotater-rotate180.png":{"frame":{"x":954,"y":1061,"w":143,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/stacker.png":{"frame":{"x":551,"y":1466,"w":261,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":261,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/blueprints/storage.png":{"frame":{"x":1,"y":354,"w":247,"h":287},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":21,"y":1,"w":247,"h":287},"sourceSize":{"w":288,"h":288}},"sprites/blueprints/transistor.png":{"frame":{"x":1387,"y":1465,"w":102,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":102,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/transistor-mirrored.png":{"frame":{"x":1517,"y":1611,"w":100,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":44,"y":0,"w":100,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/trash.png":{"frame":{"x":1191,"y":1611,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/underground_belt_entry.png":{"frame":{"x":1300,"y":26,"w":138,"h":112},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":32,"w":138,"h":112},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/underground_belt_entry-tier2.png":{"frame":{"x":1300,"y":140,"w":138,"h":125},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":19,"w":138,"h":125},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/underground_belt_exit.png":{"frame":{"x":1526,"y":571,"w":138,"h":112},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":138,"h":112},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/underground_belt_exit-tier2.png":{"frame":{"x":1238,"y":850,"w":139,"h":112},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":139,"h":112},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/virtual_processor.png":{"frame":{"x":1035,"y":337,"w":144,"h":141},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":3,"w":144,"h":141},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/virtual_processor-painter.png":{"frame":{"x":759,"y":244,"w":131,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":131,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/virtual_processor-rotater.png":{"frame":{"x":1960,"y":1903,"w":58,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":44,"y":0,"w":58,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/virtual_processor-stacker.png":{"frame":{"x":1102,"y":799,"w":130,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":130,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/virtual_processor-unstacker.png":{"frame":{"x":748,"y":477,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/blueprints/wire_tunnel.png":{"frame":{"x":1234,"y":713,"w":138,"h":135},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":138,"h":135},"sourceSize":{"w":144,"h":144}},"sprites/buildings/analyzer.png":{"frame":{"x":814,"y":1466,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/balancer.png":{"frame":{"x":248,"y":187,"w":256,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":0,"w":256,"h":143},"sourceSize":{"w":288,"h":144}},"sprites/buildings/balancer-merger.png":{"frame":{"x":1238,"y":1189,"w":139,"h":136},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":3,"w":139,"h":136},"sourceSize":{"w":144,"h":144}},"sprites/buildings/balancer-merger-inverse.png":{"frame":{"x":1238,"y":964,"w":141,"h":136},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":3,"w":141,"h":136},"sourceSize":{"w":144,"h":144}},"sprites/buildings/balancer-splitter.png":{"frame":{"x":1363,"y":1327,"w":139,"h":136},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":3,"w":139,"h":136},"sourceSize":{"w":144,"h":144}},"sprites/buildings/balancer-splitter-inverse.png":{"frame":{"x":1219,"y":1327,"w":142,"h":136},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":3,"w":142,"h":136},"sourceSize":{"w":144,"h":144}},"sprites/buildings/belt_left.png":{"frame":{"x":1439,"y":270,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/left_0.png":{"frame":{"x":1439,"y":270,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/buildings/belt_right.png":{"frame":{"x":1504,"y":1333,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/right_0.png":{"frame":{"x":1504,"y":1333,"w":130,"h":130},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":14,"w":130,"h":130},"sourceSize":{"w":144,"h":144}},"sprites/buildings/belt_top.png":{"frame":{"x":841,"y":769,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/belt/built/forward_0.png":{"frame":{"x":841,"y":769,"w":116,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":116,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/block.png":{"frame":{"x":1665,"y":685,"w":122,"h":124},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":11,"w":122,"h":124},"sourceSize":{"w":144,"h":144}},"sprites/buildings/comparator.png":{"frame":{"x":1381,"y":914,"w":143,"h":133},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":133},"sourceSize":{"w":144,"h":144}},"sprites/buildings/constant_producer.png":{"frame":{"x":550,"y":1061,"w":133,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":133,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/constant_signal.png":{"frame":{"x":1920,"y":1098,"w":104,"h":129},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":20,"y":0,"w":104,"h":129},"sourceSize":{"w":144,"h":144}},"sprites/buildings/cutter.png":{"frame":{"x":248,"y":42,"w":256,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":0,"w":256,"h":143},"sourceSize":{"w":288,"h":144}},"sprites/buildings/cutter-quad.png":{"frame":{"x":551,"y":1758,"w":524,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":25,"y":0,"w":524,"h":143},"sourceSize":{"w":576,"h":144}},"sprites/buildings/display.png":{"frame":{"x":1440,"y":1,"w":126,"h":135},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":126,"h":135},"sourceSize":{"w":144,"h":144}},"sprites/buildings/filter.png":{"frame":{"x":291,"y":768,"w":267,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":0,"w":267,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/buildings/goal_acceptor.png":{"frame":{"x":624,"y":185,"w":133,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":1,"w":133,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/buildings/hub.png":{"frame":{"x":1,"y":1498,"w":548,"h":549},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":16,"w":548,"h":549},"sourceSize":{"w":576,"h":576}},"sprites/buildings/item_producer.png":{"frame":{"x":1248,"y":569,"w":130,"h":142},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":130,"h":142},"sourceSize":{"w":144,"h":144}},"sprites/buildings/lever.png":{"frame":{"x":1789,"y":695,"w":98,"h":114},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":23,"y":10,"w":98,"h":114},"sourceSize":{"w":144,"h":144}},"sprites/buildings/logic_gate.png":{"frame":{"x":1380,"y":534,"w":143,"h":121},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":121},"sourceSize":{"w":144,"h":144}},"sprites/buildings/logic_gate-not.png":{"frame":{"x":1365,"y":1611,"w":122,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":12,"y":0,"w":122,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/logic_gate-or.png":{"frame":{"x":1526,"y":811,"w":143,"h":124},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":124},"sourceSize":{"w":144,"h":144}},"sprites/buildings/logic_gate-xor.png":{"frame":{"x":1299,"y":403,"w":143,"h":129},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":143,"h":129},"sourceSize":{"w":144,"h":144}},"sprites/buildings/miner.png":{"frame":{"x":1099,"y":1089,"w":136,"h":142},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":136,"h":142},"sourceSize":{"w":144,"h":144}},"sprites/buildings/miner-chainable.png":{"frame":{"x":1100,"y":945,"w":136,"h":142},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":136,"h":142},"sourceSize":{"w":144,"h":144}},"sprites/buildings/mixer.png":{"frame":{"x":250,"y":477,"w":260,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":260,"h":143},"sourceSize":{"w":288,"h":144}},"sprites/buildings/painter.png":{"frame":{"x":551,"y":1612,"w":288,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/buildings/painter-double.png":{"frame":{"x":1,"y":643,"w":288,"h":279},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":279},"sourceSize":{"w":288,"h":288}},"sprites/buildings/painter-mirrored.png":{"frame":{"x":1670,"y":1903,"w":288,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":288,"h":144},"sourceSize":{"w":288,"h":144}},"sprites/buildings/painter-quad.png":{"frame":{"x":551,"y":1903,"w":537,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":537,"h":144},"sourceSize":{"w":576,"h":144}},"sprites/buildings/reader.png":{"frame":{"x":696,"y":915,"w":141,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":141,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/rotater.png":{"frame":{"x":957,"y":916,"w":141,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":141,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/buildings/rotater-ccw.png":{"frame":{"x":959,"y":771,"w":141,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":141,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/buildings/rotater-rotate180.png":{"frame":{"x":987,"y":1466,"w":141,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":141,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/buildings/stacker.png":{"frame":{"x":250,"y":332,"w":260,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":260,"h":143},"sourceSize":{"w":288,"h":144}},"sprites/buildings/storage.png":{"frame":{"x":1,"y":66,"w":245,"h":286},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":22,"y":2,"w":245,"h":286},"sourceSize":{"w":288,"h":288}},"sprites/buildings/transistor.png":{"frame":{"x":1491,"y":1465,"w":100,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":100,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/transistor-mirrored.png":{"frame":{"x":1593,"y":1465,"w":99,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":45,"y":0,"w":99,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/trash.png":{"frame":{"x":672,"y":623,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/underground_belt_entry.png":{"frame":{"x":675,"y":1207,"w":137,"h":111},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":33,"w":137,"h":111},"sourceSize":{"w":144,"h":144}},"sprites/buildings/underground_belt_entry-tier2.png":{"frame":{"x":1526,"y":685,"w":137,"h":124},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":20,"w":137,"h":124},"sourceSize":{"w":144,"h":144}},"sprites/buildings/underground_belt_exit.png":{"frame":{"x":814,"y":1207,"w":137,"h":111},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":137,"h":111},"sourceSize":{"w":144,"h":144}},"sprites/buildings/underground_belt_exit-tier2.png":{"frame":{"x":953,"y":1207,"w":137,"h":111},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":137,"h":111},"sourceSize":{"w":144,"h":144}},"sprites/buildings/virtual_processor.png":{"frame":{"x":1036,"y":50,"w":144,"h":140},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":144,"h":140},"sourceSize":{"w":144,"h":144}},"sprites/buildings/virtual_processor-painter.png":{"frame":{"x":1087,"y":1320,"w":130,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":130,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/virtual_processor-rotater.png":{"frame":{"x":987,"y":1612,"w":56,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":45,"y":0,"w":56,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/virtual_processor-stacker.png":{"frame":{"x":1102,"y":653,"w":130,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":130,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/buildings/virtual_processor-unstacker.png":{"frame":{"x":1036,"y":192,"w":144,"h":143},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":1,"w":144,"h":143},"sourceSize":{"w":144,"h":144}},"sprites/buildings/wire_tunnel.png":{"frame":{"x":1300,"y":267,"w":137,"h":134},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":5,"w":137,"h":134},"sourceSize":{"w":144,"h":144}},"sprites/colors/blue.png":{"frame":{"x":92,"y":15,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/cyan.png":{"frame":{"x":148,"y":15,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/green.png":{"frame":{"x":1840,"y":361,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/purple.png":{"frame":{"x":1840,"y":310,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/red.png":{"frame":{"x":1836,"y":259,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/uncolored.png":{"frame":{"x":1836,"y":208,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/white.png":{"frame":{"x":1836,"y":157,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/colors/yellow.png":{"frame":{"x":1836,"y":106,"w":54,"h":49},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":54,"h":49},"sourceSize":{"w":54,"h":54}},"sprites/debug/acceptor_slot.png":{"frame":{"x":1234,"y":699,"w":12,"h":12},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":12,"h":12},"sourceSize":{"w":12,"h":12}},"sprites/debug/ejector_slot.png":{"frame":{"x":1619,"y":1611,"w":12,"h":12},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":12,"h":12},"sourceSize":{"w":12,"h":12}},"sprites/misc/hub_direction_indicator.png":{"frame":{"x":1248,"y":519,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/misc/processor_disabled.png":{"frame":{"x":1938,"y":567,"w":78,"h":81},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":10,"y":10,"w":78,"h":81},"sourceSize":{"w":96,"h":96}},"sprites/misc/processor_disconnected.png":{"frame":{"x":1840,"y":481,"w":65,"h":84},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":17,"y":8,"w":65,"h":84},"sourceSize":{"w":96,"h":96}},"sprites/misc/reader_overlay.png":{"frame":{"x":756,"y":28,"w":104,"h":70},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":20,"y":38,"w":104,"h":70},"sourceSize":{"w":144,"h":144}},"sprites/misc/slot_bad_arrow.png":{"frame":{"x":1525,"y":534,"w":35,"h":35},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":2,"w":35,"h":35},"sourceSize":{"w":39,"h":39}},"sprites/misc/slot_good_arrow.png":{"frame":{"x":247,"y":1,"w":35,"h":39},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":35,"h":39},"sourceSize":{"w":39,"h":39}},"sprites/misc/storage_overlay.png":{"frame":{"x":1,"y":20,"w":89,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":89,"h":44},"sourceSize":{"w":90,"h":45}},"sprites/misc/waypoint.png":{"frame":{"x":1255,"y":19,"w":38,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":38,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/misc/waypoint_wires.png":{"frame":{"x":1836,"y":56,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/boolean_false.png":{"frame":{"x":1889,"y":790,"w":31,"h":41},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":5,"w":31,"h":41},"sourceSize":{"w":48,"h":48}},"sprites/wires/boolean_true.png":{"frame":{"x":2025,"y":694,"w":22,"h":41},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":5,"w":22,"h":41},"sourceSize":{"w":48,"h":48}},"sprites/wires/display/blue.png":{"frame":{"x":862,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/cyan.png":{"frame":{"x":911,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/green.png":{"frame":{"x":960,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/purple.png":{"frame":{"x":1009,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/red.png":{"frame":{"x":1058,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/white.png":{"frame":{"x":1107,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/display/yellow.png":{"frame":{"x":1156,"y":1,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":47},"sourceSize":{"w":49,"h":49}},"sprites/wires/lever_on.png":{"frame":{"x":1922,"y":737,"w":102,"h":114},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":21,"y":10,"w":102,"h":114},"sourceSize":{"w":144,"h":144}},"sprites/wires/logical_acceptor.png":{"frame":{"x":1958,"y":1517,"w":62,"h":106},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":43,"y":0,"w":62,"h":106},"sourceSize":{"w":144,"h":144}},"sprites/wires/logical_ejector.png":{"frame":{"x":1840,"y":412,"w":60,"h":67},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":44,"y":0,"w":60,"h":67},"sourceSize":{"w":144,"h":144}},"sprites/wires/network_conflict.png":{"frame":{"x":1907,"y":521,"w":47,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":2,"w":47,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/wires/network_empty.png":{"frame":{"x":204,"y":16,"w":41,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":41,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/overlay_tile.png":{"frame":{"x":1666,"y":587,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/conflict_cross.png":{"frame":{"x":687,"y":1320,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/conflict_forward.png":{"frame":{"x":2020,"y":1903,"w":26,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":0,"w":26,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/conflict_split.png":{"frame":{"x":748,"y":390,"w":144,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":59,"w":144,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/conflict_turn.png":{"frame":{"x":1764,"y":598,"w":85,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":59,"w":85,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/first_cross.png":{"frame":{"x":550,"y":915,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/first_forward.png":{"frame":{"x":1337,"y":1611,"w":26,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":0,"w":26,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/first_split.png":{"frame":{"x":1092,"y":1233,"w":144,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":59,"w":144,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/first_turn.png":{"frame":{"x":1851,"y":608,"w":85,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":59,"w":85,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/second_cross.png":{"frame":{"x":1045,"y":1611,"w":144,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":144,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/second_forward.png":{"frame":{"x":1489,"y":1611,"w":26,"h":144},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":0,"w":26,"h":144},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/second_split.png":{"frame":{"x":1237,"y":1102,"w":144,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":59,"w":144,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/sets/second_turn.png":{"frame":{"x":1938,"y":650,"w":85,"h":85},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":59,"y":59,"w":85,"h":85},"sourceSize":{"w":144,"h":144}},"sprites/wires/wires_preview.png":{"frame":{"x":1205,"y":19,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}}},"meta":{"image":"atlas0_hq.png","format":"RGBA8888","size":{"w":2048,"h":2048},"scale":"0.75"}}
 
+=== ФАЙЛ: .\assets\storage\sprites\res_built\atlas\atlas0_lq.json ===
+{"frames":{"sprites/belt/built/forward_1.png":{"frame":{"x":1528,"y":107,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_10.png":{"frame":{"x":595,"y":76,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_11.png":{"frame":{"x":637,"y":76,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_12.png":{"frame":{"x":679,"y":76,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_13.png":{"frame":{"x":721,"y":76,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_2.png":{"frame":{"x":565,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_3.png":{"frame":{"x":607,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_4.png":{"frame":{"x":649,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_5.png":{"frame":{"x":691,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_6.png":{"frame":{"x":733,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_7.png":{"frame":{"x":775,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_8.png":{"frame":{"x":817,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_9.png":{"frame":{"x":859,"y":15,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_1.png":{"frame":{"x":979,"y":66,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_10.png":{"frame":{"x":1393,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_11.png":{"frame":{"x":1439,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_12.png":{"frame":{"x":1485,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_13.png":{"frame":{"x":969,"y":20,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_2.png":{"frame":{"x":1025,"y":62,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_3.png":{"frame":{"x":1071,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_4.png":{"frame":{"x":1117,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_5.png":{"frame":{"x":1163,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_6.png":{"frame":{"x":1209,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_7.png":{"frame":{"x":1255,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_8.png":{"frame":{"x":1301,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_9.png":{"frame":{"x":1347,"y":61,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_1.png":{"frame":{"x":1015,"y":16,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_10.png":{"frame":{"x":1429,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_11.png":{"frame":{"x":1475,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_12.png":{"frame":{"x":1521,"y":11,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_13.png":{"frame":{"x":1568,"y":25,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_2.png":{"frame":{"x":1061,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_3.png":{"frame":{"x":1107,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_4.png":{"frame":{"x":1153,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_5.png":{"frame":{"x":1199,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_6.png":{"frame":{"x":1245,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_7.png":{"frame":{"x":1291,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_8.png":{"frame":{"x":1337,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_9.png":{"frame":{"x":1383,"y":15,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/analyzer.png":{"frame":{"x":1727,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/balancer.png":{"frame":{"x":1199,"y":207,"w":87,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":87,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/balancer-merger.png":{"frame":{"x":334,"y":11,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/balancer-merger-inverse.png":{"frame":{"x":1827,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/balancer-splitter.png":{"frame":{"x":383,"y":11,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/balancer-splitter-inverse.png":{"frame":{"x":1877,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/belt_left.png":{"frame":{"x":1760,"y":112,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/belt_right.png":{"frame":{"x":1806,"y":62,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/belt_top.png":{"frame":{"x":432,"y":11,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/block.png":{"frame":{"x":901,"y":73,"w":42,"h":43},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":3,"w":42,"h":43},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/comparator.png":{"frame":{"x":184,"y":14,"w":48,"h":45},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":45},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/constant_producer.png":{"frame":{"x":516,"y":11,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/constant_signal.png":{"frame":{"x":1670,"y":65,"w":36,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":0,"w":36,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/cutter.png":{"frame":{"x":1377,"y":207,"w":87,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":87,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/cutter-quad.png":{"frame":{"x":187,"y":157,"w":177,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":0,"w":177,"h":48},"sourceSize":{"w":192,"h":48}},"sprites/blueprints/display.png":{"frame":{"x":1619,"y":111,"w":44,"h":46},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":2,"w":44,"h":46},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/filter.png":{"frame":{"x":562,"y":157,"w":92,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":92,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/goal_acceptor.png":{"frame":{"x":1093,"y":107,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/item_producer.png":{"frame":{"x":1434,"y":107,"w":45,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":45,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/lever.png":{"frame":{"x":1926,"y":38,"w":35,"h":41},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":2,"w":35,"h":41},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/logic_gate.png":{"frame":{"x":795,"y":163,"w":48,"h":42},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":42},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/logic_gate-not.png":{"frame":{"x":901,"y":23,"w":43,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":43,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/logic_gate-or.png":{"frame":{"x":845,"y":163,"w":48,"h":42},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":42},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/logic_gate-xor.png":{"frame":{"x":945,"y":161,"w":48,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/miner.png":{"frame":{"x":1142,"y":107,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/miner-chainable.png":{"frame":{"x":1240,"y":107,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/mixer.png":{"frame":{"x":837,"y":207,"w":89,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":89,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/painter.png":{"frame":{"x":366,"y":157,"w":96,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/painter-double.png":{"frame":{"x":187,"y":61,"w":96,"h":94},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":94},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/painter-mirrored.png":{"frame":{"x":464,"y":157,"w":96,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/painter-quad.png":{"frame":{"x":1,"y":20,"w":181,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":181,"h":48},"sourceSize":{"w":192,"h":48}},"sprites/blueprints/reader.png":{"frame":{"x":1827,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/rotater.png":{"frame":{"x":1927,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/rotater-ccw.png":{"frame":{"x":284,"y":11,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/rotater-rotate180.png":{"frame":{"x":1095,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/stacker.png":{"frame":{"x":928,"y":207,"w":89,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":89,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/blueprints/storage.png":{"frame":{"x":1555,"y":159,"w":84,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":0,"w":84,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/transistor.png":{"frame":{"x":1531,"y":57,"w":35,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":35,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/transistor-mirrored.png":{"frame":{"x":1889,"y":76,"w":34,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":34,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/trash.png":{"frame":{"x":1245,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/underground_belt_entry.png":{"frame":{"x":845,"y":123,"w":48,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":10,"w":48,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/underground_belt_entry-tier2.png":{"frame":{"x":895,"y":118,"w":48,"h":43},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":5,"w":48,"h":43},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/underground_belt_exit.png":{"frame":{"x":1570,"y":71,"w":48,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/underground_belt_exit-tier2.png":{"frame":{"x":1620,"y":71,"w":48,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/virtual_processor.png":{"frame":{"x":1345,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/virtual_processor-painter.png":{"frame":{"x":1614,"y":21,"w":44,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":44,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/virtual_processor-rotater.png":{"frame":{"x":946,"y":28,"w":21,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":21,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/virtual_processor-stacker.png":{"frame":{"x":549,"y":76,"w":44,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":44,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/virtual_processor-unstacker.png":{"frame":{"x":1445,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/blueprints/wire_tunnel.png":{"frame":{"x":945,"y":112,"w":48,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":47},"sourceSize":{"w":48,"h":48}},"sprites/buildings/analyzer.png":{"frame":{"x":1777,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/balancer.png":{"frame":{"x":1288,"y":207,"w":87,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":87,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/balancer-merger.png":{"frame":{"x":995,"y":112,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":47},"sourceSize":{"w":48,"h":48}},"sprites/buildings/balancer-merger-inverse.png":{"frame":{"x":1727,"y":158,"w":48,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":47},"sourceSize":{"w":48,"h":48}},"sprites/buildings/balancer-splitter.png":{"frame":{"x":1044,"y":108,"w":47,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":47},"sourceSize":{"w":48,"h":48}},"sprites/buildings/balancer-splitter-inverse.png":{"frame":{"x":1777,"y":158,"w":48,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":47},"sourceSize":{"w":48,"h":48}},"sprites/buildings/belt_left.png":{"frame":{"x":1760,"y":66,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/left_0.png":{"frame":{"x":1760,"y":66,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/buildings/belt_right.png":{"frame":{"x":1806,"y":16,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/right_0.png":{"frame":{"x":1806,"y":16,"w":44,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":44,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/buildings/belt_top.png":{"frame":{"x":474,"y":11,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/belt/built/forward_0.png":{"frame":{"x":474,"y":11,"w":40,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":40,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/block.png":{"frame":{"x":1925,"y":81,"w":42,"h":43},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":3,"w":42,"h":43},"sourceSize":{"w":48,"h":48}},"sprites/buildings/comparator.png":{"frame":{"x":234,"y":14,"w":48,"h":45},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":45},"sourceSize":{"w":48,"h":48}},"sprites/buildings/constant_producer.png":{"frame":{"x":1338,"y":107,"w":46,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":46,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/constant_signal.png":{"frame":{"x":1852,"y":16,"w":36,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":0,"w":36,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/buildings/cutter.png":{"frame":{"x":1466,"y":207,"w":87,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":87,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/cutter-quad.png":{"frame":{"x":370,"y":207,"w":177,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":0,"w":177,"h":48},"sourceSize":{"w":192,"h":48}},"sprites/buildings/display.png":{"frame":{"x":1665,"y":111,"w":44,"h":46},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":2,"w":44,"h":46},"sourceSize":{"w":48,"h":48}},"sprites/buildings/filter.png":{"frame":{"x":745,"y":207,"w":90,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":90,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/goal_acceptor.png":{"frame":{"x":1386,"y":107,"w":46,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":46,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/hub.png":{"frame":{"x":1,"y":70,"w":184,"h":185},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":4,"w":184,"h":185},"sourceSize":{"w":192,"h":192}},"sprites/buildings/item_producer.png":{"frame":{"x":1481,"y":107,"w":45,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":45,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/lever.png":{"frame":{"x":1963,"y":39,"w":34,"h":40},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":2,"w":34,"h":40},"sourceSize":{"w":48,"h":48}},"sprites/buildings/logic_gate.png":{"frame":{"x":745,"y":133,"w":48,"h":41},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":41},"sourceSize":{"w":48,"h":48}},"sprites/buildings/logic_gate-not.png":{"frame":{"x":832,"y":73,"w":43,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":43,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/logic_gate-or.png":{"frame":{"x":895,"y":163,"w":48,"h":42},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":42},"sourceSize":{"w":48,"h":48}},"sprites/buildings/logic_gate-xor.png":{"frame":{"x":995,"y":161,"w":48,"h":44},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":44},"sourceSize":{"w":48,"h":48}},"sprites/buildings/miner.png":{"frame":{"x":1191,"y":107,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/miner-chainable.png":{"frame":{"x":1289,"y":107,"w":47,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/mixer.png":{"frame":{"x":1019,"y":207,"w":88,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":88,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/painter.png":{"frame":{"x":549,"y":207,"w":96,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/painter-double.png":{"frame":{"x":285,"y":61,"w":96,"h":94},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":94},"sourceSize":{"w":96,"h":96}},"sprites/buildings/painter-mirrored.png":{"frame":{"x":647,"y":207,"w":96,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/painter-quad.png":{"frame":{"x":187,"y":207,"w":181,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":181,"h":48},"sourceSize":{"w":192,"h":48}},"sprites/buildings/reader.png":{"frame":{"x":1877,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/rotater.png":{"frame":{"x":1977,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/rotater-ccw.png":{"frame":{"x":1045,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/rotater-rotate180.png":{"frame":{"x":1145,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/stacker.png":{"frame":{"x":1109,"y":207,"w":88,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":88,"h":48},"sourceSize":{"w":96,"h":48}},"sprites/buildings/storage.png":{"frame":{"x":1641,"y":159,"w":84,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":0,"w":84,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/transistor.png":{"frame":{"x":1852,"y":76,"w":35,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":35,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/transistor-mirrored.png":{"frame":{"x":1890,"y":26,"w":34,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":34,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/trash.png":{"frame":{"x":1295,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/underground_belt_entry.png":{"frame":{"x":1711,"y":74,"w":47,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":10,"w":47,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/buildings/underground_belt_entry-tier2.png":{"frame":{"x":1711,"y":114,"w":47,"h":42},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":6,"w":47,"h":42},"sourceSize":{"w":48,"h":48}},"sprites/buildings/underground_belt_exit.png":{"frame":{"x":1708,"y":34,"w":47,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/buildings/underground_belt_exit-tier2.png":{"frame":{"x":1757,"y":26,"w":47,"h":38},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":47,"h":38},"sourceSize":{"w":48,"h":48}},"sprites/buildings/virtual_processor.png":{"frame":{"x":1395,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/virtual_processor-painter.png":{"frame":{"x":1660,"y":15,"w":44,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":44,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/virtual_processor-rotater.png":{"frame":{"x":763,"y":83,"w":21,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":21,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/virtual_processor-stacker.png":{"frame":{"x":786,"y":82,"w":44,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":44,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/virtual_processor-unstacker.png":{"frame":{"x":1495,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/buildings/wire_tunnel.png":{"frame":{"x":1570,"y":111,"w":47,"h":46},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":47,"h":46},"sourceSize":{"w":48,"h":48}},"sprites/colors/blue.png":{"frame":{"x":1768,"y":6,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/cyan.png":{"frame":{"x":877,"y":85,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/green.png":{"frame":{"x":877,"y":65,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/purple.png":{"frame":{"x":2013,"y":2,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/red.png":{"frame":{"x":1567,"y":5,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/uncolored.png":{"frame":{"x":1587,"y":5,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/white.png":{"frame":{"x":1607,"y":1,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/colors/yellow.png":{"frame":{"x":1627,"y":1,"w":18,"h":18},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":18,"h":18},"sourceSize":{"w":18,"h":18}},"sprites/debug/acceptor_slot.png":{"frame":{"x":1660,"y":65,"w":4,"h":4},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":4,"h":4},"sourceSize":{"w":4,"h":4}},"sprites/debug/ejector_slot.png":{"frame":{"x":895,"y":112,"w":4,"h":4},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":4,"h":4},"sourceSize":{"w":4,"h":4}},"sprites/misc/hub_direction_indicator.png":{"frame":{"x":1818,"y":108,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/misc/processor_disabled.png":{"frame":{"x":2013,"y":22,"w":28,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":2,"w":28,"h":29},"sourceSize":{"w":32,"h":32}},"sprites/misc/processor_disconnected.png":{"frame":{"x":1988,"y":7,"w":23,"h":30},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":2,"w":23,"h":30},"sourceSize":{"w":32,"h":32}},"sprites/misc/reader_overlay.png":{"frame":{"x":1706,"y":7,"w":36,"h":25},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":12,"w":36,"h":25},"sourceSize":{"w":48,"h":48}},"sprites/misc/slot_bad_arrow.png":{"frame":{"x":1806,"y":1,"w":13,"h":13},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":13,"h":13},"sourceSize":{"w":13,"h":13}},"sprites/misc/slot_good_arrow.png":{"frame":{"x":1821,"y":1,"w":13,"h":13},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":13,"h":13},"sourceSize":{"w":13,"h":13}},"sprites/misc/storage_overlay.png":{"frame":{"x":1,"y":3,"w":30,"h":15},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":30,"h":15},"sourceSize":{"w":30,"h":15}},"sprites/misc/waypoint.png":{"frame":{"x":1836,"y":108,"w":14,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":14,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/misc/waypoint_wires.png":{"frame":{"x":87,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/boolean_false.png":{"frame":{"x":781,"y":65,"w":12,"h":15},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":1,"w":12,"h":15},"sourceSize":{"w":16,"h":16}},"sprites/wires/boolean_true.png":{"frame":{"x":795,"y":65,"w":9,"h":15},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":1,"w":9,"h":15},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/blue.png":{"frame":{"x":763,"y":65,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/cyan.png":{"frame":{"x":877,"y":105,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/green.png":{"frame":{"x":1788,"y":8,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/purple.png":{"frame":{"x":51,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/red.png":{"frame":{"x":69,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/white.png":{"frame":{"x":105,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/display/yellow.png":{"frame":{"x":141,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/lever_on.png":{"frame":{"x":1969,"y":84,"w":36,"h":40},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":2,"w":36,"h":40},"sourceSize":{"w":48,"h":48}},"sprites/wires/logical_acceptor.png":{"frame":{"x":1963,"y":1,"w":23,"h":36},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":23,"h":36},"sourceSize":{"w":48,"h":48}},"sprites/wires/logical_ejector.png":{"frame":{"x":1744,"y":1,"w":22,"h":23},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":22,"h":23},"sourceSize":{"w":48,"h":48}},"sprites/wires/network_conflict.png":{"frame":{"x":33,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/network_empty.png":{"frame":{"x":159,"y":2,"w":15,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":15,"h":16},"sourceSize":{"w":16,"h":16}},"sprites/wires/overlay_tile.png":{"frame":{"x":945,"y":78,"w":32,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":32,"h":32},"sourceSize":{"w":32,"h":32}},"sprites/wires/sets/conflict_cross.png":{"frame":{"x":1927,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/conflict_forward.png":{"frame":{"x":2027,"y":207,"w":10,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":0,"w":10,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/conflict_split.png":{"frame":{"x":549,"y":126,"w":48,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":19,"w":48,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/conflict_turn.png":{"frame":{"x":1926,"y":7,"w":29,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":19,"w":29,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/first_cross.png":{"frame":{"x":1977,"y":207,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/first_forward.png":{"frame":{"x":2027,"y":157,"w":10,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":0,"w":10,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/first_split.png":{"frame":{"x":745,"y":176,"w":48,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":19,"w":48,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/first_turn.png":{"frame":{"x":1999,"y":53,"w":29,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":19,"w":29,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/second_cross.png":{"frame":{"x":1195,"y":157,"w":48,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":48,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/second_forward.png":{"frame":{"x":1806,"y":108,"w":10,"h":48},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":0,"w":10,"h":48},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/second_split.png":{"frame":{"x":795,"y":132,"w":48,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":19,"w":48,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/sets/second_turn.png":{"frame":{"x":2007,"y":95,"w":29,"h":29},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":19,"y":19,"w":29,"h":29},"sourceSize":{"w":48,"h":48}},"sprites/wires/wires_preview.png":{"frame":{"x":123,"y":2,"w":16,"h":16},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":16,"h":16},"sourceSize":{"w":16,"h":16}}},"meta":{"image":"atlas0_lq.png","format":"RGBA8888","size":{"w":2048,"h":256},"scale":"0.25"}}
+
+=== ФАЙЛ: .\assets\storage\sprites\res_built\atlas\atlas0_mq.json ===
+{"frames":{"sprites/belt/built/forward_1.png":{"frame":{"x":789,"y":535,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_10.png":{"frame":{"x":999,"y":339,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_11.png":{"frame":{"x":951,"y":633,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_12.png":{"frame":{"x":1058,"y":437,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_13.png":{"frame":{"x":1079,"y":339,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_2.png":{"frame":{"x":791,"y":633,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_3.png":{"frame":{"x":818,"y":437,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_4.png":{"frame":{"x":869,"y":535,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_5.png":{"frame":{"x":871,"y":633,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_6.png":{"frame":{"x":898,"y":437,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_7.png":{"frame":{"x":919,"y":339,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_8.png":{"frame":{"x":949,"y":535,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_9.png":{"frame":{"x":978,"y":437,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_1.png":{"frame":{"x":1475,"y":458,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_10.png":{"frame":{"x":1475,"y":369,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_11.png":{"frame":{"x":1564,"y":363,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_12.png":{"frame":{"x":1653,"y":363,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_13.png":{"frame":{"x":1742,"y":363,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_2.png":{"frame":{"x":1564,"y":452,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_3.png":{"frame":{"x":1653,"y":452,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_4.png":{"frame":{"x":1742,"y":452,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_5.png":{"frame":{"x":1831,"y":452,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_6.png":{"frame":{"x":1920,"y":446,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_7.png":{"frame":{"x":1079,"y":250,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_8.png":{"frame":{"x":1297,"y":383,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_9.png":{"frame":{"x":1386,"y":375,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_1.png":{"frame":{"x":1831,"y":363,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_10.png":{"frame":{"x":905,"y":157,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_11.png":{"frame":{"x":1078,"y":102,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_12.png":{"frame":{"x":1235,"y":26,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_13.png":{"frame":{"x":1324,"y":26,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_2.png":{"frame":{"x":1920,"y":357,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_3.png":{"frame":{"x":1241,"y":293,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_4.png":{"frame":{"x":1241,"y":204,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_5.png":{"frame":{"x":1330,"y":286,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_6.png":{"frame":{"x":1745,"y":274,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_7.png":{"frame":{"x":1919,"y":268,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_8.png":{"frame":{"x":1236,"y":115,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_9.png":{"frame":{"x":1325,"y":115,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/analyzer.png":{"frame":{"x":536,"y":342,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/balancer.png":{"frame":{"x":535,"y":535,"w":172,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":172,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/balancer-merger.png":{"frame":{"x":632,"y":440,"w":93,"h":93},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":1,"w":93,"h":93},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/balancer-merger-inverse.png":{"frame":{"x":535,"y":440,"w":95,"h":93},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":1,"w":95,"h":93},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/balancer-splitter.png":{"frame":{"x":727,"y":342,"w":93,"h":93},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":1,"w":93,"h":93},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/balancer-splitter-inverse.png":{"frame":{"x":822,"y":342,"w":95,"h":93},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":1,"w":95,"h":93},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/belt_left.png":{"frame":{"x":1031,"y":583,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/belt_right.png":{"frame":{"x":1297,"y":472,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/belt_top.png":{"frame":{"x":709,"y":535,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/block.png":{"frame":{"x":1834,"y":277,"w":83,"h":84},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":7,"w":83,"h":84},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/comparator.png":{"frame":{"x":362,"y":153,"w":96,"h":89},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":89},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/constant_producer.png":{"frame":{"x":634,"y":342,"w":91,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":91,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/constant_signal.png":{"frame":{"x":1168,"y":250,"w":71,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":71,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/cutter.png":{"frame":{"x":362,"y":342,"w":172,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":172,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/cutter-quad.png":{"frame":{"x":1,"y":460,"w":351,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":16,"y":0,"w":351,"h":96},"sourceSize":{"w":384,"h":96}},"sprites/blueprints/display.png":{"frame":{"x":905,"y":246,"w":86,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":5,"w":86,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/filter.png":{"frame":{"x":1118,"y":927,"w":180,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":10,"y":0,"w":180,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/goal_acceptor.png":{"frame":{"x":1498,"y":547,"w":91,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":4,"y":0,"w":91,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/item_producer.png":{"frame":{"x":1777,"y":541,"w":88,"h":95},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":88,"h":95},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/lever.png":{"frame":{"x":1414,"y":123,"w":68,"h":79},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":5,"w":68,"h":79},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/logic_gate.png":{"frame":{"x":1120,"y":843,"w":96,"h":82},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":82},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/logic_gate-not.png":{"frame":{"x":656,"y":146,"w":83,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":0,"w":83,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/logic_gate-or.png":{"frame":{"x":1218,"y":842,"w":96,"h":83},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":83},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/logic_gate-xor.png":{"frame":{"x":1414,"y":839,"w":96,"h":86},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":86},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/miner.png":{"frame":{"x":1411,"y":645,"w":92,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":92,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/miner-chainable.png":{"frame":{"x":1505,"y":645,"w":92,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":92,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/mixer.png":{"frame":{"x":1481,"y":927,"w":175,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":175,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/painter.png":{"frame":{"x":730,"y":927,"w":192,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/painter-double.png":{"frame":{"x":1,"y":271,"w":192,"h":187},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":187},"sourceSize":{"w":192,"h":192}},"sprites/blueprints/painter-mirrored.png":{"frame":{"x":535,"y":731,"w":192,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/painter-quad.png":{"frame":{"x":1,"y":558,"w":359,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":359,"h":96},"sourceSize":{"w":384,"h":96}},"sprites/blueprints/reader.png":{"frame":{"x":1708,"y":731,"w":95,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":95,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/rotater.png":{"frame":{"x":558,"y":146,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/rotater-ccw.png":{"frame":{"x":1610,"y":829,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/rotater-rotate180.png":{"frame":{"x":1708,"y":829,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/stacker.png":{"frame":{"x":1658,"y":927,"w":175,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":175,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/blueprints/storage.png":{"frame":{"x":195,"y":266,"w":165,"h":192},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":0,"w":165,"h":192},"sourceSize":{"w":192,"h":192}},"sprites/blueprints/transistor.png":{"frame":{"x":1138,"y":483,"w":68,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":68,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/transistor-mirrored.png":{"frame":{"x":1980,"y":633,"w":67,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":29,"y":0,"w":67,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/trash.png":{"frame":{"x":1904,"y":829,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/underground_belt_entry.png":{"frame":{"x":97,"y":6,"w":93,"h":75},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":21,"w":93,"h":75},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/underground_belt_entry-tier2.png":{"frame":{"x":1120,"y":581,"w":93,"h":84},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":12,"w":93,"h":84},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/underground_belt_exit.png":{"frame":{"x":1215,"y":569,"w":93,"h":75},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":93,"h":75},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/underground_belt_exit-tier2.png":{"frame":{"x":1,"y":6,"w":94,"h":75},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":0,"w":94,"h":75},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/virtual_processor.png":{"frame":{"x":1414,"y":743,"w":96,"h":94},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":96,"h":94},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/virtual_processor-painter.png":{"frame":{"x":1031,"y":672,"w":87,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":87,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/virtual_processor-rotater.png":{"frame":{"x":2002,"y":829,"w":39,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":29,"y":0,"w":39,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/virtual_processor-stacker.png":{"frame":{"x":727,"y":244,"w":87,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":87,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/virtual_processor-unstacker.png":{"frame":{"x":1316,"y":744,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/blueprints/wire_tunnel.png":{"frame":{"x":1885,"y":638,"w":93,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":2,"y":2,"w":93,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/buildings/analyzer.png":{"frame":{"x":362,"y":244,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/balancer.png":{"frame":{"x":362,"y":538,"w":171,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":171,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/balancer-merger.png":{"frame":{"x":1695,"y":638,"w":93,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":2,"w":93,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/buildings/balancer-merger-inverse.png":{"frame":{"x":1599,"y":638,"w":94,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":94,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/buildings/balancer-splitter.png":{"frame":{"x":1790,"y":638,"w":93,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":2,"w":93,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/buildings/balancer-splitter-inverse.png":{"frame":{"x":1120,"y":667,"w":95,"h":91},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":95,"h":91},"sourceSize":{"w":96,"h":96}},"sprites/buildings/belt_left.png":{"frame":{"x":1208,"y":480,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/left_0.png":{"frame":{"x":1208,"y":480,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/buildings/belt_right.png":{"frame":{"x":1386,"y":464,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/right_0.png":{"frame":{"x":1386,"y":464,"w":87,"h":87},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":9,"w":87,"h":87},"sourceSize":{"w":96,"h":96}},"sprites/buildings/belt_top.png":{"frame":{"x":711,"y":633,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/belt/built/forward_0.png":{"frame":{"x":711,"y":633,"w":78,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":78,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/block.png":{"frame":{"x":994,"y":162,"w":82,"h":83},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":7,"w":82,"h":83},"sourceSize":{"w":96,"h":96}},"sprites/buildings/comparator.png":{"frame":{"x":460,"y":153,"w":96,"h":89},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":89},"sourceSize":{"w":96,"h":96}},"sprites/buildings/constant_producer.png":{"frame":{"x":727,"y":437,"w":89,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":89,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/constant_signal.png":{"frame":{"x":1413,"y":27,"w":70,"h":86},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":0,"w":70,"h":86},"sourceSize":{"w":96,"h":96}},"sprites/buildings/cutter.png":{"frame":{"x":362,"y":440,"w":171,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":171,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/cutter-quad.png":{"frame":{"x":369,"y":829,"w":350,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":16,"y":0,"w":350,"h":96},"sourceSize":{"w":384,"h":96}},"sprites/buildings/display.png":{"frame":{"x":993,"y":247,"w":84,"h":90},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":6,"w":84,"h":90},"sourceSize":{"w":96,"h":96}},"sprites/buildings/filter.png":{"frame":{"x":1300,"y":927,"w":179,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":0,"w":179,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/goal_acceptor.png":{"frame":{"x":1029,"y":770,"w":89,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":89,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/hub.png":{"frame":{"x":1,"y":656,"w":366,"h":367},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":10,"w":366,"h":367},"sourceSize":{"w":384,"h":384}},"sprites/buildings/item_producer.png":{"frame":{"x":1867,"y":541,"w":87,"h":95},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":5,"y":0,"w":87,"h":95},"sourceSize":{"w":96,"h":96}},"sprites/buildings/lever.png":{"frame":{"x":1167,"y":112,"w":66,"h":77},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":15,"y":6,"w":66,"h":77},"sourceSize":{"w":96,"h":96}},"sprites/buildings/logic_gate.png":{"frame":{"x":1120,"y":760,"w":96,"h":81},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":81},"sourceSize":{"w":96,"h":96}},"sprites/buildings/logic_gate-not.png":{"frame":{"x":741,"y":146,"w":82,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":82,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/logic_gate-or.png":{"frame":{"x":1316,"y":842,"w":96,"h":83},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":83},"sourceSize":{"w":96,"h":96}},"sprites/buildings/logic_gate-xor.png":{"frame":{"x":1512,"y":839,"w":96,"h":86},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":86},"sourceSize":{"w":96,"h":96}},"sprites/buildings/miner.png":{"frame":{"x":1591,"y":541,"w":91,"h":95},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":91,"h":95},"sourceSize":{"w":96,"h":96}},"sprites/buildings/miner-chainable.png":{"frame":{"x":1684,"y":541,"w":91,"h":95},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":91,"h":95},"sourceSize":{"w":96,"h":96}},"sprites/buildings/mixer.png":{"frame":{"x":1835,"y":927,"w":174,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":174,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/painter.png":{"frame":{"x":721,"y":829,"w":192,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/painter-double.png":{"frame":{"x":1,"y":83,"w":192,"h":186},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":186},"sourceSize":{"w":192,"h":192}},"sprites/buildings/painter-mirrored.png":{"frame":{"x":924,"y":927,"w":192,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":192,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/painter-quad.png":{"frame":{"x":369,"y":927,"w":359,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":8,"y":0,"w":359,"h":96},"sourceSize":{"w":384,"h":96}},"sprites/buildings/reader.png":{"frame":{"x":1805,"y":731,"w":95,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":95,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/rotater.png":{"frame":{"x":1902,"y":731,"w":95,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":95,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/rotater-ccw.png":{"frame":{"x":1217,"y":646,"w":95,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":95,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/rotater-rotate180.png":{"frame":{"x":1314,"y":646,"w":95,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":95,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/stacker.png":{"frame":{"x":535,"y":633,"w":174,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":174,"h":96},"sourceSize":{"w":192,"h":96}},"sprites/buildings/storage.png":{"frame":{"x":369,"y":636,"w":164,"h":191},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":14,"y":1,"w":164,"h":191},"sourceSize":{"w":192,"h":192}},"sprites/buildings/transistor.png":{"frame":{"x":1159,"y":339,"w":68,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":68,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/transistor-mirrored.png":{"frame":{"x":1229,"y":382,"w":66,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":30,"y":0,"w":66,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/trash.png":{"frame":{"x":1218,"y":744,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/underground_belt_entry.png":{"frame":{"x":1463,"y":293,"w":92,"h":74},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":22,"w":92,"h":74},"sourceSize":{"w":96,"h":96}},"sprites/buildings/underground_belt_entry-tier2.png":{"frame":{"x":1310,"y":561,"w":92,"h":83},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":13,"w":92,"h":83},"sourceSize":{"w":96,"h":96}},"sprites/buildings/underground_belt_exit.png":{"frame":{"x":1557,"y":287,"w":92,"h":74},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":92,"h":74},"sourceSize":{"w":96,"h":96}},"sprites/buildings/underground_belt_exit-tier2.png":{"frame":{"x":1651,"y":287,"w":92,"h":74},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":92,"h":74},"sourceSize":{"w":96,"h":96}},"sprites/buildings/virtual_processor.png":{"frame":{"x":1512,"y":743,"w":96,"h":94},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":96,"h":94},"sourceSize":{"w":96,"h":96}},"sprites/buildings/virtual_processor-painter.png":{"frame":{"x":1956,"y":535,"w":87,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":87,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/virtual_processor-rotater.png":{"frame":{"x":1999,"y":731,"w":38,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":30,"y":0,"w":38,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/virtual_processor-stacker.png":{"frame":{"x":816,"y":244,"w":87,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":9,"y":0,"w":87,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/virtual_processor-unstacker.png":{"frame":{"x":1610,"y":731,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/buildings/wire_tunnel.png":{"frame":{"x":1404,"y":553,"w":92,"h":90},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":3,"w":92,"h":90},"sourceSize":{"w":96,"h":96}},"sprites/colors/blue.png":{"frame":{"x":2009,"y":401,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/cyan.png":{"frame":{"x":2009,"y":365,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/green.png":{"frame":{"x":1842,"y":241,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/purple.png":{"frame":{"x":1880,"y":241,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/red.png":{"frame":{"x":1842,"y":205,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/uncolored.png":{"frame":{"x":1880,"y":205,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/white.png":{"frame":{"x":1918,"y":232,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/colors/yellow.png":{"frame":{"x":1956,"y":232,"w":36,"h":34},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":2,"w":36,"h":34},"sourceSize":{"w":36,"h":36}},"sprites/debug/acceptor_slot.png":{"frame":{"x":2039,"y":819,"w":8,"h":8},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":8,"h":8},"sourceSize":{"w":8,"h":8}},"sprites/debug/ejector_slot.png":{"frame":{"x":2039,"y":809,"w":8,"h":8},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":8,"h":8},"sourceSize":{"w":8,"h":8}},"sprites/misc/hub_direction_indicator.png":{"frame":{"x":1658,"y":194,"w":32,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":32,"h":32},"sourceSize":{"w":32,"h":32}},"sprites/misc/processor_disabled.png":{"frame":{"x":1741,"y":217,"w":53,"h":55},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":6,"w":53,"h":55},"sourceSize":{"w":64,"h":64}},"sprites/misc/processor_disconnected.png":{"frame":{"x":1796,"y":215,"w":44,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":11,"y":5,"w":44,"h":57},"sourceSize":{"w":64,"h":64}},"sprites/misc/reader_overlay.png":{"frame":{"x":1485,"y":244,"w":70,"h":47},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":25,"w":70,"h":47},"sourceSize":{"w":96,"h":96}},"sprites/misc/slot_bad_arrow.png":{"frame":{"x":1413,"y":1,"w":24,"h":24},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":1,"w":24,"h":24},"sourceSize":{"w":26,"h":26}},"sprites/misc/slot_good_arrow.png":{"frame":{"x":1202,"y":84,"w":24,"h":26},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":1,"y":0,"w":24,"h":26},"sourceSize":{"w":26,"h":26}},"sprites/misc/storage_overlay.png":{"frame":{"x":1138,"y":451,"w":60,"h":30},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":60,"h":30},"sourceSize":{"w":60,"h":30}},"sprites/misc/waypoint.png":{"frame":{"x":1200,"y":446,"w":26,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":26,"h":32},"sourceSize":{"w":32,"h":32}},"sprites/misc/waypoint_wires.png":{"frame":{"x":1692,"y":194,"w":32,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":32,"h":32},"sourceSize":{"w":32,"h":32}},"sprites/wires/boolean_false.png":{"frame":{"x":1454,"y":229,"w":21,"h":28},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":6,"y":3,"w":21,"h":28},"sourceSize":{"w":32,"h":32}},"sprites/wires/boolean_true.png":{"frame":{"x":2031,"y":995,"w":15,"h":28},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":7,"y":3,"w":15,"h":28},"sourceSize":{"w":32,"h":32}},"sprites/wires/display/blue.png":{"frame":{"x":1419,"y":267,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/cyan.png":{"frame":{"x":1994,"y":233,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/green.png":{"frame":{"x":1167,"y":77,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/purple.png":{"frame":{"x":2009,"y":330,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/red.png":{"frame":{"x":2008,"y":295,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/white.png":{"frame":{"x":1419,"y":232,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/display/yellow.png":{"frame":{"x":1623,"y":193,"w":33,"h":33},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":33,"h":33},"sourceSize":{"w":33,"h":33}},"sprites/wires/lever_on.png":{"frame":{"x":192,"y":4,"w":69,"h":77},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":13,"y":6,"w":69,"h":77},"sourceSize":{"w":96,"h":96}},"sprites/wires/logical_acceptor.png":{"frame":{"x":1419,"y":302,"w":42,"h":71},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":28,"y":0,"w":42,"h":71},"sourceSize":{"w":96,"h":96}},"sprites/wires/logical_ejector.png":{"frame":{"x":1029,"y":536,"w":41,"h":45},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":29,"y":0,"w":41,"h":45},"sourceSize":{"w":96,"h":96}},"sprites/wires/network_conflict.png":{"frame":{"x":1726,"y":185,"w":32,"h":30},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":1,"w":32,"h":30},"sourceSize":{"w":32,"h":32}},"sprites/wires/network_empty.png":{"frame":{"x":1454,"y":259,"w":28,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":3,"y":0,"w":28,"h":32},"sourceSize":{"w":32,"h":32}},"sprites/wires/overlay_tile.png":{"frame":{"x":1557,"y":221,"w":64,"h":64},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":64,"h":64},"sourceSize":{"w":64,"h":64}},"sprites/wires/sets/conflict_cross.png":{"frame":{"x":460,"y":244,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/conflict_forward.png":{"frame":{"x":2011,"y":927,"w":18,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":0,"w":18,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/conflict_split.png":{"frame":{"x":924,"y":868,"w":96,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":39,"w":96,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/conflict_turn.png":{"frame":{"x":1177,"y":191,"w":57,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":39,"w":57,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/first_cross.png":{"frame":{"x":558,"y":244,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/first_forward.png":{"frame":{"x":2009,"y":437,"w":18,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":0,"w":18,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/first_split.png":{"frame":{"x":1022,"y":868,"w":96,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":39,"w":96,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/first_turn.png":{"frame":{"x":1623,"y":228,"w":57,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":39,"w":57,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/second_cross.png":{"frame":{"x":1806,"y":829,"w":96,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":96,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/second_forward.png":{"frame":{"x":2029,"y":437,"w":18,"h":96},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":0,"w":18,"h":96},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/second_split.png":{"frame":{"x":1079,"y":191,"w":96,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":39,"w":96,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/sets/second_turn.png":{"frame":{"x":1682,"y":228,"w":57,"h":57},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":39,"y":39,"w":57,"h":57},"sourceSize":{"w":96,"h":96}},"sprites/wires/wires_preview.png":{"frame":{"x":1760,"y":183,"w":32,"h":32},"rotated":false,"trimmed":true,"spriteSourceSize":{"x":0,"y":0,"w":32,"h":32},"sourceSize":{"w":32,"h":32}}},"meta":{"image":"atlas0_mq.png","format":"RGBA8888","size":{"w":2048,"h":1024},"scale":"0.5"}}
+
+=== ФАЙЛ: .\assets\storage\sprites\res_built\sounds\sfx.json ===
+{
+  "urls": [
+    "sfx.mp3"
+  ],
+  "sprite": {
+    "badge_notification": [
+      0,
+      967.5283446712018
+    ],
+    "copy": [
+      1100,
+      180.8163265306122
+    ],
+    "destroy_building": [
+      2200,
+      467.21088435374145
+    ],
+    "dialog_error": [
+      3300.0000000000005,
+      195.07936507936518
+    ],
+    "dialog_ok": [
+      4400,
+      880.4535147392291
+    ],
+    "level_complete": [
+      5500.000000000001,
+      2119.387755102041
+    ],
+    "place_belt": [
+      8600.000000000002,
+      63.80952380952465
+    ],
+    "place_building": [
+      9700.000000000004,
+      309.8412698412698
+    ],
+    "tutorial_step": [
+      10800.000000000002,
+      679.183673469387
+    ],
+    "ui_click": [
+      11900.000000000002,
+      112.97052154194986
+    ],
+    "ui_error": [
+      13000.000000000002,
+      305.73696145124705
+    ],
+    "ui_swish_hide": [
+      14100.000000000002,
+      85.41950113378682
+    ],
+    "ui_swish_show": [
+      15200.000000000002,
+      112.78911564625815
+    ],
+    "unlock_upgrade": [
+      16300,
+      208.97959183673365
+    ]
+  },
+  "src": [
+    "sfx.mp3"
+  ]
+}
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\atlas.json ===
+{
+    "pot": true,
+    "paddingX": 2,
+    "paddingY": 2,
+    "edgePadding": true,
+    "rotation": false,
+    "maxWidth": 2048,
+    "useIndexes": false,
+    "alphaThreshold": 1,
+    "maxHeight": 2048,
+    "stripWhitespaceX": true,
+    "stripWhitespaceY": true,
+    "duplicatePadding": true,
+    "alias": true,
+    "fast": false,
+    "limitMemory": false,
+    "combineSubdirectories": true,
+    "flattenPaths": false,
+    "bleedIterations": 4,
+    "scale": [0.25, 0.5, 0.75],
+    "scaleSuffix": ["_lq", "_mq", "_hq"]
+}
+
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\sprites\create_blueprint_previews.py ===
+# Requirements: numpy, scipy, Pillow,
+from __future__ import print_function
+import sys
+import numpy as np
+from scipy import ndimage
+from PIL import Image, ImageFilter, ImageChops
+import math
+from os import listdir
+from os.path import isdir, isfile
+
+generate_blueprint_sprite_v = np.array([[0, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, -1]])
+
+generate_blueprint_sprite_h = np.array([[0, 0, 0],
+                            [0, 0, 1],
+                            [0, -1, 0]])
+
+
+def rgb2gray(rgb):
+    return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+
+def process_image(data, outfilename, src_image):
+    img = Image.fromarray(np.asarray(
+        np.clip(data, 0, 255), dtype="uint8"), "L")
+    dest = Image.new("RGBA", (img.width, img.height))
+    src = img.load()
+    dst = dest.load()
+
+    realSrc = src_image.load()
+    mask = src_image.filter(ImageFilter.GaussianBlur(10)).load()
+    orig = src_image.load()
+
+    # isWire = "wire" in outfilename
+    isWire = False
+
+    targetR = 104
+    targetG = 200
+    targetB = 255
+
+    if isWire:
+        targetR = 255
+        targetG = 104
+        targetB = 232
+
+    for x in range(img.width):
+        for y in range(img.height):
+            realpixl = realSrc[x, y]
+            greyval = float(src[x, y])
+            greyval = min(255.0, greyval)
+            greyval = math.pow(
+                min(1, float(greyval / 255.0 * 1)), 1.5) * 255.0 * 1
+            greyval = max(0, greyval)
+            alpha = mask[x, y][3] / 255.0 * 1
+
+            edgeFactor = src[x, y] / 255.0
+            noEdge = 1 - edgeFactor
+
+            shadow = min(1, 1 - realpixl[3] / 255.0 - edgeFactor)
+            noShadow = 1 - shadow
+
+            dst[x, y] = (
+                min(255, int((realpixl[0] / 255.0 * 0.4 + 0.6) * targetR * 1.1)),
+                min(255, int((realpixl[1] / 255.0 * 0.4 + 0.6) * targetG * 1.1)),
+                min(255, int((realpixl[2] / 255.0 * 0.4 + 0.6) * targetB * 1.1)),
+                min(255, int(float(realpixl[3]) * (0.6 + 5 * edgeFactor))))
+
+
+    dest.save(outfilename)
+
+
+def generate_blueprint_sprite(infilename, outfilename):
+    print("Processing", infilename)
+    img = Image.open(infilename)
+    img.load()
+    img = img.filter(ImageFilter.GaussianBlur(0.5))
+
+    image = rgb2gray(np.asarray(img, dtype="int32"))
+    vertical = ndimage.convolve(image, generate_blueprint_sprite_v)
+    horizontal = ndimage.convolve(image, generate_blueprint_sprite_h)
+    output_image = np.sqrt(np.square(horizontal) + np.square(vertical))
+    process_image(output_image, outfilename, img)
+
+
+buildings = listdir("buildings")
+
+for buildingId in buildings:
+    if not ".png" in buildingId:
+        continue
+    if "hub" in buildingId:
+        continue
+    if "wire-" in buildingId:
+        continue
+    generate_blueprint_sprite("buildings/" + buildingId + "", "blueprints/" + buildingId + "")
+
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\sprites\belt\generate_belt_sprites.js ===
+/**
+ *
+ * Run `yarn global add canvas` first
+ */
+
+const { createCanvas, loadImage } = require("canvas");
+const fs = require("fs");
+const path = require("path");
+const { fileURLToPath } = require("url");
+
+async function run() {
+    console.log("Running");
+
+    const fps = 14;
+    const dimensions = 192;
+    const beltBorder = 23.5;
+    const lineSize = 5;
+
+    const borderColor = "#91949e";
+    const fillColor = "#d2d4d9";
+    const arrowColor = "#c0c2c7";
+
+    // Generate arrow sprite
+
+    const arrowW = 60;
+    const arrowH = arrowW / 2;
+    /** @type {HTMLCanvasElement} */
+    const arrowSprite = createCanvas(arrowW, arrowH);
+    const arrowContext = arrowSprite.getContext("2d");
+
+    arrowContext.quality = "best";
+    arrowContext.fillStyle = arrowColor;
+    arrowContext.clearRect(0, 0, arrowW, arrowH);
+    arrowContext.beginPath();
+    arrowContext.moveTo(0, arrowH);
+    arrowContext.lineTo(arrowW / 2, 0);
+    arrowContext.lineTo(arrowW, arrowH);
+    arrowContext.closePath();
+    arrowContext.fill();
+
+    const promises = [];
+
+    // First, generate the forward belt
+    for (let i = 0; i < fps; ++i) {
+        /** @type {HTMLCanvasElement} */
+        const canvas = createCanvas(dimensions, dimensions);
+        const context = canvas.getContext("2d");
+        context.quality = "best";
+
+        const procentual = i / fps;
+        context.clearRect(0, 0, dimensions, dimensions);
+
+        context.fillStyle = fillColor;
+        context.strokeStyle = borderColor;
+        context.lineWidth = lineSize;
+
+        context.beginPath();
+        context.rect(beltBorder, -10, dimensions - 2 * beltBorder, dimensions + 20);
+        context.fill();
+        context.stroke();
+
+        const spacingBetweenArrows = (dimensions - 3 * arrowH) / 3;
+        const spacingTotal = spacingBetweenArrows + arrowH;
+
+        for (let k = 0; k < 5; ++k) {
+            let y = dimensions - arrowH - (k - 1) * spacingTotal - procentual * spacingTotal;
+            context.drawImage(arrowSprite, dimensions / 2 - arrowW / 2, y);
+        }
+
+        const out = fs.createWriteStream(path.join(__dirname, "built", "forward_" + i + ".png"));
+        const stream = canvas.createPNGStream();
+        stream.pipe(out);
+        promises.push(new Promise(resolve => stream.on("end", resolve)));
+    }
+
+    // Generate left and right side belt
+    for (let i = 0; i < fps; ++i) {
+        /** @type {HTMLCanvasElement} */
+        const canvas = createCanvas(dimensions, dimensions);
+        const context = canvas.getContext("2d");
+        context.quality = "best";
+
+        const procentual = i / fps;
+        const innerRadius = beltBorder;
+        context.clearRect(0, 0, dimensions, dimensions);
+
+        context.fillStyle = fillColor;
+        context.strokeStyle = borderColor;
+        context.lineWidth = lineSize;
+
+        context.beginPath();
+        context.moveTo(beltBorder, dimensions + 10);
+        context.lineTo(beltBorder, dimensions - innerRadius);
+
+        const steps = 256;
+
+        const outerRadius = dimensions - 2 * beltBorder;
+
+        const originX = dimensions - innerRadius;
+        const originY = dimensions - innerRadius;
+
+        const sqrt = x => Math.pow(Math.abs(x), 0.975) * Math.sign(x);
+
+        for (let k = 0; k <= steps; ++k) {
+            const pct = k / steps;
+            const angleRad = Math.PI + pct * Math.PI * 0.5;
+            const offX = originX + sqrt(Math.cos(angleRad)) * outerRadius;
+            const offY = originY + sqrt(Math.sin(angleRad)) * outerRadius;
+
+            context.lineTo(offX, offY);
+        }
+
+        context.lineTo(dimensions + 10, beltBorder);
+        context.lineTo(dimensions + 10, dimensions - beltBorder);
+        context.lineTo(dimensions, dimensions - beltBorder);
+
+        for (let k = 0; k <= steps; ++k) {
+            const pct = 1 - k / steps;
+            const angleRad = Math.PI + pct * Math.PI * 0.5;
+            const offX = dimensions + Math.cos(angleRad) * innerRadius;
+            const offY = dimensions + Math.sin(angleRad) * innerRadius;
+
+            context.lineTo(offX, offY);
+        }
+
+        context.lineTo(dimensions - beltBorder, dimensions + 10);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Arrows
+        const rotationalRadius = dimensions / 2 - arrowH / 2 + 0.5;
+
+        const circumfence = (rotationalRadius * Math.PI * 2) / 4;
+        console.log("Circumfence:", circumfence, "px");
+
+        const remainingSpace = circumfence - 3 * arrowH + arrowH;
+        console.log("Remainig:", remainingSpace);
+        const spacing = remainingSpace / 3 + arrowH;
+
+        console.log("Spacing: ", spacing);
+        const angleSpacing = ((spacing / circumfence) * Math.PI) / 2;
+
+        for (let i = 0; i < 5; ++i) {
+            let angleRad = Math.PI + procentual * angleSpacing + (i - 1) * angleSpacing;
+            const offX = dimensions - arrowH / 2 + Math.cos(angleRad * 0.995) * rotationalRadius;
+            const offY = dimensions - arrowH / 2 + Math.sin(angleRad * 0.995) * rotationalRadius;
+
+            angleRad = Math.max(Math.PI, Math.min(1.5 * Math.PI, angleRad));
+
+            context.save();
+            context.translate(offX, offY);
+            context.rotate(angleRad + Math.PI);
+            context.drawImage(arrowSprite, -arrowW / 2, -arrowH / 2);
+            context.restore();
+        }
+
+        /** @type {HTMLCanvasElement} */
+        const flippedCanvas = createCanvas(dimensions, dimensions);
+        const flippedContext = flippedCanvas.getContext("2d");
+        flippedContext.quality = "best";
+        flippedContext.clearRect(0, 0, dimensions, dimensions);
+        flippedContext.scale(-1, 1);
+        flippedContext.drawImage(canvas, -dimensions, 0, dimensions, dimensions);
+
+        const outRight = fs.createWriteStream(path.join(__dirname, "built", "right_" + i + ".png"));
+        const streamRight = canvas.createPNGStream();
+        streamRight.pipe(outRight);
+
+        const outLeft = fs.createWriteStream(path.join(__dirname, "built", "left_" + i + ".png"));
+        const streamLeft = flippedCanvas.createPNGStream();
+        streamLeft.pipe(outLeft);
+
+        promises.push(new Promise(resolve => streamRight.on("end", resolve)));
+        promises.push(new Promise(resolve => streamLeft.on("end", resolve)));
+    }
+
+    console.log("Waiting for completion");
+    await Promise.all(promises);
+
+    // Also wait a bit more
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log("Copying files to all locations");
+
+    // Copy other files
+    fs.copyFileSync(
+        path.join(__dirname, "built", "forward_0.png"),
+        path.join(__dirname, "..", "buildings", "belt_top.png")
+    );
+
+    fs.copyFileSync(
+        path.join(__dirname, "built", "right_0.png"),
+        path.join(__dirname, "..", "buildings", "belt_right.png")
+    );
+
+    fs.copyFileSync(
+        path.join(__dirname, "built", "left_0.png"),
+        path.join(__dirname, "..", "buildings", "belt_left.png")
+    );
+
+    console.log("Done!");
+}
+
+run();
+
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\sprites\belt\generate_wire_sprites.js ===
+/**
+ *
+ * Run `yarn global add canvas` first
+ */
+
+const { createCanvas } = require("canvas");
+const fs = require("fs");
+const path = require("path");
+
+const outputFolder = path.join(__dirname, "..", "wires", "sets");
+
+const dimensions = 192;
+const lineSize = 14;
+const lowerLineSize = 32;
+
+const variants = {
+    first: "#61ef6f",
+    second: "#5fb2f1",
+    conflict: "#f74c4c",
+};
+
+function hexToRGB(h) {
+    let r = 0,
+        g = 0,
+        b = 0;
+
+    // 3 digits
+    if (h.length == 4) {
+        r = "0x" + h[1] + h[1];
+        g = "0x" + h[2] + h[2];
+        b = "0x" + h[3] + h[3];
+
+        // 6 digits
+    } else if (h.length == 7) {
+        r = "0x" + h[1] + h[2];
+        g = "0x" + h[3] + h[4];
+        b = "0x" + h[5] + h[6];
+    }
+
+    return [+r, +g, +b];
+}
+
+function RGBToHSL(r, g, b) {
+    // Make r, g, and b fractions of 1
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    // Find greatest and smallest channel values
+    let cmin = Math.min(r, g, b),
+        cmax = Math.max(r, g, b),
+        delta = cmax - cmin,
+        h = 0,
+        s = 0,
+        l = 0;
+    // Calculate hue
+    // No difference
+    if (delta == 0) h = 0;
+    // Red is max
+    else if (cmax == r) h = ((g - b) / delta) % 6;
+    // Green is max
+    else if (cmax == g) h = (b - r) / delta + 2;
+    // Blue is max
+    else h = (r - g) / delta + 4;
+
+    h = Math.round(h * 60);
+
+    // Make negative hues positive behind 360°
+    if (h < 0) h += 360;
+
+    // Calculate lightness
+    l = (cmax + cmin) / 2;
+
+    // Calculate saturation
+    s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+
+    // Multiply l and s by 100
+    s = +(s * 100).toFixed(1);
+    l = +(l * 100).toFixed(1);
+
+    return [h, s, l];
+}
+
+function HSLToRGB(h, s, l) {
+    // Must be fractions of 1
+    s /= 100;
+    l /= 100;
+
+    let c = (1 - Math.abs(2 * l - 1)) * s,
+        x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
+        m = l - c / 2,
+        r = 0,
+        g = 0,
+        b = 0;
+
+    if (0 <= h && h < 60) {
+        r = c;
+        g = x;
+        b = 0;
+    } else if (60 <= h && h < 120) {
+        r = x;
+        g = c;
+        b = 0;
+    } else if (120 <= h && h < 180) {
+        r = 0;
+        g = c;
+        b = x;
+    } else if (180 <= h && h < 240) {
+        r = 0;
+        g = x;
+        b = c;
+    } else if (240 <= h && h < 300) {
+        r = x;
+        g = 0;
+        b = c;
+    } else if (300 <= h && h < 360) {
+        r = c;
+        g = 0;
+        b = x;
+    }
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+
+    return [r, g, b];
+}
+
+async function run() {
+    console.log("Running");
+
+    const promises = [];
+
+    for (const variantId in variants) {
+        const variantColor = variants[variantId];
+        const variantHSL = RGBToHSL(...hexToRGB(variantColor));
+        const darkenedColor = HSLToRGB(variantHSL[0], variantHSL[1] - 15, variantHSL[2] - 20);
+        const hexDarkenedColor = "rgb(" + darkenedColor.join(",") + ")";
+
+        console.log(variantColor, "->", hexToRGB(variantColor), variantHSL, "->", darkenedColor);
+
+        const parts = {
+            forward: [[0.5, 0, 0.5, 1]],
+            turn: [
+                [0.5, 0.5, 0.5, 1],
+                [0.5, 0.5, 1, 0.5],
+            ],
+            split: [
+                [0.5, 0.5, 0.5, 1],
+                [0, 0.5, 1, 0.5],
+            ],
+            cross: [
+                [0, 0.5, 1, 0.5],
+                [0.5, 0, 0.5, 1],
+            ],
+        };
+
+        for (const partId in parts) {
+            const partLines = parts[partId];
+
+            const canvas = createCanvas(dimensions, dimensions);
+            const context = canvas.getContext("2d");
+            context.quality = "best";
+            context.clearRect(0, 0, dimensions, dimensions);
+
+            const lineCanvas = createCanvas(dimensions, dimensions);
+            const lineContext = lineCanvas.getContext("2d");
+            lineContext.quality = "best";
+            lineContext.clearRect(0, 0, dimensions, dimensions);
+            lineContext.strokeStyle = hexDarkenedColor;
+            lineContext.lineWidth = lowerLineSize;
+            lineContext.lineCap = "square";
+            lineContext.imageSmoothingEnabled = false;
+
+            // Draw lower lines
+            partLines.forEach(([x1, y1, x2, y2]) => {
+                lineContext.beginPath();
+                lineContext.moveTo(x1 * dimensions, y1 * dimensions);
+                lineContext.lineTo(x2 * dimensions, y2 * dimensions);
+                lineContext.stroke();
+            });
+
+            context.globalAlpha = 0.4;
+            context.drawImage(lineCanvas, 0, 0, dimensions, dimensions);
+
+            context.globalAlpha = 1;
+            context.imageSmoothingEnabled = false;
+            context.lineCap = "square";
+            context.strokeStyle = variantColor;
+            context.lineWidth = lineSize;
+
+            // Draw upper lines
+            partLines.forEach(([x1, y1, x2, y2]) => {
+                context.beginPath();
+                context.moveTo(x1 * dimensions, y1 * dimensions);
+                context.lineTo(x2 * dimensions, y2 * dimensions);
+                context.stroke();
+            });
+
+            const out = fs.createWriteStream(path.join(outputFolder, variantId + "_" + partId + ".png"));
+            const stream = canvas.createPNGStream();
+            stream.pipe(out);
+            promises.push(new Promise(resolve => stream.on("end", resolve)));
+        }
+    }
+
+    console.log("Waiting for completion");
+    await Promise.all(promises);
+
+    console.log("Done!");
+}
+
+run();
+
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\sprites\belt\package.json ===
+{
+    "name": "belt",
+    "version": "1.0.0",
+    "main": "index.js",
+    "private": "true",
+    "devDependencies": {
+        "canvas": "^2.6.1"
+    },
+    "scripts": {
+        "generate": "node generate_belt_sprites.js"
+    }
+}
+
+
+=== ФАЙЛ: .\assets\storage\sprites\res_raw\sprites\wires\sets\README.md ===
+Built automatically by sprites/belt/generate_wire_sprites.js
+
+
+=== ФАЙЛ: .\css\main.css ===
+/* Основные сбросы и фундаментальные стили */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0b0b1a;
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  color: #e0e0e0;
+}
+
+#game-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
 === ФАЙЛ: .\css\style.css ===
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; background: #EAE6DF; font-family: 'Segoe UI', system-ui, sans-serif; color: #333; }
+canvas { display: block; cursor: crosshair; }
 
+#ui-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; /* Пропускаем клики на канвас */
+}
+
+#toolbar {
+    position: absolute;
+    left: 20px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 10px;
+    background: rgba(40, 45, 55, 0.9);
+    padding: 15px; border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    pointer-events: auto; /* Кнопки должны кликать */
+}
+
+.tool-btn {
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: #fff; font-size: 14px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; line-height: 1.2;
+}
+.tool-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.tool-btn.active { border-color: #7AE0A3; background: rgba(122, 224, 163, 0.2); color: #7AE0A3; }
+
+#info-panel {
+    position: absolute;
+    bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(40, 45, 55, 0.85);
+    color: #ddd; padding: 10px 20px;
+    border-radius: 12px; font-size: 13px;
+    display: flex; gap: 15px; align-items: center;
+    pointer-events: auto;
+}
+
+.key-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 3px 8px; border-radius: 6px;
+    font-weight: bold; margin-right: 5px;
+}
+
+=== ФАЙЛ: .\js\Buildings.js ===
+export class Building {
+    constructor(tx, ty, type, rotation = 0) {
+        this.tx = tx; // Координата тайла X
+        this.ty = ty; // Координата тайла Y
+        this.type = type; // 'belt', 'extractor', 'hub'
+        this.rotation = rotation; // 0, 1, 2, 3 (0=вверх, 1=вправо, 2=вниз, 3=влево)
+    }
+
+    // Размер постройки в тайлах
+    getSize() {
+        if (this.type === 'hub') return { w: 4, h: 4 };
+        return { w: 1, h: 1 };
+    }
+}
+
+export class BuildingManager {
+    constructor(game) {
+        this.game = game;
+        this.buildings = [];
+        this.ghost = null; // Призрак для предпросмотра
+        
+        this._initGhost();
+    }
+
+    _initGhost() {
+        this.ghost = new Building(0, 0, 'belt', 0);
+        this.ghost.visible = false;
+    }
+
+    updateGhost(mouseX, mouseY) {
+        if (!this.game.selectedType) {
+            this.ghost.visible = false;
+            return;
+        }
+
+        const worldPos = this.game.camera.screenToWorld(mouseX, mouseY);
+        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+        
+        this.ghost.tx = tile.tx;
+        this.ghost.ty = tile.ty;
+        this.ghost.type = this.game.selectedType;
+        this.ghost.visible = true;
+    }
+
+    rotateGhost() {
+        if (this.ghost.visible) {
+            this.ghost.rotation = (this.ghost.rotation + 1) % 4;
+        }
+    }
+
+    tryPlace() {
+        if (!this.ghost.visible) return false;
+
+        const size = this.ghost.getSize();
+        
+        // Проверка коллизий
+        for (let dx = 0; dx < size.w; dx++) {
+            for (let dy = 0; dy < size.h; dy++) {
+                if (this.getBuildingAt(this.ghost.tx + dx, this.ghost.ty + dy)) {
+                    return false; // Место занято
+                }
+            }
+        }
+
+        // Для экстрактора проверяем наличие жилы
+        if (this.ghost.type === 'extractor') {
+            if (!this.game.map.getVeinAt(this.ghost.tx, this.ghost.ty)) {
+                return false; // Нет жилы
+            }
+        }
+
+        // Создаем и добавляем
+        const newBuilding = new Building(this.ghost.tx, this.ghost.ty, this.ghost.type, this.ghost.rotation);
+        this.buildings.push(newBuilding);
+        return true;
+    }
+
+    getBuildingAt(tx, ty) {
+        for (const b of this.buildings) {
+            const size = b.getSize();
+            if (tx >= b.tx && tx < b.tx + size.w && ty >= b.ty && ty < b.ty + size.h) {
+                return b;
+            }
+        }
+        return null;
+    }
+
+    render(ctx, camera) {
+        const tileSize = this.game.map.tileSize;
+
+        // Рендер построек
+        for (const b of this.buildings) {
+            this._drawBuilding(ctx, b, tileSize, false);
+        }
+
+        // Рендер призрака
+        if (this.ghost.visible) {
+            this._drawBuilding(ctx, this.ghost, tileSize, true);
+        }
+    }
+
+    _drawBuilding(ctx, b, tileSize, isGhost) {
+        const x = b.tx * tileSize;
+        const y = b.ty * tileSize;
+        const size = b.getSize();
+        const w = size.w * tileSize;
+        const h = size.h * tileSize;
+
+        ctx.save();
+        if (isGhost) ctx.globalAlpha = 0.6;
+
+        // Центрируем для поворота
+        ctx.translate(x + w / 2, y + h / 2);
+        ctx.rotate(b.rotation * Math.PI / 2);
+        ctx.translate(-w / 2, -h / 2);
+
+        if (b.type === 'belt') {
+            // Конвейер
+            ctx.fillStyle = '#8898A5';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = '#5A6B7A';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, w, h);
+            
+            // Стрелка направления
+            ctx.fillStyle = '#D0D8E0';
+            ctx.beginPath();
+            ctx.moveTo(w * 0.3, h * 0.6);
+            ctx.lineTo(w * 0.7, h * 0.6);
+            ctx.lineTo(w * 0.5, h * 0.2);
+            ctx.closePath();
+            ctx.fill();
+        } 
+        else if (b.type === 'extractor') {
+            // Экстрактор
+            ctx.fillStyle = '#9B7E6B';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = '#6B5545';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(0, 0, w, h);
+            
+            // "Бур"
+            ctx.fillStyle = '#D4C4B7';
+            ctx.beginPath();
+            ctx.arc(w / 2, h / 2, w * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#6B5545';
+            ctx.stroke();
+        } 
+        else if (b.type === 'hub') {
+            // Хаб 4x4
+            ctx.fillStyle = '#A36B6B';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = '#7A4545';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(0, 0, w, h);
+            
+            // Текст/Иконка
+            ctx.fillStyle = '#FFF';
+            ctx.font = `bold ${w * 0.2}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('HUB', w / 2, h / 2);
+        }
+
+        ctx.restore();
+    }
+}
+
+=== ФАЙЛ: .\js\Camera.js ===
+export class Camera {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.x = 0; // Мировая координата X центра экрана
+        this.y = 0; // Мировая координата Y центра экрана
+        this.zoom = 1.0;
+        this.targetZoom = 1.0;
+        
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.camStartX = 0;
+        this.camStartY = 0;
+
+        this.keys = {};
+        this.moveSpeed = 500; // Пикселей в секунду
+
+        this._bindEvents();
+    }
+
+    _bindEvents() {
+        window.addEventListener('keydown', (e) => this.keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', (e) => this.keys[e.key.toLowerCase()] = false);
+
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 1 || (e.button === 0 && e.shiftKey)) { // Средняя кнопка или Shift+ЛКМ
+                this.isDragging = true;
+                this.dragStartX = e.clientX;
+                this.dragStartY = e.clientY;
+                this.camStartX = this.x;
+                this.camStartY = this.y;
+                this.canvas.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            this.isDragging = false;
+            this.canvas.style.cursor = 'crosshair';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const dx = (e.clientX - this.dragStartX) / this.zoom;
+                const dy = (e.clientY - this.dragStartY) / this.zoom;
+                this.x = this.camStartX - dx;
+                this.y = this.camStartY - dy;
+            }
+        });
+
+        this.canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = 0.1;
+            if (e.deltaY < 0) this.targetZoom *= (1 + zoomFactor);
+            else this.targetZoom /= (1 + zoomFactor);
+            
+            this.targetZoom = Math.max(0.2, Math.min(3.0, this.targetZoom));
+        }, { passive: false });
+    }
+
+    update(dt) {
+        // Плавный зум
+        this.zoom += (this.targetZoom - this.zoom) * 0.2;
+
+        // Движение на WASD
+        const speed = (this.moveSpeed / this.zoom) * dt;
+        if (this.keys['w'] || this.keys['ц']) this.y -= speed;
+        if (this.keys['s'] || this.keys['ы']) this.y += speed;
+        if (this.keys['a'] || this.keys['ф']) this.x -= speed;
+        if (this.keys['d'] || this.keys['в']) this.x += speed;
+    }
+
+    // Конвертация экранных координат (мыши) в мировые
+    screenToWorld(screenX, screenY) {
+        const worldX = (screenX - this.canvas.width / 2) / this.zoom + this.x;
+        const worldY = (screenY - this.canvas.height / 2) / this.zoom + this.y;
+        return { x: worldX, y: worldY };
+    }
+
+    // Применяем трансформацию канваса для рендера мира
+    applyTransform(ctx) {
+        ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+        ctx.scale(this.zoom, this.zoom);
+        ctx.translate(-this.x, -this.y);
+    }
+}
 
 === ФАЙЛ: .\js\entities.js ===
+class Building {
+  constructor(type, gx, gy, dir = 0) {
+    this.type = type;
+    this.gridX = gx;
+    this.gridY = gy;
+    this.direction = dir;
+  }
+  canAccept(fromDir, resource = null) { return false; }
+  update(engine) {}
+  getOutputDirections() { return [this.direction]; }
+}
 
+// === Конвейер (лента) ===
+class Conveyor extends Building {
+  constructor(gx, gy, dir) {
+    super('conveyor', gx, gy, dir);
+    this.itemsLeft = [];   // ресурсы на левой стороне (макс 4)
+    this.itemsRight = [];  // на правой (макс 4)
+  }
+  canAccept(fromDir, resource = null) {
+    // Принимаем сзади и с боков (если есть место)
+    const backDir = (this.direction + 2) % 4;
+    if (fromDir === backDir) return true; // сзади всегда можно
+    // Боковая подача: проверяем, есть ли место на соответствующей стороне
+    // Определяем, какая сторона ближе
+    const side = this.getSideForDir(fromDir);
+    if (side === 'left' && this.itemsLeft.length < 4) return true;
+    if (side === 'right' && this.itemsRight.length < 4) return true;
+    return false;
+  }
+  getSideForDir(fromDir) {
+    // Направление fromDir относительно направления конвейера
+    // Если предмет приходит слева (по ходу движения), то side = 'left' и т.д.
+    const rel = (fromDir - this.direction + 4) % 4;
+    // 0: совпадает (сзади), обрабатывается отдельно
+    // 1: справа? зависит от ориентации
+    // Упростим: если fromDir == (this.direction + 1)%4 => right, если (this.direction + 3)%4 => left
+    if (fromDir === (this.direction + 1) % 4) return 'right';
+    if (fromDir === (this.direction + 3) % 4) return 'left';
+    return 'left'; // fallback
+  }
+  addItem(resource, side) {
+    if (side === 'left') this.itemsLeft.push(resource);
+    else this.itemsRight.push(resource);
+  }
+  // Обновление: продвижение предметов (будет в gameEngine)
+}
+
+// === Экстрактор ===
+class Extractor extends Building {
+  constructor(gx, gy, dir, shape, color) {
+    super('extractor', gx, gy, dir);
+    this.shape = shape;
+    this.color = color;
+    this.cooldown = 0;
+    this.cooldownMax = 60;
+  }
+  update(engine) {
+    this.cooldown--;
+    if (this.cooldown <= 0) {
+      this.cooldown = this.cooldownMax;
+      const off = dirToOffset(this.direction);
+      const gx = this.gridX + off.dx;
+      const gy = this.gridY + off.dy;
+      if (engine.canOutputTo(gx, gy, this.direction)) {
+        engine.spawnItem(gx, gy, new ResourceItem(this.shape, this.color), this.direction);
+      }
+    }
+  }
+}
+
+// === Резак ===
+class Cutter extends Building {
+  constructor(gx, gy, dir) {
+    super('cutter', gx, gy, dir);
+    this.processing = null;
+  }
+  canAccept(fromDir) { return !this.processing; }
+  update(engine) {
+    if (!this.processing) return;
+    this.processing.timer--;
+    if (this.processing.timer <= 0) {
+      const outputs = RECIPES.cutter(this.processing.resource);
+      this.processing = null;
+      if (!outputs) return;
+      const dirs = [this.direction, (this.direction + 1) % 4];
+      for (let i = 0; i < outputs.length; i++) {
+        const off = dirToOffset(dirs[i]);
+        const gx = this.gridX + off.dx;
+        const gy = this.gridY + off.dy;
+        if (engine.canOutputTo(gx, gy, dirs[i])) {
+          engine.spawnItem(gx, gy, outputs[i], dirs[i]);
+        }
+      }
+    }
+  }
+  getOutputDirections() { return [this.direction, (this.direction + 1) % 4]; }
+}
+
+// === Вращатель ===
+class Rotator extends Building {
+  constructor(gx, gy, dir) {
+    super('rotator', gx, gy, dir);
+    this.processing = null;
+  }
+  canAccept(fromDir) { return !this.processing; }
+  update(engine) {
+    if (!this.processing) return;
+    this.processing.timer--;
+    if (this.processing.timer <= 0) {
+      const rotated = RECIPES.rotator(this.processing.resource);
+      this.processing = null;
+      const off = dirToOffset(this.direction);
+      const gx = this.gridX + off.dx;
+      const gy = this.gridY + off.dy;
+      if (engine.canOutputTo(gx, gy, this.direction)) {
+        engine.spawnItem(gx, gy, rotated, this.direction);
+      }
+    }
+  }
+}
+
+// === Смеситель ===
+class Mixer extends Building {
+  constructor(gx, gy, dir) {
+    super('mixer', gx, gy, dir);
+    this.inputA = null;
+    this.inputB = null;
+    this.processingTimer = 0;
+    this.leftDir = (dir + 3) % 4;
+    this.rightDir = (dir + 1) % 4;
+  }
+  canAccept(fromDir) {
+    if (fromDir === this.leftDir && !this.inputA) return true;
+    if (fromDir === this.rightDir && !this.inputB) return true;
+    return false;
+  }
+  update(engine) {
+    if (this.inputA && this.inputB) {
+      if (this.processingTimer > 0) {
+        this.processingTimer--;
+        if (this.processingTimer <= 0) {
+          const result = RECIPES.mixer(this.inputA, this.inputB);
+          this.inputA = this.inputB = null;
+          if (result) {
+            const off = dirToOffset(this.direction);
+            const gx = this.gridX + off.dx;
+            const gy = this.gridY + off.dy;
+            if (engine.canOutputTo(gx, gy, this.direction)) {
+              engine.spawnItem(gx, gy, result, this.direction);
+            }
+          }
+        }
+      } else {
+        this.processingTimer = 50;
+      }
+    }
+  }
+}
+
+// === Хаб ===
+class Hub extends Building {
+  constructor(gx, gy, dir) {
+    super('hub', gx, gy, dir);
+  }
+  canAccept(fromDir) {
+    const backDir = (this.direction + 2) % 4;
+    return fromDir === backDir;
+  }
+}
+
+function dirToOffset(dir) {
+  return { 0: {dx:1,dy:0}, 1: {dx:0,dy:1}, 2: {dx:-1,dy:0}, 3: {dx:0,dy:-1} }[dir];
+}
 
 === ФАЙЛ: .\js\GameEngine.js ===
+class GameEngine {
+  constructor() {
+    this.TILE_SIZE = 64;
+    this.GRID_COLS = 60;
+    this.GRID_ROWS = 40;
+    this.buildings = [];
+    this.items = []; // теперь предметы на конвейерах хранятся в самом здании, а items - только для анимации перемещения?
+    // В этой версии предметы будут храниться в зданиях-конвейерах, а для перемещения будем использовать отдельную логику.
+    // Пока оставим совместимость: предметы на конвейерах внутри items, но с привязкой к клетке.
+    this.worldPatches = [];
+    this.level = 1;
+    this.goalDelivered = 0;
+    this.goalRequired = 20;
+    this.goalShape = 'circle';
+    this.goalColor = 'red';
+    this.tickRate = 30;
+    this.tickCounter = 0;
+    this.running = false;
+    this.ui = null;
+  }
 
+  init() {
+    this.initPatches();
+    const cx = Math.floor(this.GRID_COLS / 2);
+    const cy = Math.floor(this.GRID_ROWS / 2);
+    this.addBuilding(new Hub(cx, cy, 0));
+    this.generateGoal();
+  }
+
+  initPatches() {
+    this.worldPatches = Array.from({length: this.GRID_COLS}, () => new Array(this.GRID_ROWS).fill(null));
+    const cx = Math.floor(this.GRID_COLS / 2);
+    const cy = Math.floor(this.GRID_ROWS / 2);
+    // Красный круг
+    this.worldPatches[cx - 7][cy] = { shape: 'circle', color: 'red' };
+    // Синий круг
+    this.worldPatches[cx + 7][cy] = { shape: 'circle', color: 'blue' };
+  }
+
+  addBuilding(b) { this.buildings.push(b); }
+  getBuildingAt(gx, gy) { return this.buildings.find(b => b.gridX === gx && b.gridY === gy); }
+  removeBuilding(gx, gy) {
+    const idx = this.buildings.findIndex(b => b.gridX === gx && b.gridY === gy);
+    if (idx !== -1 && this.buildings[idx].type !== 'hub') {
+      this.buildings.splice(idx, 1);
+      return true;
+    }
+    return false;
+  }
+
+  canOutputTo(gx, gy, fromDir) {
+    const b = this.getBuildingAt(gx, gy);
+    if (!b) return false;
+    if (b instanceof Conveyor) return b.canAccept(fromDir);
+    if (b instanceof Hub || b instanceof Cutter || b instanceof Rotator || b instanceof Mixer) return b.canAccept(fromDir);
+    return false;
+  }
+
+  spawnItem(gx, gy, resource, fromDir) {
+    // Предмет появляется на конвейере или сразу в здании
+    const b = this.getBuildingAt(gx, gy);
+    if (b instanceof Conveyor) {
+      // Определить сторону
+      const backDir = (b.direction + 2) % 4;
+      let side = 'left';
+      if (fromDir === backDir) {
+        // если сзади, кладём на дальнюю сторону? По механике Factorio сзади кладёт на дальнюю (от входа) сторону.
+        // Упростим: всегда на левую, если она свободна, иначе на правую.
+        if (b.itemsLeft.length <= b.itemsRight.length) side = 'left';
+        else side = 'right';
+      } else {
+        side = b.getSideForDir(fromDir);
+      }
+      if (side === 'left' && b.itemsLeft.length < 4) {
+        b.itemsLeft.push(resource);
+        // запускаем анимацию? Пока предмет хранится в массиве.
+      } else if (side === 'right' && b.itemsRight.length < 4) {
+        b.itemsRight.push(resource);
+      }
+      // Иначе предмет теряется (нет места)
+    } else if (b instanceof Cutter || b instanceof Rotator || b instanceof Mixer) {
+      // Попытка вставить
+      this.tryInsertIntoBuilding(b, resource, fromDir);
+    } else if (b instanceof Hub) {
+      this.deliverToHub(resource);
+    }
+  }
+
+  tryInsertIntoBuilding(b, resource, fromDir) {
+    if (b instanceof Cutter && !b.processing) {
+      b.processing = { resource, timer: 40 };
+      return true;
+    }
+    if (b instanceof Rotator && !b.processing) {
+      b.processing = { resource, timer: 30 };
+      return true;
+    }
+    if (b instanceof Mixer) {
+      if (fromDir === b.leftDir && !b.inputA) { b.inputA = resource; return true; }
+      if (fromDir === b.rightDir && !b.inputB) { b.inputB = resource; return true; }
+    }
+    return false;
+  }
+
+  deliverToHub(resource) {
+    if (resource.shape === this.goalShape && resource.color === this.goalColor) {
+      this.goalDelivered++;
+      if (this.ui) this.ui.updateHUD();
+      if (this.goalDelivered >= this.goalRequired) {
+        this.level++;
+        this.generateGoal();
+        this.buildings.forEach(b => { if (b instanceof Extractor) b.cooldownMax = Math.max(15, 60 - this.level * 5); });
+      }
+    }
+  }
+
+  generateGoal() {
+    this.goalShape = RESOURCE_SHAPES[Math.floor(Math.random() * RESOURCE_SHAPES.length)];
+    this.goalColor = RESOURCE_COLORS[Math.floor(Math.random() * RESOURCE_COLORS.length)];
+    this.goalDelivered = 0;
+    this.goalRequired = 15 + this.level * 5;
+    if (this.ui) this.ui.updateHUD();
+  }
+
+  canPlaceBuilding(gx, gy, type) {
+    if (gx < 0 || gx >= this.GRID_COLS || gy < 0 || gy >= this.GRID_ROWS) return false;
+    if (this.getBuildingAt(gx, gy)) return false;
+    if (type === 'extractor') return !!this.worldPatches[gx]?.[gy];
+    return true;
+  }
+
+  placeBuilding(type, gx, gy, direction) {
+    if (type === 'extractor') {
+      const patch = this.worldPatches[gx]?.[gy];
+      if (!patch) return false;
+      if (this.getBuildingAt(gx, gy)) return false;
+      this.addBuilding(new Extractor(gx, gy, direction, patch.shape, patch.color));
+      return true;
+    }
+    if (!this.canPlaceBuilding(gx, gy, type)) return false;
+    let b;
+    switch (type) {
+      case 'conveyor': b = new Conveyor(gx, gy, direction); break;
+      case 'cutter': b = new Cutter(gx, gy, direction); break;
+      case 'rotator': b = new Rotator(gx, gy, direction); break;
+      case 'mixer': b = new Mixer(gx, gy, direction); break;
+      case 'hub':
+        const existing = this.buildings.find(b => b.type === 'hub');
+        if (existing) this.buildings = this.buildings.filter(b => b !== existing);
+        b = new Hub(gx, gy, direction);
+        break;
+      default: return false;
+    }
+    this.addBuilding(b);
+    return true;
+  }
+
+  // === Главный тик ===
+  tick() {
+    // Обновление зданий
+    this.buildings.forEach(b => b.update(this));
+
+    // Движение предметов на конвейерах
+    for (const b of this.buildings) {
+      if (b instanceof Conveyor) {
+        this.processConveyor(b);
+      }
+    }
+  }
+
+  processConveyor(conv) {
+    // Перемещаем предметы вперёд по ленте: продвигаем все предметы на 1 позицию, если впереди есть место
+    const nextPos = {
+      x: conv.gridX + dirToOffset(conv.direction).dx,
+      y: conv.gridY + dirToOffset(conv.direction).dy
+    };
+    const nextBuilding = this.getBuildingAt(nextPos.x, nextPos.y);
+
+    // Для левой стороны
+    if (conv.itemsLeft.length > 0) {
+      const item = conv.itemsLeft[0];
+      if (nextBuilding instanceof Conveyor) {
+        // Попытка передать на левую сторону следующего конвейера
+        if (nextBuilding.itemsLeft.length < 4) {
+          nextBuilding.itemsLeft.push(item);
+          conv.itemsLeft.shift();
+        }
+        // Если левая занята, возможно попробовать правую? По механике Factorio нет, остаёмся на месте.
+      } else if (nextBuilding && nextBuilding.canAccept(conv.direction)) {
+        // Фабрика или хаб
+        if (this.tryInsertIntoBuilding(nextBuilding, item, conv.direction)) {
+          conv.itemsLeft.shift();
+        } else if (nextBuilding instanceof Hub) {
+          this.deliverToHub(item);
+          conv.itemsLeft.shift();
+        }
+      }
+    }
+    // Для правой стороны аналогично
+    if (conv.itemsRight.length > 0) {
+      const item = conv.itemsRight[0];
+      if (nextBuilding instanceof Conveyor) {
+        if (nextBuilding.itemsRight.length < 4) {
+          nextBuilding.itemsRight.push(item);
+          conv.itemsRight.shift();
+        }
+      } else if (nextBuilding && nextBuilding.canAccept(conv.direction)) {
+        if (this.tryInsertIntoBuilding(nextBuilding, item, conv.direction)) {
+          conv.itemsRight.shift();
+        } else if (nextBuilding instanceof Hub) {
+          this.deliverToHub(item);
+          conv.itemsRight.shift();
+        }
+      }
+    }
+    // Также предметы могут продвигаться внутри ленты? Упростим: только передача на следующую клетку.
+  }
+
+  start() {
+    this.running = true;
+    const loop = () => {
+      if (!this.running) return;
+      this.tickCounter++;
+      if (this.tickCounter >= this.tickRate) {
+        this.tickCounter = 0;
+        this.tick();
+      }
+      if (this.ui) this.ui.render();
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+}
+
+=== ФАЙЛ: .\js\HUD.js ===
+export class HUD {
+    constructor(game) {
+        this.game = game;
+        this.toolbar = document.getElementById('toolbar');
+        this.buttons = {};
+
+        this._createToolbar();
+        this._bindHotkeys();
+    }
+
+    _createToolbar() {
+        const items = [
+            { type: 'belt', label: '1<br>Лента' },
+            { type: 'extractor', label: '2<br>Экстракт.' },
+            { type: 'hub', label: '3<br>Хаб' }
+        ];
+
+        items.forEach((item, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'tool-btn';
+            btn.innerHTML = item.label;
+            btn.dataset.type = item.type;
+            
+            btn.addEventListener('click', () => this.selectBuilding(item.type));
+            this.toolbar.appendChild(btn);
+            this.buttons[item.type] = btn;
+        });
+    }
+
+    _bindHotkeys() {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '1' || e.key === 'ч') this.selectBuilding('belt');
+            if (e.key === '2' || e.key === 'у') this.selectBuilding('extractor');
+            if (e.key === '3' || e.key === 'е') this.selectBuilding('hub');
+            
+            if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'к') {
+                this.game.buildingManager.rotateGhost();
+            }
+            if (e.key === 'Escape') {
+                this.selectBuilding(null);
+            }
+        });
+    }
+
+    selectBuilding(type) {
+        this.game.selectedType = type;
+        
+        // Обновляем UI
+        Object.values(this.buttons).forEach(btn => btn.classList.remove('active'));
+        if (type && this.buttons[type]) {
+            this.buttons[type].classList.add('active');
+        }
+    }
+}
+
+=== ФАЙЛ: .\js\main.js ===
+import { Camera } from './Camera.js';
+import { GameMap } from './Map.js';
+import { BuildingManager } from './Buildings.js';
+import { HUD } from './HUD.js';
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        this.camera = new Camera(this.canvas);
+        this.map = new GameMap(this.camera);
+        this.buildingManager = new BuildingManager(this);
+        this.hud = new HUD(this);
+
+        this.selectedType = null; // Текущий тип постройки для размещения
+        this.lastTime = 0;
+
+        this._resize();
+        window.addEventListener('resize', () => this._resize());
+        this._bindMouse();
+
+        // Старт игрового цикла
+        requestAnimationFrame((t) => this._loop(t));
+    }
+
+    _resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    _bindMouse() {
+        this.canvas.addEventListener('mousemove', (e) => {
+            this.buildingManager.updateGhost(e.clientX, e.clientY);
+        });
+
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && !e.shiftKey) { // Левая кнопка (без Shift, чтобы не мешать перетаскиванию)
+                if (this.selectedType) {
+                    this.buildingManager.tryPlace();
+                }
+            } else if (e.button === 2) { // Правая кнопка
+                this.buildingManager.rotateGhost();
+            }
+        });
+
+        // Отключаем контекстное меню по ПКМ
+        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    _loop(time) {
+        const dt = (time - this.lastTime) / 1000;
+        this.lastTime = time;
+
+        this._update(dt);
+        this._render();
+
+        requestAnimationFrame((t) => this._loop(t));
+    }
+
+    _update(dt) {
+        this.camera.update(dt);
+    }
+
+    _render() {
+        // Очистка
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Применяем камеру
+        this.ctx.save();
+        this.camera.applyTransform(this.ctx);
+
+        // Рендер мира
+        this.map.render(this.ctx);
+        this.buildingManager.render(this.ctx, this.camera);
+
+        this.ctx.restore();
+    }
+}
+
+// Запуск
+const game = new Game();
+
+=== ФАЙЛ: .\js\Map.js ===
+export class GameMap {
+    constructor(camera) {
+        this.camera = camera;
+        this.tileSize = 64; // Размер тайла в пикселях
+        
+        // Генерируем жилы кварков (случайные пятна)
+        this.veins = [];
+        this._generateVeins();
+    }
+
+    _generateVeins() {
+        const colors = ['#E07A7A', '#7A9EE0', '#7AE0A3']; // Пастельные красный, синий, зеленый
+        for (let i = 0; i < 30; i++) {
+            this.veins.push({
+                x: (Math.random() - 0.5) * 3000,
+                y: (Math.random() - 0.5) * 3000,
+                radius: 100 + Math.random() * 150,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+    }
+
+    render(ctx) {
+        // 1. Фон
+        ctx.fillStyle = '#EAE6DF';
+        ctx.fillRect(-5000, -5000, 10000, 10000);
+
+        // 2. Жилы (рисуем до сетки, чтобы они были "под" ней)
+        for (const vein of this.veins) {
+            ctx.fillStyle = vein.color;
+            ctx.globalAlpha = 0.4;
+            ctx.beginPath();
+            ctx.arc(vein.x, vein.y, vein.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+
+        // 3. Сетка
+        this._renderGrid(ctx);
+    }
+
+    _renderGrid(ctx) {
+        const zoom = this.camera.zoom;
+        // Оптимизация: рисуем сетку только в видимой области
+        const topLeft = this.camera.screenToWorld(0, 0);
+        const bottomRight = this.camera.screenToWorld(this.camera.canvas.width, this.camera.canvas.height);
+
+        const startX = Math.floor(topLeft.x / this.tileSize) * this.tileSize;
+        const startY = Math.floor(topLeft.y / this.tileSize) * this.tileSize;
+        const endX = Math.ceil(bottomRight.x / this.tileSize) * this.tileSize;
+        const endY = Math.ceil(bottomRight.y / this.tileSize) * this.tileSize;
+
+        ctx.strokeStyle = '#D8D3CB';
+        ctx.lineWidth = 1 / zoom; // Чтобы толщина линии не зависела от зума
+
+        ctx.beginPath();
+        for (let x = startX; x <= endX; x += this.tileSize) {
+            ctx.moveTo(x, startY);
+            ctx.lineTo(x, endY);
+        }
+        for (let y = startY; y <= endY; y += this.tileSize) {
+            ctx.moveTo(startX, y);
+            ctx.lineTo(endX, y);
+        }
+        ctx.stroke();
+    }
+
+    // Получить координаты тайла из мировых координат
+    worldToTile(worldX, worldY) {
+        return {
+            tx: Math.floor(worldX / this.tileSize),
+            ty: Math.floor(worldY / this.tileSize)
+        };
+    }
+
+    // Получить цвет жилы в точке (если есть)
+    getVeinAt(tx, ty) {
+        const worldX = tx * this.tileSize + this.tileSize / 2;
+        const worldY = ty * this.tileSize + this.tileSize / 2;
+        
+        for (const vein of this.veins) {
+            const dist = Math.hypot(worldX - vein.x, worldY - vein.y);
+            if (dist < vein.radius) return vein.color;
+        }
+        return null;
+    }
+}
 
 === ФАЙЛ: .\js\recipes.js ===
-
+const RECIPES = {
+  // Резак: для красного - вертикально (left/right), для синего - горизонтально (top/bottom)
+  cutter: (resource) => {
+    if (!resource.isHalf && resource.shape === 'circle') {
+      if (resource.color === 'red') {
+        return [
+          ResourceItem.createHalf('circle', 'left', resource.color),
+          ResourceItem.createHalf('circle', 'right', resource.color)
+        ];
+      } else if (resource.color === 'blue') {
+        return [
+          ResourceItem.createHalf('circle', 'top', resource.color),
+          ResourceItem.createHalf('circle', 'bottom', resource.color)
+        ];
+      }
+    }
+    return null;
+  },
+  // Вращатель: меняет суффикс по часовой стрелке
+  rotator: (resource) => {
+    if (!resource.isHalf) return resource.clone();
+    const cycle = ['top', 'right', 'bottom', 'left'];
+    const idx = cycle.indexOf(resource.halfSuffix);
+    if (idx === -1) return resource.clone();
+    const newSuffix = cycle[(idx + 1) % 4];
+    return ResourceItem.createHalf(resource.baseShape, newSuffix, resource.color);
+  },
+  // Смеситель: принимает левую и правую половинки одного цвета и формы
+  mixer: (a, b) => {
+    if (a.color !== b.color) return null;
+    if (a.baseShape !== b.baseShape) return null;
+    const valid =
+      (a.halfSuffix === 'left' && b.halfSuffix === 'right') ||
+      (a.halfSuffix === 'right' && b.halfSuffix === 'left');
+    if (valid) {
+      return ResourceItem.createFull(a.baseShape, a.color);
+    }
+    return null;
+  }
+};
 
 === ФАЙЛ: .\js\resources.js ===
+class ResourceItem {
+  constructor(shape, color) {
+    this.shape = shape;
+    this.color = color;
+  }
+  get baseShape() { return this.shape.split('_')[0]; }
+  get isHalf() { return this.shape.includes('_'); }
+  get halfSuffix() {
+    const parts = this.shape.split('_');
+    return parts.length > 1 ? parts[1] : null;
+  }
+  equals(other) {
+    return this.shape === other.shape && this.color === other.color;
+  }
+  clone() { return new ResourceItem(this.shape, this.color); }
+}
 
+const RESOURCE_SHAPES = ['circle'];
+const RESOURCE_COLORS = ['red', 'blue'];
+
+ResourceItem.createHalf = (base, suffix, color) => new ResourceItem(`${base}_${suffix}`, color);
+ResourceItem.createFull = (shape, color) => new ResourceItem(shape, color);
+
+const COLOR_HEX = {
+  red: '#e94560',
+  blue: '#4d80e4',
+  green: '#4ecca3',
+  yellow: '#ffd700',
+  cyan: '#00d4ff',
+  magenta: '#ff6ec7',
+  white: '#ffffff',
+  uncolored: '#cccccc'
+};
 
 === ФАЙЛ: .\js\technologies.js ===
+/**
+ * Место для технологий (пока заглушка).
+ */
+class TechnologyTree {
+  constructor() {
+    this.unlocked = new Set();
+  }
 
+  isUnlocked(techId) {
+    return this.unlocked.has(techId);
+  }
+
+  unlock(techId) {
+    this.unlocked.add(techId);
+  }
+}
 
 === ФАЙЛ: .\js\ui.js ===
+class UIManager {
+  constructor(engine) {
+    this.engine = engine;
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.wrapper = document.getElementById('canvas-wrapper');
+    this.goalCanvas = document.getElementById('goalCanvas');
+    this.goalCtx = this.goalCanvas.getContext('2d');
+    this.cameraX = engine.WORLD_W / 2 - 400;
+    this.cameraY = engine.WORLD_H / 2 - 300;
+    this.zoom = 1.0;
+    this.selectedTool = null;
+    this.direction = 0;
+    this.isDragging = false;
+    this.dragStart = { x: 0, y: 0, camX: 0, camY: 0 };
+    this.mouseGrid = { x: -1, y: -1 };
+    this.inventoryOpen = false;
+    this.localizer = new Localizer('ru');
+  }
 
+  init() {
+    this.bindEvents();
+    this.updateHUD();
+    this.drawGoalPreview();
+    this.applyLocalization();
+  }
+
+  applyLocalization() {
+    document.querySelectorAll('[data-loc]').forEach(el => {
+      el.textContent = this.localizer.t(el.dataset.loc);
+    });
+  }
+
+  bindEvents() {
+    this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+    this.canvas.addEventListener('mousedown', e => this.onMouseDown(e));
+    this.canvas.addEventListener('mouseup', e => this.onMouseUp(e));
+    this.canvas.addEventListener('mouseleave', e => this.onMouseLeave(e));
+    this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+    this.canvas.addEventListener('wheel', e => this.onWheel(e));
+    window.addEventListener('keydown', e => this.onKeyDown(e));
+
+    // Кнопки инвентаря
+    document.querySelectorAll('.inv-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.selectTool(btn.dataset.tool);
+        this.closeInventory();
+      });
+    });
+  }
+
+  selectTool(toolId) {
+    if (this.selectedTool === toolId) {
+      this.selectedTool = null;
+    } else {
+      this.selectedTool = toolId;
+    }
+    this.updateToolbarUI();
+  }
+
+  updateToolbarUI() {
+    document.querySelectorAll('.inv-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tool === this.selectedTool);
+    });
+    // Можно обновить иконку на кнопке E? Не требуется.
+  }
+
+  openInventory() {
+    this.inventoryOpen = true;
+    document.getElementById('inventory-menu').style.display = 'block';
+  }
+  closeInventory() {
+    this.inventoryOpen = false;
+    document.getElementById('inventory-menu').style.display = 'none';
+  }
+
+  // Ввод
+  screenToWorld(sx, sy) {
+    const rect = this.canvas.getBoundingClientRect();
+    return { x: (sx - rect.left) / this.zoom + this.cameraX, y: (sy - rect.top) / this.zoom + this.cameraY };
+  }
+  worldToGrid(wx, wy) {
+    return { gx: Math.floor(wx / this.engine.TILE_SIZE), gy: Math.floor(wy / this.engine.TILE_SIZE) };
+  }
+
+  onMouseMove(e) {
+    const world = this.screenToWorld(e.clientX, e.clientY);
+    const grid = this.worldToGrid(world.x, world.y);
+    this.mouseGrid = grid;
+    if (this.isDragging) {
+      const dx = e.clientX - this.dragStart.x;
+      const dy = e.clientY - this.dragStart.y;
+      this.cameraX = this.dragStart.camX - dx / this.zoom;
+      this.cameraY = this.dragStart.camY - dy / this.zoom;
+    }
+  }
+
+  onMouseDown(e) {
+    if (e.button === 0) {
+      if (this.inventoryOpen) {
+        this.closeInventory();
+        return;
+      }
+      this.isDragging = true;
+      this.dragStart = { x: e.clientX, y: e.clientY, camX: this.cameraX, camY: this.cameraY };
+      this.canvas.style.cursor = 'grabbing';
+      return;
+    }
+    if (e.button === 2) {
+      if (this.selectedTool) {
+        this.selectedTool = null;
+        this.updateToolbarUI();
+      } else {
+        const b = this.engine.getBuildingAt(this.mouseGrid.gx, this.mouseGrid.gy);
+        if (b && b.type !== 'hub') {
+          b.direction = (b.direction + 1) % 4;
+        }
+      }
+    }
+  }
+
+  onMouseUp(e) {
+    if (e.button === 0 && this.isDragging) {
+      // Если не было перетаскивания, то это клик
+      const dx = Math.abs(e.clientX - this.dragStart.x);
+      const dy = Math.abs(e.clientY - this.dragStart.y);
+      if (dx < 3 && dy < 3 && this.selectedTool) {
+        // клик для размещения
+        const gx = this.mouseGrid.gx;
+        const gy = this.mouseGrid.gy;
+        if (gx >= 0 && gy >= 0 && gx < this.engine.GRID_COLS && gy < this.engine.GRID_ROWS) {
+          if (this.selectedTool === 'demolish') {
+            this.engine.removeBuilding(gx, gy);
+          } else {
+            this.engine.placeBuilding(this.selectedTool, gx, gy, this.direction);
+          }
+        }
+      }
+    }
+    this.isDragging = false;
+    this.canvas.style.cursor = 'crosshair';
+  }
+
+  onMouseLeave() {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'crosshair';
+  }
+
+  onWheel(e) {
+    e.preventDefault();
+    const worldBefore = this.screenToWorld(e.clientX, e.clientY);
+    this.zoom = e.deltaY < 0 ? Math.min(3.0, this.zoom * 1.08) : Math.max(0.3, this.zoom / 1.08);
+    const worldAfter = this.screenToWorld(e.clientX, e.clientY);
+    this.cameraX += worldBefore.x - worldAfter.x;
+    this.cameraY += worldBefore.y - worldAfter.y;
+  }
+
+  onKeyDown(e) {
+    // WASD камера
+    const speed = 32 / this.zoom;
+    if (e.key === 'w' || e.key === 'W') this.cameraY -= speed;
+    if (e.key === 's' || e.key === 'S') this.cameraY += speed;
+    if (e.key === 'a' || e.key === 'A') this.cameraX -= speed;
+    if (e.key === 'd' || e.key === 'D') this.cameraX += speed;
+
+    if (e.key === 'Escape') {
+      this.selectedTool = null;
+      this.updateToolbarUI();
+      this.closeInventory();
+    }
+    if (e.key === 'e' || e.key === 'E') {
+      e.preventDefault();
+      if (this.inventoryOpen) this.closeInventory();
+      else this.openInventory();
+    }
+    if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      if (this.mouseGrid.x >= 0 && this.mouseGrid.y >= 0) {
+        const b = this.engine.getBuildingAt(this.mouseGrid.x, this.mouseGrid.y);
+        if (b && b.type !== 'hub') {
+          b.direction = (b.direction + 1) % 4;
+        }
+      }
+    }
+    // Выбор инструмента цифрами? оставим как было
+  }
+
+  // Рендеринг
+  updateHUD() {
+    document.getElementById('progress').textContent = `${this.engine.goalDelivered} / ${this.engine.goalRequired}`;
+    document.getElementById('level-indicator').textContent = `${this.localizer.t('level')} ${this.engine.level}`;
+    this.drawGoalPreview();
+  }
+
+  drawGoalPreview() {
+    this.goalCtx.clearRect(0, 0, 40, 40);
+    this.goalCtx.save();
+    this.goalCtx.translate(20, 20);
+    drawShape(this.goalCtx, this.engine.goalShape, this.engine.goalColor, 16);
+    this.goalCtx.restore();
+  }
+
+  render() {
+    this.canvas.width = this.wrapper.clientWidth;
+    this.canvas.height = this.wrapper.clientHeight;
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.save();
+    ctx.translate(-this.cameraX * this.zoom, -this.cameraY * this.zoom);
+    ctx.scale(this.zoom, this.zoom);
+
+    const TILE = this.engine.TILE_SIZE;
+    const startCol = Math.max(0, Math.floor(this.cameraX / TILE) - 1);
+    const endCol = Math.min(this.engine.GRID_COLS, Math.ceil((this.cameraX + this.canvas.width / this.zoom) / TILE) + 1);
+    const startRow = Math.max(0, Math.floor(this.cameraY / TILE) - 1);
+    const endRow = Math.min(this.engine.GRID_ROWS, Math.ceil((this.cameraY + this.canvas.height / this.zoom) / TILE) + 1);
+
+    // Фон (пока тёмно-синий, позже сделаем релакс)
+    for (let gx = startCol; gx <= endCol; gx++) {
+      for (let gy = startRow; gy <= endRow; gy++) {
+        const x = gx * TILE, y = gy * TILE;
+        ctx.fillStyle = (gx + gy) % 2 === 0 ? '#1a1c2e' : '#1f2138';
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.strokeRect(x, y, TILE, TILE);
+
+        const patch = this.engine.worldPatches[gx]?.[gy];
+        if (patch && !this.engine.getBuildingAt(gx, gy)) {
+          ctx.save();
+          ctx.translate(x + TILE/2, y + TILE/2);
+          ctx.globalAlpha = 0.3;
+          drawShape(ctx, patch.shape, patch.color, TILE * 0.3);
+          ctx.globalAlpha = 1;
+          ctx.restore();
+        }
+      }
+    }
+
+    // Здания
+    this.engine.buildings.forEach(b => {
+      const x = b.gridX * TILE + TILE/2;
+      const y = b.gridY * TILE + TILE/2;
+      drawBuilding(ctx, x, y, b, TILE);
+    });
+
+    // Подсветка под мышью
+    if (this.mouseGrid.gx >= 0 && this.mouseGrid.gy >= 0 &&
+        this.mouseGrid.gx < this.engine.GRID_COLS && this.mouseGrid.gy < this.engine.GRID_ROWS) {
+      const hx = this.mouseGrid.gx * TILE;
+      const hy = this.mouseGrid.gy * TILE;
+      ctx.strokeStyle = 'rgba(255,215,0,0.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(hx + 1, hy + 1, TILE - 2, TILE - 2);
+
+      if (this.selectedTool && this.selectedTool !== 'demolish' && this.engine.canPlaceBuilding(this.mouseGrid.gx, this.mouseGrid.gy, this.selectedTool)) {
+        ctx.globalAlpha = 0.4;
+        drawBuilding(ctx, hx + TILE/2, hy + TILE/2, { type: this.selectedTool, direction: this.direction }, TILE);
+        ctx.globalAlpha = 1;
+      }
+      if (this.selectedTool === 'demolish' && this.engine.getBuildingAt(this.mouseGrid.gx, this.mouseGrid.gy)) {
+        ctx.fillStyle = 'rgba(255,0,0,0.35)';
+        ctx.fillRect(hx, hy, TILE, TILE);
+      }
+    }
+
+    ctx.restore();
+  }
+}
+
+// --- Функции отрисовки ---
+function drawBuilding(ctx, x, y, b, TILE) {
+  const s = TILE * 0.7;
+  ctx.save();
+  ctx.translate(x, y);
+  if (b.type === 'conveyor') {
+    // Рисуем ленту конвейера
+    ctx.fillStyle = '#2a3045';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#556080';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    // Стрелки направления (маленькие треугольники по центру)
+    ctx.fillStyle = '#8899cc';
+    for (let i = 0; i < 3; i++) {
+      const offset = (i - 1) * s * 0.3;
+      ctx.beginPath();
+      if (b.direction === 0) { // right
+        ctx.moveTo(-s*0.2, offset - s*0.1);
+        ctx.lineTo(s*0.15, offset);
+        ctx.lineTo(-s*0.2, offset + s*0.1);
+      } else if (b.direction === 1) { // down
+        ctx.moveTo(offset - s*0.1, -s*0.2);
+        ctx.lineTo(offset, s*0.15);
+        ctx.lineTo(offset + s*0.1, -s*0.2);
+      } else if (b.direction === 2) { // left
+        ctx.moveTo(s*0.2, offset - s*0.1);
+        ctx.lineTo(-s*0.15, offset);
+        ctx.lineTo(s*0.2, offset + s*0.1);
+      } else { // up
+        ctx.moveTo(offset - s*0.1, s*0.2);
+        ctx.lineTo(offset, -s*0.15);
+        ctx.lineTo(offset + s*0.1, s*0.2);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Отображаем предметы на ленте
+    if (b instanceof Conveyor) {
+      // Левая сторона
+      b.itemsLeft.forEach((res, i) => {
+        const lx = -s*0.25;
+        const ly = (i - 1.5) * s*0.25; // равномерно
+        ctx.save();
+        ctx.translate(lx, ly);
+        drawShape(ctx, res.shape, res.color, s*0.18);
+        ctx.restore();
+      });
+      // Правая сторона
+      b.itemsRight.forEach((res, i) => {
+        const rx = s*0.25;
+        const ry = (i - 1.5) * s*0.25;
+        ctx.save();
+        ctx.translate(rx, ry);
+        drawShape(ctx, res.shape, res.color, s*0.18);
+        ctx.restore();
+      });
+    }
+  } else if (b.type === 'extractor') {
+    ctx.fillStyle = '#4a3f35';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#8b7355';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.fillStyle = '#ccc';
+    ctx.font = `${s*0.5}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⛏', 0, -s*0.1);
+    drawShape(ctx, b.shape, b.color, s*0.22);
+    // Выходная стрелка
+    drawOutputArrow(ctx, s, b.direction);
+  } else if (b.type === 'cutter') {
+    ctx.fillStyle = '#4a4a6a';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.fillStyle = '#ddd';
+    ctx.font = `${s*0.5}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✂', 0, 0);
+    if (b.processing) {
+      ctx.fillStyle = 'rgba(255,255,0,0.4)';
+      ctx.beginPath(); ctx.arc(0, 0, s*0.3, 0, Math.PI*2); ctx.fill();
+    }
+    // Входы и выходы
+    drawInputArrow(ctx, s, b.direction); // вход сзади
+    const outDirs = b.getOutputDirections();
+    outDirs.forEach(d => drawOutputArrow(ctx, s, d));
+  } else if (b.type === 'rotator') {
+    ctx.fillStyle = '#3a4a3a';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#6a8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.fillStyle = '#ddd';
+    ctx.font = `${s*0.5}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🔄', 0, 0);
+    drawInputArrow(ctx, s, b.direction);
+    drawOutputArrow(ctx, s, b.direction);
+  } else if (b.type === 'mixer') {
+    ctx.fillStyle = '#4a3a4a';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#a6a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.fillStyle = '#ddd';
+    ctx.font = `${s*0.5}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎨', 0, 0);
+    // Левый и правый входы
+    drawInputArrow(ctx, s, b.leftDir);
+    drawInputArrow(ctx, s, b.rightDir);
+    drawOutputArrow(ctx, s, b.direction);
+  } else if (b.type === 'hub') {
+    ctx.fillStyle = '#4a3a2a';
+    ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = '#daa520';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.fillStyle = '#ffd700';
+    ctx.font = `${s*0.6}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🏠', 0, 0);
+    drawInputArrow(ctx, s, b.direction);
+  }
+  ctx.restore();
+}
+
+function drawInputArrow(ctx, s, dir) {
+  ctx.fillStyle = '#2ecc71';
+  ctx.beginPath();
+  const offset = s * 0.7;
+  const size = s * 0.15;
+  if (dir === 0) { // справа налево
+    ctx.moveTo(offset, -size);
+    ctx.lineTo(offset + size, 0);
+    ctx.lineTo(offset, size);
+  } else if (dir === 1) { // сверху вниз
+    ctx.moveTo(-size, offset);
+    ctx.lineTo(0, offset + size);
+    ctx.lineTo(size, offset);
+  } else if (dir === 2) { // слева направо
+    ctx.moveTo(-offset, -size);
+    ctx.lineTo(-offset - size, 0);
+    ctx.lineTo(-offset, size);
+  } else { // снизу вверх
+    ctx.moveTo(-size, -offset);
+    ctx.lineTo(0, -offset - size);
+    ctx.lineTo(size, -offset);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawOutputArrow(ctx, s, dir) {
+  ctx.fillStyle = '#e67e22';
+  ctx.beginPath();
+  const offset = s * 0.7;
+  const size = s * 0.15;
+  if (dir === 0) { // right
+    ctx.moveTo(offset - size, -size);
+    ctx.lineTo(offset, 0);
+    ctx.lineTo(offset - size, size);
+  } else if (dir === 1) { // down
+    ctx.moveTo(-size, offset - size);
+    ctx.lineTo(0, offset);
+    ctx.lineTo(size, offset - size);
+  } else if (dir === 2) { // left
+    ctx.moveTo(-offset + size, -size);
+    ctx.lineTo(-offset, 0);
+    ctx.lineTo(-offset + size, size);
+  } else { // up
+    ctx.moveTo(-size, -offset + size);
+    ctx.lineTo(0, -offset);
+    ctx.lineTo(size, -offset + size);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawShape(ctx, shape, color, size) {
+  ctx.fillStyle = COLOR_HEX[color] || COLOR_HEX.uncolored;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  if (shape === 'circle' || shape.includes('circle')) {
+    ctx.arc(0, 0, size, 0, Math.PI * 2);
+  } else if (shape === 'square') {
+    ctx.rect(-size, -size, size * 2, size * 2);
+  } else if (shape === 'star') {
+    const spikes = 5, outer = size, inner = size * 0.45;
+    for (let i = 0; i < spikes * 2; i++) {
+      const r = i % 2 === 0 ? outer : inner;
+      const a = (i * Math.PI) / spikes - Math.PI / 2;
+      if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+      else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    ctx.closePath();
+  }
+  ctx.fill();
+  ctx.stroke();
+}
 
 === ФАЙЛ: .\js\language\en.js ===
-
+const LANG_EN = {
+  level: "Level",
+  goal: "🎯 Goal:",
+  tool_conveyor: "Conveyor (C)",
+  tool_extractor: "Extractor (E)",
+  tool_cutter: "Cutter (Q)",
+  tool_rotator: "Rotator (R)",
+  tool_mixer: "Mixer (M)",
+  tool_hub: "Hub (H)",
+  tool_demolish: "Demolish (X)",
+  hint_empty: "empty hand",
+  hint_rotate: "rotate / cancel",
+  hint_dir: "direction",
+  hint_zoom: "zoom"
+};
 
 === ФАЙЛ: .\js\language\localizer.js ===
+class Localizer {
+  constructor(lang = 'en') {
+    this.lang = lang;
+    this.translations = {};
+    this.loadTranslations();
+  }
 
+  loadTranslations() {
+    if (typeof LANG_EN !== 'undefined') Object.assign(this.translations, LANG_EN);
+    if (this.lang === 'ru' && typeof LANG_RU !== 'undefined') Object.assign(this.translations, LANG_RU);
+  }
+
+  t(key) {
+    return this.translations[key] || key;
+  }
+}
 
 === ФАЙЛ: .\js\language\ru.js ===
+const LANG_RU = {};

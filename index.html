@@ -1,60 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Era – Factory</title>
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Era - Factory</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="game-container">
-    <div id="canvas-wrapper">
-      <canvas id="gameCanvas"></canvas>
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <div id="toolbar"></div>
+        <div id="info-panel">
+            <span class="key-badge">WASD</span> Движение
+            <span class="key-badge">Колесо</span> Зум
+            <span class="key-badge">R / ПКМ</span> Поворот
+            <span class="key-badge">1-3</span> Выбор
+        </div>
     </div>
-    <div id="hud">
-      <div id="level-indicator" data-loc="level">Level 1</div>
-      <div id="goal-display">
-        <span data-loc="goal">🎯 Goal:</span>
-        <div id="goal-shape"><canvas id="goalCanvas" width="40" height="40"></canvas></div>
-        <span id="progress">0 / 20</span>
-      </div>
-    </div>
-    <!-- Меню инвентаря (скрыто) -->
-    <div id="inventory-menu" style="display:none;">
-      <div class="inv-grid">
-        <button class="inv-btn" data-tool="conveyor"><span>➡️</span></button>
-        <button class="inv-btn" data-tool="extractor"><span>⛏️</span></button>
-        <button class="inv-btn" data-tool="cutter"><span>✂️</span></button>
-        <button class="inv-btn" data-tool="rotator"><span>🔄</span></button>
-        <button class="inv-btn" data-tool="mixer"><span>🎨</span></button>
-        <button class="inv-btn" data-tool="hub"><span>🏠</span></button>
-        <button class="inv-btn" data-tool="demolish"><span>💥</span></button>
-      </div>
-    </div>
-    <div id="info-panel">
-      <div class="key-hint"><span class="key-badge">WASD</span> <span data-loc="hint_move">move</span></div>
-      <div class="key-hint"><span class="key-badge">R</span> <span data-loc="hint_rotate">rotate</span></div>
-      <div class="key-hint"><span class="key-badge">E</span> <span data-loc="hint_inv">inventory</span></div>
-      <div class="key-hint"><span class="key-badge">Wheel</span> <span data-loc="hint_zoom">zoom</span></div>
-    </div>
-  </div>
-  <script src="js/language/localizer.js"></script>
-  <script src="js/language/en.js"></script>
-  <script src="js/language/ru.js"></script>
-  <script src="js/resources.js"></script>
-  <script src="js/recipes.js"></script>
-  <script src="js/technologies.js"></script>
-  <script src="js/entities.js"></script>
-  <script src="js/GameEngine.js"></script>
-  <script src="js/ui.js"></script>
-  <script>
-    const game = new GameEngine();
-    const ui = new UIManager(game);
-    game.ui = ui;
-    game.init();
-    ui.init();
-    game.start();
-  </script>
+
+    <!-- Подключаем главный модуль -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

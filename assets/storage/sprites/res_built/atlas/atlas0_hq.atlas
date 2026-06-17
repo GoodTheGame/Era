@@ -1,0 +1,1336 @@
+
+atlas0_hq.png
+size: 2048, 2048
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+sprites/belt/built/forward_1
+  rotate: false
+  xy: 512, 476
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_10
+  rotate: false
+  xy: 1130, 507
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_11
+  rotate: false
+  xy: 1181, 361
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_12
+  rotate: false
+  xy: 1182, 215
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_13
+  rotate: false
+  xy: 1182, 69
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_2
+  rotate: false
+  xy: 554, 622
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_3
+  rotate: false
+  xy: 630, 476
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_4
+  rotate: false
+  xy: 894, 477
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_5
+  rotate: false
+  xy: 506, 186
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_6
+  rotate: false
+  xy: 630, 330
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_7
+  rotate: false
+  xy: 969, 1320
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_8
+  rotate: false
+  xy: 1012, 480
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_9
+  rotate: false
+  xy: 1269, 1465
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/left_1
+  rotate: false
+  xy: 1509, 1201
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_10
+  rotate: false
+  xy: 1572, 43
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_11
+  rotate: false
+  xy: 1704, 175
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_12
+  rotate: false
+  xy: 1704, 43
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_13
+  rotate: false
+  xy: 1708, 455
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_2
+  rotate: false
+  xy: 1524, 1069
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_3
+  rotate: false
+  xy: 1526, 937
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_4
+  rotate: false
+  xy: 1641, 1201
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_5
+  rotate: false
+  xy: 1656, 1069
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_6
+  rotate: false
+  xy: 1658, 937
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_7
+  rotate: false
+  xy: 1576, 439
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_8
+  rotate: false
+  xy: 1576, 307
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_9
+  rotate: false
+  xy: 1572, 175
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/right_1
+  rotate: false
+  xy: 1708, 323
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_10
+  rotate: false
+  xy: 1788, 1097
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_11
+  rotate: false
+  xy: 1790, 965
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_12
+  rotate: false
+  xy: 1883, 1625
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_13
+  rotate: false
+  xy: 1790, 833
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_2
+  rotate: false
+  xy: 624, 53
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_3
+  rotate: false
+  xy: 1619, 1625
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_4
+  rotate: false
+  xy: 1694, 1493
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_5
+  rotate: false
+  xy: 1751, 1625
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_6
+  rotate: false
+  xy: 1826, 1493
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_7
+  rotate: false
+  xy: 1744, 1361
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_8
+  rotate: false
+  xy: 1876, 1361
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_9
+  rotate: false
+  xy: 1773, 1229
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/blueprints/analyzer
+  rotate: false
+  xy: 841, 1612
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/balancer
+  rotate: false
+  xy: 291, 1060
+  size: 257, 144
+  orig: 288, 144
+  offset: 17, 0
+  index: -1
+sprites/blueprints/balancer-merger
+  rotate: false
+  xy: 894, 337
+  size: 139, 138
+  orig: 144, 144
+  offset: 5, 4
+  index: -1
+sprites/blueprints/balancer-merger-inverse
+  rotate: false
+  xy: 892, 197
+  size: 142, 138
+  orig: 144, 144
+  offset: 0, 4
+  index: -1
+sprites/blueprints/balancer-splitter
+  rotate: false
+  xy: 1383, 1049
+  size: 139, 138
+  orig: 144, 144
+  offset: 5, 4
+  index: -1
+sprites/blueprints/balancer-splitter-inverse
+  rotate: false
+  xy: 892, 57
+  size: 142, 138
+  orig: 144, 144
+  offset: 0, 4
+  index: -1
+sprites/blueprints/belt_left
+  rotate: false
+  xy: 1444, 402
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/belt_right
+  rotate: false
+  xy: 1440, 138
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/blueprints/belt_top
+  rotate: false
+  xy: 839, 915
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/blueprints/block
+  rotate: false
+  xy: 1922, 971
+  size: 123, 125
+  orig: 144, 144
+  offset: 11, 8
+  index: -1
+sprites/blueprints/comparator
+  rotate: false
+  xy: 541, 1331
+  size: 144, 133
+  orig: 144, 144
+  offset: 0, 11
+  index: -1
+sprites/blueprints/constant_producer
+  rotate: false
+  xy: 833, 1320
+  size: 134, 144
+  orig: 144, 144
+  offset: 7, 0
+  index: -1
+sprites/blueprints/constant_signal
+  rotate: false
+  xy: 1636, 1333
+  size: 106, 130
+  orig: 144, 144
+  offset: 19, 14
+  index: -1
+sprites/blueprints/cutter
+  rotate: false
+  xy: 291, 914
+  size: 257, 144
+  orig: 288, 144
+  offset: 17, 0
+  index: -1
+sprites/blueprints/cutter-quad
+  rotate: false
+  xy: 1, 1206
+  size: 526, 144
+  orig: 576, 144
+  offset: 24, 0
+  index: -1
+sprites/blueprints/display
+  rotate: false
+  xy: 1379, 1189
+  size: 128, 136
+  orig: 144, 144
+  offset: 8, 0
+  index: -1
+sprites/blueprints/filter
+  rotate: false
+  xy: 1077, 1757
+  size: 268, 144
+  orig: 288, 144
+  offset: 16, 0
+  index: -1
+sprites/blueprints/goal_acceptor
+  rotate: false
+  xy: 560, 769
+  size: 134, 144
+  orig: 144, 144
+  offset: 7, 0
+  index: -1
+sprites/blueprints/item_producer
+  rotate: false
+  xy: 759, 100
+  size: 131, 142
+  orig: 144, 144
+  offset: 8, 2
+  index: -1
+sprites/blueprints/lever
+  rotate: false
+  xy: 1922, 853
+  size: 100, 116
+  orig: 144, 144
+  offset: 22, 19
+  index: -1
+sprites/blueprints/logic_gate
+  rotate: false
+  xy: 529, 1207
+  size: 144, 122
+  orig: 144, 144
+  offset: 0, 22
+  index: -1
+sprites/blueprints/logic_gate-not
+  rotate: false
+  xy: 829, 1061
+  size: 123, 144
+  orig: 144, 144
+  offset: 11, 0
+  index: -1
+sprites/blueprints/logic_gate-or
+  rotate: false
+  xy: 1379, 788
+  size: 144, 124
+  orig: 144, 144
+  offset: 0, 20
+  index: -1
+sprites/blueprints/logic_gate-xor
+  rotate: false
+  xy: 1380, 657
+  size: 144, 129
+  orig: 144, 144
+  offset: 0, 15
+  index: -1
+sprites/blueprints/miner
+  rotate: false
+  xy: 963, 626
+  size: 137, 143
+  orig: 144, 144
+  offset: 4, 1
+  index: -1
+sprites/blueprints/miner-chainable
+  rotate: false
+  xy: 1130, 1466
+  size: 137, 143
+  orig: 144, 144
+  offset: 4, 1
+  index: -1
+sprites/blueprints/mixer
+  rotate: false
+  xy: 291, 622
+  size: 261, 144
+  orig: 288, 144
+  offset: 13, 0
+  index: -1
+sprites/blueprints/painter
+  rotate: false
+  xy: 1090, 1903
+  size: 288, 144
+  orig: 288, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/painter-double
+  rotate: false
+  xy: 1, 924
+  size: 288, 280
+  orig: 288, 288
+  offset: 0, 8
+  index: -1
+sprites/blueprints/painter-mirrored
+  rotate: false
+  xy: 1380, 1903
+  size: 288, 144
+  orig: 288, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/painter-quad
+  rotate: false
+  xy: 1, 1352
+  size: 538, 144
+  orig: 576, 144
+  offset: 12, 0
+  index: -1
+sprites/blueprints/reader
+  rotate: false
+  xy: 685, 1061
+  size: 142, 144
+  orig: 144, 144
+  offset: 1, 0
+  index: -1
+sprites/blueprints/rotater
+  rotate: false
+  xy: 696, 769
+  size: 143, 144
+  orig: 144, 144
+  offset: 1, 0
+  index: -1
+sprites/blueprints/rotater-ccw
+  rotate: false
+  xy: 818, 623
+  size: 143, 144
+  orig: 144, 144
+  offset: 1, 0
+  index: -1
+sprites/blueprints/rotater-rotate180
+  rotate: false
+  xy: 954, 1061
+  size: 143, 144
+  orig: 144, 144
+  offset: 1, 0
+  index: -1
+sprites/blueprints/stacker
+  rotate: false
+  xy: 551, 1466
+  size: 261, 144
+  orig: 288, 144
+  offset: 13, 0
+  index: -1
+sprites/blueprints/storage
+  rotate: false
+  xy: 1, 354
+  size: 247, 287
+  orig: 288, 288
+  offset: 21, 0
+  index: -1
+sprites/blueprints/transistor
+  rotate: false
+  xy: 1387, 1465
+  size: 102, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/transistor-mirrored
+  rotate: false
+  xy: 1517, 1611
+  size: 100, 144
+  orig: 144, 144
+  offset: 44, 0
+  index: -1
+sprites/blueprints/trash
+  rotate: false
+  xy: 1191, 1611
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/underground_belt_entry
+  rotate: false
+  xy: 1300, 26
+  size: 138, 112
+  orig: 144, 144
+  offset: 4, 0
+  index: -1
+sprites/blueprints/underground_belt_entry-tier2
+  rotate: false
+  xy: 1300, 140
+  size: 138, 125
+  orig: 144, 144
+  offset: 4, 0
+  index: -1
+sprites/blueprints/underground_belt_exit
+  rotate: false
+  xy: 1526, 571
+  size: 138, 112
+  orig: 144, 144
+  offset: 4, 32
+  index: -1
+sprites/blueprints/underground_belt_exit-tier2
+  rotate: false
+  xy: 1238, 850
+  size: 139, 112
+  orig: 144, 144
+  offset: 4, 32
+  index: -1
+sprites/blueprints/virtual_processor
+  rotate: false
+  xy: 1035, 337
+  size: 144, 141
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/virtual_processor-painter
+  rotate: false
+  xy: 759, 244
+  size: 131, 144
+  orig: 144, 144
+  offset: 13, 0
+  index: -1
+sprites/blueprints/virtual_processor-rotater
+  rotate: false
+  xy: 1960, 1903
+  size: 58, 144
+  orig: 144, 144
+  offset: 44, 0
+  index: -1
+sprites/blueprints/virtual_processor-stacker
+  rotate: false
+  xy: 1102, 799
+  size: 130, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/blueprints/virtual_processor-unstacker
+  rotate: false
+  xy: 748, 477
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/blueprints/wire_tunnel
+  rotate: false
+  xy: 1234, 713
+  size: 138, 135
+  orig: 144, 144
+  offset: 4, 5
+  index: -1
+sprites/buildings/analyzer
+  rotate: false
+  xy: 814, 1466
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/balancer
+  rotate: false
+  xy: 248, 187
+  size: 256, 143
+  orig: 288, 144
+  offset: 17, 1
+  index: -1
+sprites/buildings/balancer-merger
+  rotate: false
+  xy: 1238, 1189
+  size: 139, 136
+  orig: 144, 144
+  offset: 5, 5
+  index: -1
+sprites/buildings/balancer-merger-inverse
+  rotate: false
+  xy: 1238, 964
+  size: 141, 136
+  orig: 144, 144
+  offset: 0, 5
+  index: -1
+sprites/buildings/balancer-splitter
+  rotate: false
+  xy: 1363, 1327
+  size: 139, 136
+  orig: 144, 144
+  offset: 5, 5
+  index: -1
+sprites/buildings/balancer-splitter-inverse
+  rotate: false
+  xy: 1219, 1327
+  size: 142, 136
+  orig: 144, 144
+  offset: 0, 5
+  index: -1
+sprites/buildings/belt_left
+  rotate: false
+  xy: 1439, 270
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/belt/built/left_0
+  rotate: false
+  xy: 1439, 270
+  size: 130, 130
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/belt_right
+  rotate: false
+  xy: 1504, 1333
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/right_0
+  rotate: false
+  xy: 1504, 1333
+  size: 130, 130
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/buildings/belt_top
+  rotate: false
+  xy: 841, 769
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/belt/built/forward_0
+  rotate: false
+  xy: 841, 769
+  size: 116, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/buildings/block
+  rotate: false
+  xy: 1665, 685
+  size: 122, 124
+  orig: 144, 144
+  offset: 11, 9
+  index: -1
+sprites/buildings/comparator
+  rotate: false
+  xy: 1381, 914
+  size: 143, 133
+  orig: 144, 144
+  offset: 1, 11
+  index: -1
+sprites/buildings/constant_producer
+  rotate: false
+  xy: 550, 1061
+  size: 133, 144
+  orig: 144, 144
+  offset: 8, 0
+  index: -1
+sprites/buildings/constant_signal
+  rotate: false
+  xy: 1920, 1098
+  size: 104, 129
+  orig: 144, 144
+  offset: 20, 15
+  index: -1
+sprites/buildings/cutter
+  rotate: false
+  xy: 248, 42
+  size: 256, 143
+  orig: 288, 144
+  offset: 17, 1
+  index: -1
+sprites/buildings/cutter-quad
+  rotate: false
+  xy: 551, 1758
+  size: 524, 143
+  orig: 576, 144
+  offset: 25, 1
+  index: -1
+sprites/buildings/display
+  rotate: false
+  xy: 1440, 1
+  size: 126, 135
+  orig: 144, 144
+  offset: 9, 0
+  index: -1
+sprites/buildings/filter
+  rotate: false
+  xy: 291, 768
+  size: 267, 144
+  orig: 288, 144
+  offset: 17, 0
+  index: -1
+sprites/buildings/goal_acceptor
+  rotate: false
+  xy: 624, 185
+  size: 133, 143
+  orig: 144, 144
+  offset: 8, 0
+  index: -1
+sprites/buildings/hub
+  rotate: false
+  xy: 1, 1498
+  size: 548, 549
+  orig: 576, 576
+  offset: 14, 11
+  index: -1
+sprites/buildings/item_producer
+  rotate: false
+  xy: 1248, 569
+  size: 130, 142
+  orig: 144, 144
+  offset: 8, 2
+  index: -1
+sprites/buildings/lever
+  rotate: false
+  xy: 1789, 695
+  size: 98, 114
+  orig: 144, 144
+  offset: 23, 20
+  index: -1
+sprites/buildings/logic_gate
+  rotate: false
+  xy: 1380, 534
+  size: 143, 121
+  orig: 144, 144
+  offset: 1, 23
+  index: -1
+sprites/buildings/logic_gate-not
+  rotate: false
+  xy: 1365, 1611
+  size: 122, 144
+  orig: 144, 144
+  offset: 12, 0
+  index: -1
+sprites/buildings/logic_gate-or
+  rotate: false
+  xy: 1526, 811
+  size: 143, 124
+  orig: 144, 144
+  offset: 1, 20
+  index: -1
+sprites/buildings/logic_gate-xor
+  rotate: false
+  xy: 1299, 403
+  size: 143, 129
+  orig: 144, 144
+  offset: 1, 15
+  index: -1
+sprites/buildings/miner
+  rotate: false
+  xy: 1099, 1089
+  size: 136, 142
+  orig: 144, 144
+  offset: 5, 2
+  index: -1
+sprites/buildings/miner-chainable
+  rotate: false
+  xy: 1100, 945
+  size: 136, 142
+  orig: 144, 144
+  offset: 5, 2
+  index: -1
+sprites/buildings/mixer
+  rotate: false
+  xy: 250, 477
+  size: 260, 143
+  orig: 288, 144
+  offset: 14, 1
+  index: -1
+sprites/buildings/painter
+  rotate: false
+  xy: 551, 1612
+  size: 288, 144
+  orig: 288, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/painter-double
+  rotate: false
+  xy: 1, 643
+  size: 288, 279
+  orig: 288, 288
+  offset: 0, 9
+  index: -1
+sprites/buildings/painter-mirrored
+  rotate: false
+  xy: 1670, 1903
+  size: 288, 144
+  orig: 288, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/painter-quad
+  rotate: false
+  xy: 551, 1903
+  size: 537, 144
+  orig: 576, 144
+  offset: 13, 0
+  index: -1
+sprites/buildings/reader
+  rotate: false
+  xy: 696, 915
+  size: 141, 144
+  orig: 144, 144
+  offset: 2, 0
+  index: -1
+sprites/buildings/rotater
+  rotate: false
+  xy: 957, 916
+  size: 141, 143
+  orig: 144, 144
+  offset: 2, 1
+  index: -1
+sprites/buildings/rotater-ccw
+  rotate: false
+  xy: 959, 771
+  size: 141, 143
+  orig: 144, 144
+  offset: 2, 1
+  index: -1
+sprites/buildings/rotater-rotate180
+  rotate: false
+  xy: 987, 1466
+  size: 141, 143
+  orig: 144, 144
+  offset: 2, 1
+  index: -1
+sprites/buildings/stacker
+  rotate: false
+  xy: 250, 332
+  size: 260, 143
+  orig: 288, 144
+  offset: 14, 1
+  index: -1
+sprites/buildings/storage
+  rotate: false
+  xy: 1, 66
+  size: 245, 286
+  orig: 288, 288
+  offset: 22, 0
+  index: -1
+sprites/buildings/transistor
+  rotate: false
+  xy: 1491, 1465
+  size: 100, 144
+  orig: 144, 144
+  offset: 1, 0
+  index: -1
+sprites/buildings/transistor-mirrored
+  rotate: false
+  xy: 1593, 1465
+  size: 99, 144
+  orig: 144, 144
+  offset: 45, 0
+  index: -1
+sprites/buildings/trash
+  rotate: false
+  xy: 672, 623
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/underground_belt_entry
+  rotate: false
+  xy: 675, 1207
+  size: 137, 111
+  orig: 144, 144
+  offset: 5, 0
+  index: -1
+sprites/buildings/underground_belt_entry-tier2
+  rotate: false
+  xy: 1526, 685
+  size: 137, 124
+  orig: 144, 144
+  offset: 5, 0
+  index: -1
+sprites/buildings/underground_belt_exit
+  rotate: false
+  xy: 814, 1207
+  size: 137, 111
+  orig: 144, 144
+  offset: 5, 33
+  index: -1
+sprites/buildings/underground_belt_exit-tier2
+  rotate: false
+  xy: 953, 1207
+  size: 137, 111
+  orig: 144, 144
+  offset: 5, 33
+  index: -1
+sprites/buildings/virtual_processor
+  rotate: false
+  xy: 1036, 50
+  size: 144, 140
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/virtual_processor-painter
+  rotate: false
+  xy: 1087, 1320
+  size: 130, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/buildings/virtual_processor-rotater
+  rotate: false
+  xy: 987, 1612
+  size: 56, 144
+  orig: 144, 144
+  offset: 45, 0
+  index: -1
+sprites/buildings/virtual_processor-stacker
+  rotate: false
+  xy: 1102, 653
+  size: 130, 144
+  orig: 144, 144
+  offset: 14, 0
+  index: -1
+sprites/buildings/virtual_processor-unstacker
+  rotate: false
+  xy: 1036, 192
+  size: 144, 143
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/buildings/wire_tunnel
+  rotate: false
+  xy: 1300, 267
+  size: 137, 134
+  orig: 144, 144
+  offset: 5, 5
+  index: -1
+sprites/colors/blue
+  rotate: false
+  xy: 92, 15
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/cyan
+  rotate: false
+  xy: 148, 15
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/green
+  rotate: false
+  xy: 1840, 361
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/purple
+  rotate: false
+  xy: 1840, 310
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/red
+  rotate: false
+  xy: 1836, 259
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/uncolored
+  rotate: false
+  xy: 1836, 208
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/white
+  rotate: false
+  xy: 1836, 157
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/colors/yellow
+  rotate: false
+  xy: 1836, 106
+  size: 54, 49
+  orig: 54, 54
+  offset: 0, 1
+  index: -1
+sprites/debug/acceptor_slot
+  rotate: false
+  xy: 1234, 699
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+sprites/debug/ejector_slot
+  rotate: false
+  xy: 1619, 1611
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+sprites/misc/hub_direction_indicator
+  rotate: false
+  xy: 1248, 519
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+sprites/misc/processor_disabled
+  rotate: false
+  xy: 1938, 567
+  size: 78, 81
+  orig: 96, 96
+  offset: 10, 5
+  index: -1
+sprites/misc/processor_disconnected
+  rotate: false
+  xy: 1840, 481
+  size: 65, 84
+  orig: 96, 96
+  offset: 17, 4
+  index: -1
+sprites/misc/reader_overlay
+  rotate: false
+  xy: 756, 28
+  size: 104, 70
+  orig: 144, 144
+  offset: 20, 36
+  index: -1
+sprites/misc/slot_bad_arrow
+  rotate: false
+  xy: 1525, 534
+  size: 35, 35
+  orig: 39, 39
+  offset: 2, 2
+  index: -1
+sprites/misc/slot_good_arrow
+  rotate: false
+  xy: 247, 1
+  size: 35, 39
+  orig: 39, 39
+  offset: 2, 0
+  index: -1
+sprites/misc/storage_overlay
+  rotate: false
+  xy: 1, 20
+  size: 89, 44
+  orig: 90, 45
+  offset: 1, 0
+  index: -1
+sprites/misc/waypoint
+  rotate: false
+  xy: 1255, 19
+  size: 38, 48
+  orig: 48, 48
+  offset: 5, 0
+  index: -1
+sprites/misc/waypoint_wires
+  rotate: false
+  xy: 1836, 56
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+sprites/wires/boolean_false
+  rotate: false
+  xy: 1889, 790
+  size: 31, 41
+  orig: 48, 48
+  offset: 9, 2
+  index: -1
+sprites/wires/boolean_true
+  rotate: false
+  xy: 2025, 694
+  size: 22, 41
+  orig: 48, 48
+  offset: 11, 2
+  index: -1
+sprites/wires/display/blue
+  rotate: false
+  xy: 862, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/cyan
+  rotate: false
+  xy: 911, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/green
+  rotate: false
+  xy: 960, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/purple
+  rotate: false
+  xy: 1009, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/red
+  rotate: false
+  xy: 1058, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/white
+  rotate: false
+  xy: 1107, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/display/yellow
+  rotate: false
+  xy: 1156, 1
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+sprites/wires/lever_on
+  rotate: false
+  xy: 1922, 737
+  size: 102, 114
+  orig: 144, 144
+  offset: 21, 20
+  index: -1
+sprites/wires/logical_acceptor
+  rotate: false
+  xy: 1958, 1517
+  size: 62, 106
+  orig: 144, 144
+  offset: 43, 38
+  index: -1
+sprites/wires/logical_ejector
+  rotate: false
+  xy: 1840, 412
+  size: 60, 67
+  orig: 144, 144
+  offset: 44, 77
+  index: -1
+sprites/wires/network_conflict
+  rotate: false
+  xy: 1907, 521
+  size: 47, 44
+  orig: 48, 48
+  offset: 1, 2
+  index: -1
+sprites/wires/network_empty
+  rotate: false
+  xy: 204, 16
+  size: 41, 48
+  orig: 48, 48
+  offset: 5, 0
+  index: -1
+sprites/wires/overlay_tile
+  rotate: false
+  xy: 1666, 587
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/conflict_cross
+  rotate: false
+  xy: 687, 1320
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/conflict_forward
+  rotate: false
+  xy: 2020, 1903
+  size: 26, 144
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/sets/conflict_split
+  rotate: false
+  xy: 748, 390
+  size: 144, 85
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/conflict_turn
+  rotate: false
+  xy: 1764, 598
+  size: 85, 85
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/sets/first_cross
+  rotate: false
+  xy: 550, 915
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/first_forward
+  rotate: false
+  xy: 1337, 1611
+  size: 26, 144
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/sets/first_split
+  rotate: false
+  xy: 1092, 1233
+  size: 144, 85
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/first_turn
+  rotate: false
+  xy: 1851, 608
+  size: 85, 85
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/sets/second_cross
+  rotate: false
+  xy: 1045, 1611
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/second_forward
+  rotate: false
+  xy: 1489, 1611
+  size: 26, 144
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/sets/second_split
+  rotate: false
+  xy: 1237, 1102
+  size: 144, 85
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+sprites/wires/sets/second_turn
+  rotate: false
+  xy: 1938, 650
+  size: 85, 85
+  orig: 144, 144
+  offset: 59, 0
+  index: -1
+sprites/wires/wires_preview
+  rotate: false
+  xy: 1205, 19
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
