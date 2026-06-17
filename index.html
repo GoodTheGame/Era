@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,18 +10,25 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     
-    <!-- UI Overlay -->
     <div id="ui-layer">
+        <!-- Кнопки интерфейса слева сверху -->
+        <div id="top-buttons">
+            <button class="top-btn" id="btn-settings" title="Настройки">⚙️</button>
+            <button class="top-btn" id="btn-menu" title="Меню">☰</button>
+        </div>
+        
+        <!-- Тулбар снизу по центру -->
         <div id="toolbar"></div>
+        
+        <!-- Подсказки -->
         <div id="info-panel">
             <span class="key-badge">WASD</span> Движение
             <span class="key-badge">Колесо</span> Зум
-            <span class="key-badge">R / ПКМ</span> Поворот
-            <span class="key-badge">1-3</span> Выбор
+            <span class="key-badge">R</span> Поворот
+            <span class="key-badge">Q</span> Пипетка
         </div>
     </div>
 
-    <!-- Подключаем главный модуль -->
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

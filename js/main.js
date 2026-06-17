@@ -47,20 +47,20 @@ class Game {
         
         await atlasLoader.loadAtlas(
             'atlas0_lq',
-            'assets/storage/sprites/res_built/atlas/atlas0_lq.json',
-            'assets/storage/sprites/res_built/atlas/atlas0_lq.png'
+            'assets/sprites/res_built/atlas/atlas0_lq.json',
+            'assets/sprites/res_built/atlas/atlas0_lq.png'
         );
         
         await atlasLoader.loadAtlas(
             'atlas0_mq',
-            'assets/storage/sprites/res_built/atlas/atlas0_mq.json',
-            'assets/storage/sprites/res_built/atlas/atlas0_mq.png'
+            'assets/sprites/res_built/atlas/atlas0_mq.json',
+            'assets/sprites/res_built/atlas/atlas0_mq.png'
         );
         
         await atlasLoader.loadAtlas(
             'atlas0_hq',
-            'assets/storage/sprites/res_built/atlas/atlas0_hq.json',
-            'assets/storage/sprites/res_built/atlas/atlas0_hq.png'
+            'assets/sprites/res_built/atlas/atlas0_hq.json',
+            'assets/sprites/res_built/atlas/atlas0_hq.png'
         );
 
         await atlasLoader.waitForAll();

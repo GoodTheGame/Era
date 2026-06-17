@@ -30,6 +30,7 @@ export class AtlasLoader {
 
     async waitForAll() {
         await Promise.all(this.loadingPromises);
+        this.loadingPromises = []; // Очищаем после ожидания
     }
 
     getSprite(name, spritePath) {
@@ -64,11 +65,9 @@ export class AtlasLoader {
         const sprite = this.getSprite(name, spritePath);
         if (!sprite) return;
 
-        // Вычисляем масштаб
         const scaleX = width / sprite.sourceW;
         const scaleY = height / sprite.sourceH;
 
-        // Рисуем с учетом обрезки (trimming)
         ctx.drawImage(
             sprite.image,
             sprite.sx, sprite.sy, sprite.sw, sprite.sh,
@@ -80,5 +79,4 @@ export class AtlasLoader {
     }
 }
 
-// Глобальный экземпляр загрузчика
 export const atlasLoader = new AtlasLoader();

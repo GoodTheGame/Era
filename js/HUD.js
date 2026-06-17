@@ -1,3 +1,4 @@
+// js/HUD.js
 export class HUD {
     constructor(game) {
         this.game = game;
@@ -13,12 +14,12 @@ export class HUD {
             { key: '1', type: 'belt',           label: '1<br>Лента' },
             { key: '2', type: 'tunnel',         label: '2<br>Тоннель' },
             { key: '3', type: 'splitter',       label: '3<br>Разделит.' },
-            { key: '4', type: 'extractor',      label: '4<br>Добыча' },
-            { key: '5', type: 'cutter',         label: '5<br>Резак' },
-            { key: '6', type: 'rotator',        label: '6<br>Вращатель' },
-            { key: '7', type: 'mixer',          label: '7<br>Смеситель' },
-            { key: '8', type: 'storage',        label: '8<br>Склад' },
-            { key: '9', type: 'balancer',       label: '9<br>Баланс.' },
+            { key: '4', type: 'balancer',       label: '4<br>Баланс.' }, // Добавлено
+            { key: '5', type: 'extractor',      label: '5<br>Добыча' },
+            { key: '6', type: 'cutter',         label: '6<br>Резак' },
+            { key: '7', type: 'rotator',        label: '7<br>Вращатель' },
+            { key: '8', type: 'mixer',          label: '8<br>Смеситель' },
+            { key: '9', type: 'storage',        label: '9<br>Склад' },
             { key: '0', type: 'trash',          label: '0<br>Мусор' }
         ];
 
@@ -38,29 +39,25 @@ export class HUD {
         window.addEventListener('keydown', (e) => {
             const key = e.key;
             
-            // Цифры 1-9, 0
             if (key === '1') this.selectBuilding('belt');
             else if (key === '2') this.selectBuilding('tunnel');
             else if (key === '3') this.selectBuilding('splitter');
-            else if (key === '4') this.selectBuilding('extractor');
-            else if (key === '5') this.selectBuilding('cutter');
-            else if (key === '6') this.selectBuilding('rotator');
-            else if (key === '7') this.selectBuilding('mixer');
-            else if (key === '8') this.selectBuilding('storage');
-            else if (key === '9') this.selectBuilding('balancer');
+            else if (key === '4') this.selectBuilding('balancer');
+            else if (key === '5') this.selectBuilding('extractor');
+            else if (key === '6') this.selectBuilding('cutter');
+            else if (key === '7') this.selectBuilding('rotator');
+            else if (key === '8') this.selectBuilding('mixer');
+            else if (key === '9') this.selectBuilding('storage');
             else if (key === '0') this.selectBuilding('trash');
             
-            // Поворот
             else if (key.toLowerCase() === 'r' || key.toLowerCase() === 'к') {
                 this.game.buildingManager.rotateGhost();
             }
             
-            // Пипетка (Q)
             else if (key.toLowerCase() === 'q' || key.toLowerCase() === 'й') {
                 this.game.buildingManager.pipette();
             }
             
-            // Отмена (Escape)
             else if (key === 'Escape') {
                 this.selectBuilding(null);
             }

@@ -1,78 +1,101 @@
+// js/Map.js
 export class GameMap {
     constructor(camera) {
         this.camera = camera;
         this.tileSize = 64;
+        
         this.veins = [];
         this._generateVeins();
+        
+        // Кэш для отрисовки жил
+        this.veinCanvasCache = new Map();
     }
 
     _generateVeins() {
-        // 3 типа кварков (цвета), по 2 жилы каждого
+        // Генерируем жилы как в Shapez - с использованием seed для детерминированности
         const veinTypes = [
-            { color: '#E07A7A', name: 'up_quark' },
-            { color: '#7A9EE0', name: 'down_quark' },
-            { color: '#7AE0A3', name: 'strange_quark' }
+            { color: '#ff666a', name: 'red' },
+            { color: '#66a7ff', name: 'blue' },
+            { color: '#78ff66', name: 'green' }
         ];
         
-        const placedVeins = [];
-        const minDistance = 450;
-        
+        // По 2 жилы каждого типа
         for (const type of veinTypes) {
             for (let i = 0; i < 2; i++) {
-                let attempts = 0;
-                let placed = false;
+                const seed = `${type.name}_${i}`;
+                const rng = this._seededRandom(seed);
                 
-                while (!placed && attempts < 200) {
-                    const x = (Math.random() - 0.5) * 3500;
-                    const y = (Math.random() - 0.5) * 3500;
-                    const radius = 130 + Math.random() * 70;
-                    
-                    // Не ближе 500px к центру (где Хаб)
-                    const distToCenter = Math.hypot(x, y);
-                    if (distToCenter < 500) {
-                        attempts++;
-                        continue;
-                    }
-                    
-                    // Проверяем дистанцию до других жил
-                    let valid = true;
-                    for (const v of placedVeins) {
-                        const dist = Math.hypot(x - v.x, y - v.y);
-                        if (dist < minDistance) {
-                            valid = false;
-                            break;
-                        }
-                    }
-                    
-                    if (valid) {
-                        const vein = { x, y, radius, color: type.color, name: type.name };
-                        this.veins.push(vein);
-                        placedVeins.push(vein);
-                        placed = true;
-                    }
-                    
-                    attempts++;
-                }
+                // Позиция в пределах карты
+                const x = (rng() - 0.5) * 3000;
+                const y = (rng() - 0.5) * 3000;
+                
+                // Не ближе 500px к центру (где Хаб)
+                const distToCenter = Math.hypot(x, y);
+                if (distToCenter < 500) continue;
+                
+                // Размер жилы
+                const radius = 120 + rng() * 80;
+                
+                this.veins.push({
+                    x, y,
+                    radius,
+                    color: type.color,
+                    name: type.name,
+                    seed: seed
+                });
             }
         }
     }
 
+    _seededRandom(seed) {
+        let hash = 0;
+        for (let i = 0; i < seed.length; i++) {
+            const char = seed.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        
+        return function() {
+            hash = (hash * 9301 + 49297) % 233280;
+            return hash / 233280;
+        };
+    }
+
     render(ctx) {
+        // Тёмный фон
         ctx.fillStyle = '#1a1d2e';
         ctx.fillRect(-5000, -5000, 10000, 10000);
 
+        // Рисуем жилы
         for (const vein of this.veins) {
-            const gradient = ctx.createRadialGradient(vein.x, vein.y, 0, vein.x, vein.y, vein.radius);
-            gradient.addColorStop(0, vein.color + 'aa');
-            gradient.addColorStop(0.7, vein.color + '55');
-            gradient.addColorStop(1, vein.color + '00');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(vein.x, vein.y, vein.radius, 0, Math.PI * 2);
-            ctx.fill();
+            this._drawVein(ctx, vein);
         }
 
         this._renderGrid(ctx);
+    }
+
+    _drawVein(ctx, vein) {
+        ctx.save();
+        ctx.translate(vein.x, vein.y);
+        
+        // Рисуем жилу как в Shapez - с несколькими слоями градиентов
+        const layers = 3;
+        for (let i = 0; i < layers; i++) {
+            const layerRadius = vein.radius * (1 - i * 0.25);
+            const alpha = 0.3 + i * 0.2;
+            
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, layerRadius);
+            gradient.addColorStop(0, vein.color + Math.floor(alpha * 255).toString(16).padStart(2, '0'));
+            gradient.addColorStop(0.7, vein.color + Math.floor(alpha * 0.5 * 255).toString(16).padStart(2, '0'));
+            gradient.addColorStop(1, vein.color + '00');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, layerRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        ctx.restore();
     }
 
     _renderGrid(ctx) {
