@@ -968,6 +968,7 @@ export class Building {
         this.rotation = rotation;
         this.animationFrame = 0;
         this.animationTimer = 0;
+        this.beltType = 0; // 0=forward, 1=left, 2=right
     }
 
     update(dt) {
@@ -982,17 +983,9 @@ export class Building {
 
     getSize() {
         const base = BUILDING_SIZES[this.type] || { w: 1, h: 1 };
-        
-        // Для квадратных зданий поворот не меняет занимаемую площадь
-        if (base.w === base.h) {
-            return base;
-        }
-
-        // Для прямоугольных: при повороте на 90/270 градусов меняем местами W и H
         if (this.rotation % 2 === 1) {
             return { w: base.h, h: base.w };
         }
-        
         return base;
     }
 }
@@ -1036,41 +1029,86 @@ export class BuildingManager {
         this.ghost.ty = tile.ty;
         this.ghost.type = this.game.selectedType;
         this.ghost.visible = true;
-
+        
         if (this.game.selectedType === 'belt') {
             this.ghost.rotation = this._calculateOptimalBeltRotation(tile.tx, tile.ty);
+            this.ghost.beltType = this._calculateBeltType(tile.tx, tile.ty, this.ghost.rotation);
         }
+    }
+
+    _calculateBeltType(tx, ty, rotation) {
+        const neighbors = this._getBeltNeighborInfo(tx, ty);
+        
+        if (neighbors.inputFrom === null && neighbors.outputTo === null) {
+            return 0; // Изолированный - прямой
+        }
+        
+        if (neighbors.inputFrom !== null && neighbors.outputTo !== null) {
+            const inputDir = neighbors.inputFrom;
+            const outputDir = neighbors.outputTo;
+            
+            // Если вход и выход противоположны - прямой
+            if ((inputDir + 2) % 4 === outputDir) {
+                return 0; // forward
+            }
+            
+            // Определяем тип поворота
+            // rotation - направление ВЫХОДА конвейера
+            // inputDir - с какой стороны входит
+            const diff = (outputDir - inputDir + 4) % 4;
+            
+            if (diff === 1) {
+                // Поворот направо (по часовой)
+                return 2; // right
+            } else if (diff === 3) {
+                // Поворот налево (против часовой)
+                return 1; // left
+            }
+        }
+        
+        return 0; // По умолчанию прямой
     }
 
     _calculateOptimalBeltRotation(tx, ty) {
         const neighbors = this._getBeltNeighborInfo(tx, ty);
+        
         if (neighbors.inputFrom !== null && neighbors.outputTo !== null) {
             return this._determineBeltRotation(neighbors.inputFrom, neighbors.outputTo);
         }
+        
         if (neighbors.inputFrom !== null) {
             return (neighbors.inputFrom + 2) % 4;
         }
+        
         if (neighbors.outputTo !== null) {
             return neighbors.outputTo;
         }
+        
         return 0;
     }
 
+    
     _getBeltNeighborInfo(tx, ty) {
-        const result = { inputFrom: null, outputTo: null };
+        const result = {
+            inputFrom: null,
+            outputTo: null
+        };
+        
         const directions = [
-            { dx: 0, dy: -1, dir: 0 },
-            { dx: 1, dy: 0, dir: 1 },
-            { dx: 0, dy: 1, dir: 2 },
-            { dx: -1, dy: 0, dir: 3 }
+            { dx: 0, dy: -1, dir: 0 },  // top
+            { dx: 1, dy: 0, dir: 1 },   // right
+            { dx: 0, dy: 1, dir: 2 },   // bottom
+            { dx: -1, dy: 0, dir: 3 }   // left
         ];
-
+        
         for (const { dx, dy, dir } of directions) {
             const neighborTx = tx + dx;
             const neighborTy = ty + dy;
             const neighbor = this.getBuildingAt(neighborTx, neighborTy);
+            
             if (!neighbor) continue;
-
+            
+            // Если сосед - конвейер
             if (neighbor.type === 'belt') {
                 const neighborOutputDir = neighbor.rotation;
                 const directionToUs = (dir + 2) % 4;
@@ -1078,13 +1116,18 @@ export class BuildingManager {
                     result.inputFrom = dir;
                 }
             }
+            
+            // Если сосед - здание, выдающее в нашу сторону
             if (this._buildingOutputsTo(neighbor, tx, ty)) {
                 result.inputFrom = dir;
             }
+            
+            // Если сосед - здание, принимающее с нашей стороны
             if (this._buildingAcceptsFrom(neighbor, tx, ty, dir)) {
                 result.outputTo = dir;
             }
         }
+        
         return result;
     }
 
@@ -1108,9 +1151,12 @@ export class BuildingManager {
     }
 
     _determineBeltRotation(inputFrom, outputTo) {
+        // Если вход и выход противоположны - прямой конвейер
         if ((inputFrom + 2) % 4 === outputTo) {
             return outputTo;
         }
+        
+        // Для поворотов - конвейер смотрит в сторону выхода
         return outputTo;
     }
 
@@ -1122,6 +1168,9 @@ export class BuildingManager {
     rotateGhost() {
         if (this.ghost.visible) {
             this.ghost.rotation = (this.ghost.rotation + 1) % 4;
+            if (this.ghost.type === 'belt') {
+                this.ghost.beltType = this._calculateBeltType(this.ghost.tx, this.ghost.ty, this.ghost.rotation);
+            }
         }
     }
 
@@ -1132,6 +1181,7 @@ export class BuildingManager {
         if (b && b.type !== 'hub') {
             this.game.selectedType = b.type;
             this.ghost.rotation = b.rotation;
+            this.ghost.beltType = b.beltType;
             this.game.hud.updateActiveButton();
             return true;
         }
@@ -1187,12 +1237,13 @@ export class BuildingManager {
 
     _tryPlace() {
         if (!this.ghost.visible) return false;
+        
         const size = this.ghost.getSize();
         const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
         const targetTx = tile.tx;
         const targetTy = tile.ty;
-
+        
         for (let dx = 0; dx < size.w; dx++) {
             for (let dy = 0; dy < size.h; dy++) {
                 if (this.getBuildingAt(targetTx + dx, targetTy + dy)) {
@@ -1200,19 +1251,24 @@ export class BuildingManager {
                 }
             }
         }
-
+        
         if (this.ghost.type === 'extractor') {
             if (!this.game.map.getVeinAt(targetTx, targetTy)) {
                 return false;
             }
         }
-
+        
         const newBuilding = new Building(
             targetTx,
             targetTy,
             this.ghost.type,
             this.ghost.rotation
         );
+        
+        if (this.ghost.type === 'belt') {
+            newBuilding.beltType = this.ghost.beltType;
+        }
+        
         this.buildings.push(newBuilding);
         this.lastPlacedTile = { tx: targetTx, ty: targetTy };
         return true;
@@ -1243,44 +1299,56 @@ export class BuildingManager {
     }
 
     _drawBuilding(ctx, b, tileSize, isGhost) {
+        const x = b.tx * tileSize;
+        const y = b.ty * tileSize;
         const size = b.getSize();
         const w = size.w * tileSize;
         const h = size.h * tileSize;
-        const x = b.tx * tileSize;
-        const y = b.ty * tileSize;
-
+        
         ctx.save();
         if (isGhost) ctx.globalAlpha = 0.6;
-
+        
         if (b.type === 'belt') {
-            spriteRenderer.drawBelt(ctx, x, y, tileSize, b.rotation, b.animationFrame);
-        } else if (b.type === 'extractor') {
-            spriteRenderer.drawBuilding(ctx, x, y, tileSize, tileSize, 'miner', b.rotation);
-        } else if (b.type === 'hub') {
+            spriteRenderer.drawBelt(ctx, x, y, tileSize, b.rotation, b.animationFrame, b.beltType);
+        }
+        else if (b.type === 'extractor') {
+            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'miner', b.rotation);
+        }
+        else if (b.type === 'hub') {
             spriteRenderer.drawBuilding(ctx, x, y, w, h, 'hub', 0);
-        } else if (b.type === 'cutter') {
+        }
+        else if (b.type === 'cutter') {
             spriteRenderer.drawBuilding(ctx, x, y, w, h, 'cutter', b.rotation);
-        } else if (b.type === 'rotator') {
-            spriteRenderer.drawBuilding(ctx, x, y, tileSize, tileSize, 'rotater', b.rotation);
-        } else if (b.type === 'mixer') {
+        }
+        else if (b.type === 'rotator') {
+            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'rotater', b.rotation);
+        }
+        else if (b.type === 'mixer') {
             spriteRenderer.drawBuilding(ctx, x, y, w, h, 'mixer', b.rotation);
-        } else if (b.type === 'splitter') {
-            spriteRenderer.drawBuilding(ctx, x, y, tileSize, tileSize, 'balancer-splitter', b.rotation);
-        } else if (b.type === 'balancer') {
+        }
+        else if (b.type === 'splitter') {
+            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'balancer-splitter', b.rotation);
+        }
+        else if (b.type === 'balancer') {
             spriteRenderer.drawBuilding(ctx, x, y, w, h, 'balancer', b.rotation);
-        } else if (b.type === 'storage') {
+        }
+        else if (b.type === 'storage') {
             spriteRenderer.drawBuilding(ctx, x, y, w, h, 'storage', 0);
-        } else if (b.type === 'trash') {
-            spriteRenderer.drawBuilding(ctx, x, y, tileSize, tileSize, 'trash', b.rotation);
-        } else if (b.type === 'tunnel') {
-            spriteRenderer.drawBuilding(ctx, x, y, tileSize, tileSize, 'underground_belt_entry', b.rotation);
-        } else {
+        }
+        else if (b.type === 'trash') {
+            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'trash', b.rotation);
+        }
+        else if (b.type === 'tunnel') {
+            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'underground_belt_entry', b.rotation);
+        }
+        else {
             ctx.fillStyle = '#8898A5';
             ctx.fillRect(x, y, w, h);
             ctx.strokeStyle = '#5A6B7A';
             ctx.lineWidth = 2;
             ctx.strokeRect(x, y, w, h);
         }
+        
         ctx.restore();
     }
 }
@@ -2248,58 +2316,84 @@ export class SpriteRenderer {
         if (['lq', 'mq', 'hq'].includes(quality)) this.currentAtlas = quality;
     }
 
-    // SpriteRenderer.js - ИСПРАВЛЕННАЯ ЧАСТЬ
-
-_drawSprite(ctx, sprite, x, y, targetW, targetH) {
-    if (!sprite) return;
-    
-    const { image, sx, sy, sw, sh, dx, dy, sourceW, sourceH } = sprite;
-    
-    // Масштаб относительно логического размера (sourceSize)
-    const scaleX = targetW / sourceW;
-    const scaleY = targetH / sourceH;
-
-    // Ключевое изменение: смещение dx/dy в атласе задаётся ОТ ЛЕВОГО ВЕРХНЕГО УГЛА sourceSize.
-    // Но мы рисуем относительно ЦЕНТРА (0,0 после translate).
-    // Поэтому нужно пересчитать dx/dy относительно центра sourceSize.
-    const centerX = sourceW / 2;
-    const centerY = sourceH / 2;
-    
-    // Смещение от центра источника
-    const offsetX = (dx - centerX) * scaleX;
-    const offsetY = (dy - centerY) * scaleY;
-    
-    // Размер обрезанного спрайта, масштабированный и центрированный
-    const drawW = sw * scaleX;
-    const drawH = sh * scaleY;
-    const drawX = offsetX - drawW / 2;
-    const drawY = offsetY - drawH / 2;
-
-    ctx.drawImage(image, sx, sy, sw, sh, drawX, drawY, drawW, drawH);
-}
-
-drawBuilding(ctx, x, y, localW, localH, buildingType, rotation = 0, variant = '') {
-    let spritePath = variant
-        ? `sprites/buildings/${buildingType}-${variant}.png`
-        : `sprites/buildings/${buildingType}.png`;
+    _drawSprite(ctx, sprite, x, y, targetW, targetH) {
+        if (!sprite) return;
         
-    const sprite = atlasLoader.getSprite(`atlas0_${this.currentAtlas}`, spritePath);
-    if (!sprite) {
-        ctx.fillStyle = '#ff00ff';
-        ctx.fillRect(x, y, localW, localH);
-        return;
+        const { image, sx, sy, sw, sh, dx, dy, sourceW, sourceH } = sprite;
+        
+        // Масштабируем относительно sourceSize
+        const scaleX = targetW / sourceW;
+        const scaleY = targetH / sourceH;
+
+        // Учитываем смещение dx/dy из атласа
+        const drawX = x + dx * scaleX;
+        const drawY = y + dy * scaleY;
+        const drawW = sw * scaleX;
+        const drawH = sh * scaleY;
+
+        ctx.drawImage(image, sx, sy, sw, sh, drawX, drawY, drawW, drawH);
     }
 
-    ctx.save();
-    // Переносим начало координат в центр занимаемой области
-    ctx.translate(x + localW / 2, y + localH / 2);
-    ctx.rotate(rotation * Math.PI / 2);
-    
-    // Рисуем спрайт относительно нового центра (0,0)
-    this._drawSprite(ctx, sprite, 0, 0, localW, localH);
-    
-    ctx.restore();
-}
+    drawBelt(ctx, x, y, size, rotation, frame, beltType = 0) {
+        // Выбираем спрайт в зависимости от типа конвейера
+        let spriteType = 'forward';
+        if (beltType === 1) {
+            spriteType = 'left';
+        } else if (beltType === 2) {
+            spriteType = 'right';
+        }
+        
+        const spritePath = `sprites/belt/built/${spriteType}_${frame}.png`;
+        const sprite = atlasLoader.getSprite(`atlas0_${this.currentAtlas}`, spritePath);
+        if (!sprite) return;
+
+        ctx.save();
+        ctx.translate(x + size / 2, y + size / 2);
+        ctx.rotate(rotation * Math.PI / 2);
+        ctx.translate(-size / 2, -size / 2);
+        
+        this._drawSprite(ctx, sprite, 0, 0, size, size);
+        ctx.restore();
+    }
+
+    drawBuilding(ctx, x, y, localW, localH, buildingType, rotation = 0, variant = '') {
+        let spritePath = variant
+            ? `sprites/buildings/${buildingType}-${variant}.png`
+            : `sprites/buildings/${buildingType}.png`;
+            
+        // Для повернутых зданий пытаемся найти специальный спрайт
+        if (rotation % 2 === 1) {
+            const rotatedPath = `sprites/buildings/${buildingType}-rotated.png`;
+            const rotatedSprite = atlasLoader.getSprite(`atlas0_${this.currentAtlas}`, rotatedPath);
+            if (rotatedSprite) {
+                spritePath = rotatedPath;
+            }
+        }
+            
+        const sprite = atlasLoader.getSprite(`atlas0_${this.currentAtlas}`, spritePath);
+        if (!sprite) {
+            ctx.fillStyle = '#ff00ff';
+            ctx.fillRect(x, y, localW, localH);
+            return;
+        }
+
+        ctx.save();
+        
+        // Если здание прямоугольное и повернуто, меняем местами размеры для корректного центрирования
+        if (rotation % 2 === 1 && localW !== localH) {
+            ctx.translate(x + localW / 2, y + localH / 2);
+            ctx.rotate(rotation * Math.PI / 2);
+            ctx.translate(-localH / 2, -localW / 2);
+            this._drawSprite(ctx, sprite, 0, 0, localH, localW);
+        } else {
+            ctx.translate(x + localW / 2, y + localH / 2);
+            ctx.rotate(rotation * Math.PI / 2);
+            ctx.translate(-localW / 2, -localH / 2);
+            this._drawSprite(ctx, sprite, 0, 0, localW, localH);
+        }
+        
+        ctx.restore();
+    }
 }
 
 export const spriteRenderer = new SpriteRenderer();

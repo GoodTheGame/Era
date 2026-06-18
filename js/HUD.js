@@ -4,7 +4,6 @@ export class HUD {
         this.game = game;
         this.toolbar = document.getElementById('toolbar');
         this.buttons = {};
-
         this._createToolbar();
         this._bindHotkeys();
     }
@@ -14,7 +13,7 @@ export class HUD {
             { key: '1', type: 'belt',           label: '1<br>Лента' },
             { key: '2', type: 'tunnel',         label: '2<br>Тоннель' },
             { key: '3', type: 'splitter',       label: '3<br>Разделит.' },
-            { key: '4', type: 'balancer',       label: '4<br>Баланс.' }, // Добавлено
+            { key: '4', type: 'balancer',       label: '4<br>Баланс.' },
             { key: '5', type: 'extractor',      label: '5<br>Добыча' },
             { key: '6', type: 'cutter',         label: '6<br>Резак' },
             { key: '7', type: 'rotator',        label: '7<br>Вращатель' },
@@ -28,7 +27,6 @@ export class HUD {
             btn.className = 'tool-btn';
             btn.innerHTML = item.label;
             btn.dataset.type = item.type;
-            
             btn.addEventListener('click', () => this.selectBuilding(item.type));
             this.toolbar.appendChild(btn);
             this.buttons[item.type] = btn;
@@ -38,7 +36,13 @@ export class HUD {
     _bindHotkeys() {
         window.addEventListener('keydown', (e) => {
             const key = e.key;
-            
+
+            // Предотвращаем стандартное поведение для игровых клавиш
+            if (['1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+                 'r', 'R', 'к', 'К', 'q', 'Q', 'й', 'Й', 'Escape'].includes(key)) {
+                e.preventDefault();
+            }
+
             if (key === '1') this.selectBuilding('belt');
             else if (key === '2') this.selectBuilding('tunnel');
             else if (key === '3') this.selectBuilding('splitter');
@@ -49,15 +53,16 @@ export class HUD {
             else if (key === '8') this.selectBuilding('mixer');
             else if (key === '9') this.selectBuilding('storage');
             else if (key === '0') this.selectBuilding('trash');
-            
-            else if (key.toLowerCase() === 'r' || key.toLowerCase() === 'к') {
-                this.game.buildingManager.rotateGhost();
+            else if (key === 'r' || key === 'R' || key === 'к' || key === 'К') {
+                if (this.game.selectedType) {
+                    this.game.buildingManager.rotateGhost();
+                } else {
+                    this.game.buildingManager.rotateBuildingUnderCursor();
+                }
             }
-            
-            else if (key.toLowerCase() === 'q' || key.toLowerCase() === 'й') {
+            else if (key === 'q' || key === 'Q' || key === 'й' || key === 'Й') {
                 this.game.buildingManager.pipette();
             }
-            
             else if (key === 'Escape') {
                 this.selectBuilding(null);
             }
@@ -67,7 +72,6 @@ export class HUD {
     selectBuilding(type) {
         this.game.selectedType = type;
         this.updateActiveButton();
-        
         if (type) {
             this.game.buildingManager._updateGhostFromLastMouse();
         }

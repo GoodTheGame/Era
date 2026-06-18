@@ -1,19 +1,41 @@
 // Buildings.js
-import { spriteRenderer } from './SpriteRenderer.js';
+import {
+    beltBuilding,
+    updateSurroundingBelts,
+    calculateOptimalBeltRotation,
+    calculateBeltType,
+    rotateBelt,
+    getBeltTypeFromDirs,
+    getInputsAndOutputs
+} from './buildings/belt.js';
+import { extractorBuilding } from './buildings/extractor.js';
+import { cutterBuilding } from './buildings/cutter.js';
+import { rotatorBuilding } from './buildings/rotator.js';
+import { mixerBuilding } from './buildings/mixer.js';
+import { splitterBuilding } from './buildings/splitter.js';
+import { balancerBuilding } from './buildings/balancer.js';
+import { storageBuilding } from './buildings/storage.js';
+import { trashBuilding } from './buildings/trash.js';
+import { tunnelBuilding } from './buildings/tunnel.js';
+import { hubBuilding } from './buildings/hub.js';
 
-export const BUILDING_SIZES = {
-    'belt': { w: 1, h: 1 },
-    'tunnel': { w: 1, h: 1 },
-    'extractor': { w: 1, h: 1 },
-    'cutter': { w: 2, h: 1 },
-    'rotator': { w: 1, h: 1 },
-    'mixer': { w: 2, h: 1 },
-    'splitter': { w: 1, h: 1 },
-    'balancer': { w: 2, h: 1 },
-    'storage': { w: 2, h: 2 },
-    'trash': { w: 1, h: 1 },
-    'hub': { w: 4, h: 4 }
+const BUILDING_MODULES = {
+    'belt': beltBuilding,
+    'extractor': extractorBuilding,
+    'cutter': cutterBuilding,
+    'rotator': rotatorBuilding,
+    'mixer': mixerBuilding,
+    'splitter': splitterBuilding,
+    'balancer': balancerBuilding,
+    'storage': storageBuilding,
+    'trash': trashBuilding,
+    'tunnel': tunnelBuilding,
+    'hub': hubBuilding,
 };
+
+export const BUILDING_SIZES = Object.fromEntries(
+    Object.entries(BUILDING_MODULES).map(([type, mod]) => [type, mod.size])
+);
 
 export class Building {
     constructor(tx, ty, type, rotation = 0) {
@@ -22,18 +44,7 @@ export class Building {
         this.type = type;
         this.rotation = rotation;
         this.animationFrame = 0;
-        this.animationTimer = 0;
-        this.beltType = 0; // 0=forward, 1=left, 2=right
-    }
-
-    update(dt) {
-        if (this.type === 'belt') {
-            this.animationTimer += dt;
-            if (this.animationTimer >= 0.07) {
-                this.animationTimer = 0;
-                this.animationFrame = (this.animationFrame + 1) % 14;
-            }
-        }
+        this.beltType = 0;
     }
 
     getSize() {
@@ -55,6 +66,15 @@ export class BuildingManager {
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
         this.lastPlacedTile = null;
+        this.lastGhostTile = null;
+        this.ghostPreferred = { rotation: 0, beltType: 0 };
+        this.pendingFirstBeltTile = null;
+        this.isDraggingBelt = false;
+        this.justPlaced = false;
+
+        this.beltAnimFrame = 0;
+        this.beltAnimTimer = 0;
+
         this._initGhost();
     }
 
@@ -64,170 +84,191 @@ export class BuildingManager {
     }
 
     update(dt) {
-        for (const b of this.buildings) {
-            b.update(dt);
+        this.beltAnimTimer += dt;
+        while (this.beltAnimTimer >= 0.07) {
+            this.beltAnimTimer -= 0.07;
+            this.beltAnimFrame = (this.beltAnimFrame + 1) % 14;
         }
-        this._updateGhostFromLastMouse();
+
         if (this.isRightMouseDown && !this.game.selectedType) {
             this._deleteUnderCursor();
         }
+
+        this._updateGhostFromLastMouse();
     }
 
     _updateGhostFromLastMouse() {
-        if (!this.game.selectedType) {
-            this.ghost.visible = false;
-            return;
-        }
+        if (!this.game.selectedType) { this.ghost.visible = false; return; }
         const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+
+        if (this.justPlaced) {
+            if (this.lastPlacedTile && tile.tx === this.lastPlacedTile.tx && tile.ty === this.lastPlacedTile.ty) {
+                this.ghost.visible = false;
+                return;
+            } else {
+                this.justPlaced = false;
+            }
+        }
+
+        if (this.lastGhostTile && (tile.tx !== this.lastGhostTile.tx || tile.ty !== this.lastGhostTile.ty)) {
+            this.lastGhostTile = null;
+        }
+
         this.ghost.tx = tile.tx;
         this.ghost.ty = tile.ty;
         this.ghost.type = this.game.selectedType;
         this.ghost.visible = true;
-        
-        if (this.game.selectedType === 'belt') {
-            this.ghost.rotation = this._calculateOptimalBeltRotation(tile.tx, tile.ty);
-            this.ghost.beltType = this._calculateBeltType(tile.tx, tile.ty, this.ghost.rotation);
-        }
-    }
 
-    _calculateBeltType(tx, ty, rotation) {
-        const neighbors = this._getBeltNeighborInfo(tx, ty);
-        
-        if (neighbors.inputFrom === null && neighbors.outputTo === null) {
-            return 0; // Изолированный - прямой
-        }
-        
-        if (neighbors.inputFrom !== null && neighbors.outputTo !== null) {
-            const inputDir = neighbors.inputFrom;
-            const outputDir = neighbors.outputTo;
-            
-            // Если вход и выход противоположны - прямой
-            if ((inputDir + 2) % 4 === outputDir) {
-                return 0; // forward
-            }
-            
-            // Определяем тип поворота
-            // rotation - направление ВЫХОДА конвейера
-            // inputDir - с какой стороны входит
-            const diff = (outputDir - inputDir + 4) % 4;
-            
-            if (diff === 1) {
-                // Поворот направо (по часовой)
-                return 2; // right
-            } else if (diff === 3) {
-                // Поворот налево (против часовой)
-                return 1; // left
-            }
-        }
-        
-        return 0; // По умолчанию прямой
-    }
+        const module = BUILDING_MODULES[this.game.selectedType];
 
-    _calculateOptimalBeltRotation(tx, ty) {
-        const neighbors = this._getBeltNeighborInfo(tx, ty);
-        
-        if (neighbors.inputFrom !== null && neighbors.outputTo !== null) {
-            return this._determineBeltRotation(neighbors.inputFrom, neighbors.outputTo);
-        }
-        
-        if (neighbors.inputFrom !== null) {
-            return (neighbors.inputFrom + 2) % 4;
-        }
-        
-        if (neighbors.outputTo !== null) {
-            return neighbors.outputTo;
-        }
-        
-        return 0;
-    }
-
-    
-    _getBeltNeighborInfo(tx, ty) {
-        const result = {
-            inputFrom: null,
-            outputTo: null
-        };
-        
-        const directions = [
-            { dx: 0, dy: -1, dir: 0 },  // top
-            { dx: 1, dy: 0, dir: 1 },   // right
-            { dx: 0, dy: 1, dir: 2 },   // bottom
-            { dx: -1, dy: 0, dir: 3 }   // left
-        ];
-        
-        for (const { dx, dy, dir } of directions) {
-            const neighborTx = tx + dx;
-            const neighborTy = ty + dy;
-            const neighbor = this.getBuildingAt(neighborTx, neighborTy);
-            
-            if (!neighbor) continue;
-            
-            // Если сосед - конвейер
-            if (neighbor.type === 'belt') {
-                const neighborOutputDir = neighbor.rotation;
-                const directionToUs = (dir + 2) % 4;
-                if (neighborOutputDir === directionToUs) {
-                    result.inputFrom = dir;
+        if (!this.lastGhostTile) {
+            const { inputs, outputs } = getInputsAndOutputs(tile.tx, tile.ty, this.game);
+            if (inputs.length === 0 && outputs.length === 0) {
+                this.ghost.rotation = this.ghostPreferred.rotation;
+                this.ghost.beltType = 0;
+            } else {
+                if (module && module.getGhostRotation) {
+                    this.ghost.rotation = module.getGhostRotation(tile.tx, tile.ty, this.game);
+                }
+                if (module && module.getGhostBeltType) {
+                    this.ghost.beltType = module.getGhostBeltType(tile.tx, tile.ty, this.ghost.rotation, this.game);
                 }
             }
-            
-            // Если сосед - здание, выдающее в нашу сторону
-            if (this._buildingOutputsTo(neighbor, tx, ty)) {
-                result.inputFrom = dir;
+        }
+    }
+
+    // ---------------------------------------------------------------
+    //  АВТОПРОКЛАДКА С ПОВОРОТАМИ, ЗАМЫКАНИЕМ И ВЫХОДОМ
+    // ---------------------------------------------------------------
+    _tryPlaceBeltAt(tx, ty) {
+        const existing = this.getBuildingAt(tx, ty);
+        if (existing && existing.type !== 'belt') return false;
+
+        let newBelt = null;
+
+        if (this.lastPlacedTile) {
+            const prev = this.getBuildingAt(this.lastPlacedTile.tx, this.lastPlacedTile.ty);
+            if (!prev || prev.type !== 'belt') {
+                newBelt = new Building(tx, ty, 'belt', this.ghost.rotation);
+                newBelt.beltType = 0;
+            } else {
+                // Направление от предыдущего к текущей клетке
+                const dx = tx - prev.tx;
+                const dy = ty - prev.ty;
+                let fromDir = null;
+                if (dx === 0 && dy === -1) fromDir = 0;
+                else if (dx === 1 && dy === 0) fromDir = 1;
+                else if (dx === 0 && dy === 1) fromDir = 2;
+                else if (dx === -1 && dy === 0) fromDir = 3;
+                if (fromDir === null) return false;
+
+                if (existing && existing.type === 'belt') {
+                    // Клетка занята конвейером – стыковка или замыкание
+                    const outDir = existing.rotation;
+                    newBelt = new Building(tx, ty, 'belt', outDir);
+                    newBelt.beltType = getBeltTypeFromDirs(fromDir, outDir);
+                } else {
+                    // Пустая клетка: прямое продолжение или поворот
+                    const outDx = [0, 1, 0, -1][prev.rotation];
+                    const outDy = [-1, 0, 1, 0][prev.rotation];
+                    const expectedTX = prev.tx + outDx;
+                    const expectedTY = prev.ty + outDy;
+
+                    if (tx === expectedTX && ty === expectedTY) {
+                        // Прямое продолжение
+                        newBelt = new Building(tx, ty, 'belt', prev.rotation);
+                        newBelt.beltType = 0;
+                    } else {
+                        // Не прямо – это поворот, обработаем снаружи
+                        return false;
+                    }
+                }
             }
-            
-            // Если сосед - здание, принимающее с нашей стороны
-            if (this._buildingAcceptsFrom(neighbor, tx, ty, dir)) {
-                result.outputTo = dir;
+        } else {
+            // Самый первый конвейер
+            newBelt = new Building(tx, ty, 'belt', this.ghost.rotation);
+            newBelt.beltType = 0;
+        }
+
+        if (!newBelt) return false;
+
+        // Если существующий конвейер полностью совпадает – не трогаем, но продолжаем линию
+        if (existing && existing.type === 'belt' &&
+            existing.rotation === newBelt.rotation &&
+            existing.beltType === newBelt.beltType) {
+            this.lastPlacedTile = { tx, ty };
+            return true;
+        }
+
+        // Замена существующего
+        if (existing) {
+            this.buildings = this.buildings.filter(b => b !== existing);
+        }
+        if (this.getBuildingAt(tx, ty)) return false;
+
+        this.buildings.push(newBelt);
+        updateSurroundingBelts(tx, ty, this.game);
+        this.lastPlacedTile = { tx, ty };
+        return true;
+    }
+
+    _tryPlace() {
+        if (!this.ghost.visible) return false;
+        const size = this.ghost.getSize();
+        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+        const tx = tile.tx, ty = tile.ty;
+
+        for (let dx = 0; dx < size.w; dx++) {
+            for (let dy = 0; dy < size.h; dy++) {
+                if (this.getBuildingAt(tx + dx, ty + dy)) return false;
             }
         }
-        
-        return result;
-    }
+        if (this.ghost.type === 'extractor' && !this.game.map.getVeinAt(tx, ty)) return false;
 
-    _buildingOutputsTo(building, targetTx, targetTy) {
-        if (building.type === 'extractor' || building.type === 'belt') {
-            const outputDir = building.rotation;
-            const outputDx = [0, 1, 0, -1][outputDir];
-            const outputDy = [-1, 0, 1, 0][outputDir];
-            return (building.tx + outputDx === targetTx && building.ty + outputDy === targetTy);
+        const newBuilding = new Building(tx, ty, this.ghost.type, this.ghost.rotation);
+        if (this.ghost.type === 'belt') {
+            newBuilding.beltType = this.ghost.beltType || 0;
         }
-        return false;
-    }
-
-    _buildingAcceptsFrom(building, sourceTx, sourceTy, dir) {
-        if (['cutter', 'rotator', 'mixer', 'storage'].includes(building.type)) {
-            const inputDir = (building.rotation + 2) % 4;
-            const sourceDir = (dir + 2) % 4;
-            return inputDir === sourceDir;
+        this.buildings.push(newBuilding);
+        if (this.ghost.type === 'belt') {
+            updateSurroundingBelts(tx, ty, this.game);
         }
-        return false;
+        this.lastPlacedTile = { tx, ty };
+        return true;
     }
 
-    _determineBeltRotation(inputFrom, outputTo) {
-        // Если вход и выход противоположны - прямой конвейер
-        if ((inputFrom + 2) % 4 === outputTo) {
-            return outputTo;
+    rotateBuildingUnderCursor() {
+        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+        const building = this.getBuildingAt(tile.tx, tile.ty);
+        if (!building || building.type === 'hub') return;
+        const module = BUILDING_MODULES[building.type];
+        if (module && module.rotate) {
+            module.rotate(building, this.game);
+            updateSurroundingBelts(building.tx, building.ty, this.game);
+        } else {
+            building.rotation = (building.rotation + 1) % 4;
         }
-        
-        // Для поворотов - конвейер смотрит в сторону выхода
-        return outputTo;
-    }
-
-    setMousePosition(x, y) {
-        this.lastMouseX = x;
-        this.lastMouseY = y;
     }
 
     rotateGhost() {
-        if (this.ghost.visible) {
+        if (!this.ghost.visible) return;
+        const module = BUILDING_MODULES[this.ghost.type];
+        if (module && module.rotateGhost) {
+            module.rotateGhost(this.ghost, this.game);
+            this.ghostPreferred.rotation = this.ghost.rotation;
+            this.ghostPreferred.beltType = 0;
+            this.lastGhostTile = { tx: this.ghost.tx, ty: this.ghost.ty };
+        } else {
             this.ghost.rotation = (this.ghost.rotation + 1) % 4;
-            if (this.ghost.type === 'belt') {
-                this.ghost.beltType = this._calculateBeltType(this.ghost.tx, this.ghost.ty, this.ghost.rotation);
-            }
+            this.ghostPreferred.rotation = this.ghost.rotation;
+            this.ghostPreferred.beltType = 0;
         }
     }
+
+    setMousePosition(x, y) { this.lastMouseX = x; this.lastMouseY = y; }
 
     pipette() {
         const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
@@ -236,7 +277,7 @@ export class BuildingManager {
         if (b && b.type !== 'hub') {
             this.game.selectedType = b.type;
             this.ghost.rotation = b.rotation;
-            this.ghost.beltType = b.beltType;
+            if (b.type === 'belt') this.ghost.beltType = b.beltType;
             this.game.hud.updateActiveButton();
             return true;
         }
@@ -249,18 +290,69 @@ export class BuildingManager {
         const b = this.getBuildingAt(tile.tx, tile.ty);
         if (b && b.type !== 'hub') {
             this.buildings = this.buildings.filter(x => x !== b);
+            if (b.type === 'belt') {
+                updateSurroundingBelts(b.tx, b.ty, this.game);
+            }
         }
     }
 
     onLeftMouseDown() {
         this.isLeftMouseDown = true;
         this.lastPlacedTile = null;
-        this._tryPlace();
+        this.justPlaced = false;
+
+        if (this.game.selectedType === 'belt') {
+            const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+            const existing = this.getBuildingAt(tile.tx, tile.ty);
+
+            if (existing && existing.type !== 'belt') {
+                this.pendingFirstBeltTile = null;
+                this.isDraggingBelt = false;
+            } else if (existing && existing.type === 'belt') {
+                // Ручная стыковка: вход от призрака, выход существующего
+                const inDir = (this.ghost.rotation + 2) % 4;
+                const outDir = existing.rotation;
+                const newRotation = outDir;
+                const newBeltType = getBeltTypeFromDirs(inDir, outDir);
+                const newBelt = new Building(tile.tx, tile.ty, 'belt', newRotation);
+                newBelt.beltType = newBeltType;
+                if (existing.rotation !== newRotation || existing.beltType !== newBeltType) {
+                    this.buildings = this.buildings.filter(b => b !== existing);
+                    this.buildings.push(newBelt);
+                    updateSurroundingBelts(tile.tx, tile.ty, this.game);
+                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                    this.justPlaced = true;
+                }
+                this.pendingFirstBeltTile = null;
+                this.isDraggingBelt = false;
+            } else {
+                this.pendingFirstBeltTile = { tx: tile.tx, ty: tile.ty };
+                this.isDraggingBelt = true;
+            }
+        } else {
+            this._tryPlace();
+            this.justPlaced = true;
+        }
     }
 
     onLeftMouseUp() {
+        if (this.pendingFirstBeltTile) {
+            const tile = this.pendingFirstBeltTile;
+            if (!this.getBuildingAt(tile.tx, tile.ty)) {
+                const newBelt = new Building(tile.tx, tile.ty, 'belt', this.ghost.rotation);
+                newBelt.beltType = 0;
+                this.buildings.push(newBelt);
+                updateSurroundingBelts(tile.tx, tile.ty, this.game);
+                this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                this.justPlaced = true;
+            }
+            this.pendingFirstBeltTile = null;
+        }
         this.isLeftMouseDown = false;
         this.lastPlacedTile = null;
+        this.isDraggingBelt = false;
+        this.pendingFirstBeltTile = null;
     }
 
     onRightMouseDown() {
@@ -272,6 +364,7 @@ export class BuildingManager {
         } else {
             this._deleteUnderCursor();
         }
+        this.justPlaced = false;
     }
 
     onRightMouseUp() {
@@ -279,66 +372,90 @@ export class BuildingManager {
     }
 
     onMouseMove() {
+        this.justPlaced = false;
+
         if (this.isLeftMouseDown && this.game.selectedType === 'belt') {
             const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-            if (!this.lastPlacedTile ||
-                this.lastPlacedTile.tx !== tile.tx ||
-                this.lastPlacedTile.ty !== tile.ty) {
+
+            // Первый конвейер при движении
+            if (this.pendingFirstBeltTile && (tile.tx !== this.pendingFirstBeltTile.tx || tile.ty !== this.pendingFirstBeltTile.ty)) {
+                const ftx = this.pendingFirstBeltTile.tx;
+                const fty = this.pendingFirstBeltTile.ty;
+                if (!this.getBuildingAt(ftx, fty)) {
+                    const newBelt = new Building(ftx, fty, 'belt', this.ghost.rotation);
+                    newBelt.beltType = 0;
+                    this.buildings.push(newBelt);
+                    updateSurroundingBelts(ftx, fty, this.game);
+                    this.lastPlacedTile = { tx: ftx, ty: fty };
+                }
+                this.pendingFirstBeltTile = null;
+            }
+
+            // Продолжение линии
+            if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
+                const success = this._tryPlaceBeltAt(tile.tx, tile.ty);
+                if (!success) {
+                    // Не удалось поставить прямо – обрабатываем поворот или выход из углового
+                    if (this.lastPlacedTile) {
+                        const prev = this.getBuildingAt(this.lastPlacedTile.tx, this.lastPlacedTile.ty);
+                        if (prev && prev.type === 'belt') {
+                            if (prev.beltType === 0) {
+                                // Превращаем предыдущий прямой в угловой
+                                const dx = tile.tx - prev.tx;
+                                const dy = tile.ty - prev.ty;
+                                let newDir = null;
+                                if (dx === 0 && dy === -1) newDir = 0;
+                                else if (dx === 1 && dy === 0) newDir = 1;
+                                else if (dx === 0 && dy === 1) newDir = 2;
+                                else if (dx === -1 && dy === 0) newDir = 3;
+
+                                if (newDir !== null && newDir !== prev.rotation) {
+                                    const inDir = (prev.rotation + 2) % 4;
+                                    prev.rotation = newDir;
+                                    prev.beltType = getBeltTypeFromDirs(inDir, newDir);
+                                    updateSurroundingBelts(prev.tx, prev.ty, this.game);
+                                    // Теперь пробуем поставить конвейер в новой клетке
+                                    if (!this.getBuildingAt(tile.tx, tile.ty) || this.getBuildingAt(tile.tx, tile.ty).type === 'belt') {
+                                        this._tryPlaceBeltAt(tile.tx, tile.ty);
+                                    }
+                                }
+                            } else {
+                                // Предыдущий уже угловой – ставим прямой конвейер в направлении движения
+                                const dx = tile.tx - prev.tx;
+                                const dy = tile.ty - prev.ty;
+                                let dir = 0;
+                                if (dx === 0 && dy === -1) dir = 0;
+                                else if (dx === 1 && dy === 0) dir = 1;
+                                else if (dx === 0 && dy === 1) dir = 2;
+                                else if (dx === -1 && dy === 0) dir = 3;
+                                const newBelt = new Building(tile.tx, tile.ty, 'belt', dir);
+                                newBelt.beltType = 0;
+                                if (!this.getBuildingAt(tile.tx, tile.ty)) {
+                                    this.buildings.push(newBelt);
+                                    updateSurroundingBelts(tile.tx, tile.ty, this.game);
+                                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (this.isLeftMouseDown && this.game.selectedType && this.game.selectedType !== 'belt') {
+            const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+            if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
                 this._tryPlace();
             }
         }
     }
 
-    _tryPlace() {
-        if (!this.ghost.visible) return false;
-        
-        const size = this.ghost.getSize();
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-        const targetTx = tile.tx;
-        const targetTy = tile.ty;
-        
-        for (let dx = 0; dx < size.w; dx++) {
-            for (let dy = 0; dy < size.h; dy++) {
-                if (this.getBuildingAt(targetTx + dx, targetTy + dy)) {
-                    return false;
-                }
-            }
-        }
-        
-        if (this.ghost.type === 'extractor') {
-            if (!this.game.map.getVeinAt(targetTx, targetTy)) {
-                return false;
-            }
-        }
-        
-        const newBuilding = new Building(
-            targetTx,
-            targetTy,
-            this.ghost.type,
-            this.ghost.rotation
-        );
-        
-        if (this.ghost.type === 'belt') {
-            newBuilding.beltType = this.ghost.beltType;
-        }
-        
-        this.buildings.push(newBuilding);
-        this.lastPlacedTile = { tx: targetTx, ty: targetTy };
-        return true;
-    }
-
-    tryPlace() {
-        return this._tryPlace();
-    }
+    tryPlace() { return this._tryPlace(); }
 
     getBuildingAt(tx, ty) {
         for (const b of this.buildings) {
             const size = b.getSize();
-            if (tx >= b.tx && tx < b.tx + size.w && ty >= b.ty && ty < b.ty + size.h) {
-                return b;
-            }
+            if (tx >= b.tx && tx < b.tx + size.w && ty >= b.ty && ty < b.ty + size.h) return b;
         }
         return null;
     }
@@ -346,64 +463,30 @@ export class BuildingManager {
     render(ctx, camera) {
         const tileSize = this.game.map.tileSize;
         for (const b of this.buildings) {
-            this._drawBuilding(ctx, b, tileSize, false);
+            if (b.type === 'belt') b.animationFrame = this.beltAnimFrame;
         }
-        if (this.ghost.visible && this.game.selectedType) {
-            this._drawBuilding(ctx, this.ghost, tileSize, true);
+        for (const b of this.buildings) {
+            const module = BUILDING_MODULES[b.type];
+            if (module) {
+                ctx.save();
+                module.render(ctx, b, tileSize, false, this.game);
+                ctx.restore();
+            } else {
+                const x = b.tx * tileSize;
+                const y = b.ty * tileSize;
+                ctx.fillStyle = '#ff00ff';
+                ctx.fillRect(x, y, tileSize, tileSize);
+            }
         }
-    }
 
-    _drawBuilding(ctx, b, tileSize, isGhost) {
-        const x = b.tx * tileSize;
-        const y = b.ty * tileSize;
-        const size = b.getSize();
-        const w = size.w * tileSize;
-        const h = size.h * tileSize;
-        
-        ctx.save();
-        if (isGhost) ctx.globalAlpha = 0.6;
-        
-        if (b.type === 'belt') {
-            spriteRenderer.drawBelt(ctx, x, y, tileSize, b.rotation, b.animationFrame, b.beltType);
+        if (this.ghost.visible && this.game.selectedType) {
+            const module = BUILDING_MODULES[this.game.selectedType];
+            if (module) {
+                ctx.save();
+                ctx.globalAlpha = 0.6;
+                module.render(ctx, this.ghost, tileSize, true, this.game);
+                ctx.restore();
+            }
         }
-        else if (b.type === 'extractor') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'miner', b.rotation);
-        }
-        else if (b.type === 'hub') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'hub', 0);
-        }
-        else if (b.type === 'cutter') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'cutter', b.rotation);
-        }
-        else if (b.type === 'rotator') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'rotater', b.rotation);
-        }
-        else if (b.type === 'mixer') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'mixer', b.rotation);
-        }
-        else if (b.type === 'splitter') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'balancer-splitter', b.rotation);
-        }
-        else if (b.type === 'balancer') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'balancer', b.rotation);
-        }
-        else if (b.type === 'storage') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'storage', 0);
-        }
-        else if (b.type === 'trash') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'trash', b.rotation);
-        }
-        else if (b.type === 'tunnel') {
-            spriteRenderer.drawBuilding(ctx, x, y, w, h, 'underground_belt_entry', b.rotation);
-        }
-        else {
-            ctx.fillStyle = '#8898A5';
-            ctx.fillRect(x, y, w, h);
-            ctx.strokeStyle = '#5A6B7A';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x, y, w, h);
-        }
-        
-        ctx.restore();
     }
 }
