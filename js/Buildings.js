@@ -1,35 +1,20 @@
-// Buildings.js
-import {
-    beltBuilding,
-    updateSurroundingBelts,
-    calculateOptimalBeltRotation,
-    calculateBeltType,
-    rotateBelt,
-    getBeltTypeFromDirs,
-    getInputsAndOutputs
-} from './buildings/belt.js';
-import { extractorBuilding } from './buildings/extractor.js';
-import { cutterBuilding } from './buildings/cutter.js';
-import { rotatorBuilding } from './buildings/rotator.js';
-import { mixerBuilding } from './buildings/mixer.js';
-import { splitterBuilding } from './buildings/splitter.js';
-import { balancerBuilding } from './buildings/balancer.js';
-import { storageBuilding } from './buildings/storage.js';
-import { trashBuilding } from './buildings/trash.js';
-import { tunnelBuilding } from './buildings/tunnel.js';
+import { quantumResonatorBuilding } from './buildings/quantum_resonator.js';
+import { gluonExtractorBuilding } from './buildings/gluon_extractor.js';
+import { leptonExtractorBuilding } from './buildings/lepton_extractor.js';
+import { nodeBuilding } from './buildings/node.js';
+import { connectorBuilding } from './buildings/connector.js';
+import { hadronSynthesizerBuilding } from './buildings/hadron_synthesizer.js';
+import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { hubBuilding } from './buildings/hub.js';
 
 const BUILDING_MODULES = {
-    'belt': beltBuilding,
-    'extractor': extractorBuilding,
-    'cutter': cutterBuilding,
-    'rotator': rotatorBuilding,
-    'mixer': mixerBuilding,
-    'splitter': splitterBuilding,
-    'balancer': balancerBuilding,
-    'storage': storageBuilding,
-    'trash': trashBuilding,
-    'tunnel': tunnelBuilding,
+    'quantum_resonator': quantumResonatorBuilding,
+    'gluon_extractor': gluonExtractorBuilding,
+    'lepton_extractor': leptonExtractorBuilding,
+    'node': nodeBuilding,
+    'connector': connectorBuilding,
+    'hadron_synthesizer': hadronSynthesizerBuilding,
+    'electron_capture': electronCaptureBuilding,
     'hub': hubBuilding,
 };
 
@@ -39,19 +24,18 @@ export const BUILDING_SIZES = Object.fromEntries(
 
 export class Building {
     constructor(tx, ty, type, rotation = 0) {
-        this.tx = tx;
-        this.ty = ty;
-        this.type = type;
-        this.rotation = rotation;
-        this.animationFrame = 0;
-        this.beltType = 0;
+        this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
+        this.quarkType = 0; // для добытчиков
+        this.recipe = 'proton'; // для фабрик
+        this.resources = {}; // общий для добытчиков и узлов
+        this.inputResources = {}; // для фабрик
+        this.outputResources = {};
+        this.timer = 0;
+        this.craftTimer = 0;
     }
-
     getSize() {
         const base = BUILDING_SIZES[this.type] || { w: 1, h: 1 };
-        if (this.rotation % 2 === 1) {
-            return { w: base.h, h: base.w };
-        }
+        if (this.rotation % 2 === 1 && base.w !== base.h) return { w: base.h, h: base.w };
         return base;
     }
 }
@@ -61,430 +45,198 @@ export class BuildingManager {
         this.game = game;
         this.buildings = [];
         this.ghost = null;
-        this.lastMouseX = 0;
-        this.lastMouseY = 0;
-        this.isLeftMouseDown = false;
-        this.isRightMouseDown = false;
-        this.lastPlacedTile = null;
-        this.lastGhostTile = null;
-        this.ghostPreferred = { rotation: 0, beltType: 0 };
-        this.pendingFirstBeltTile = null;
-        this.isDraggingBelt = false;
-        this.justPlaced = false;
-
-        this.beltAnimFrame = 0;
-        this.beltAnimTimer = 0;
-
+        this.lastMouseX = 0; this.lastMouseY = 0;
+        this.isLeftMouseDown = false; this.isRightMouseDown = false;
+        this.wireSource = null;
         this._initGhost();
     }
-
     _initGhost() {
-        this.ghost = new Building(0, 0, 'belt', 0);
+        this.ghost = new Building(0, 0, 'quantum_resonator', 0);
         this.ghost.visible = false;
     }
-
     update(dt) {
-        this.beltAnimTimer += dt;
-        while (this.beltAnimTimer >= 0.07) {
-            this.beltAnimTimer -= 0.07;
-            this.beltAnimFrame = (this.beltAnimFrame + 1) % 14;
+        for (const b of this.buildings) {
+            const mod = BUILDING_MODULES[b.type];
+            if (mod && mod.update) mod.update(b, this.game, dt);
         }
-
-        if (this.isRightMouseDown && !this.game.selectedType) {
-            this._deleteUnderCursor();
-        }
-
+        if (this.isRightMouseDown && !this.game.selectedType) this._deleteUnderCursor();
         this._updateGhostFromLastMouse();
     }
-
     _updateGhostFromLastMouse() {
-        if (!this.game.selectedType) { this.ghost.visible = false; return; }
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-
-        if (this.justPlaced) {
-            if (this.lastPlacedTile && tile.tx === this.lastPlacedTile.tx && tile.ty === this.lastPlacedTile.ty) {
-                this.ghost.visible = false;
-                return;
-            } else {
-                this.justPlaced = false;
-            }
-        }
-
-        if (this.lastGhostTile && (tile.tx !== this.lastGhostTile.tx || tile.ty !== this.lastGhostTile.ty)) {
-            this.lastGhostTile = null;
-        }
-
-        this.ghost.tx = tile.tx;
-        this.ghost.ty = tile.ty;
-        this.ghost.type = this.game.selectedType;
-        this.ghost.visible = true;
-
-        const module = BUILDING_MODULES[this.game.selectedType];
-
-        if (!this.lastGhostTile) {
-            const { inputs, outputs } = getInputsAndOutputs(tile.tx, tile.ty, this.game);
-            if (inputs.length === 0 && outputs.length === 0) {
-                this.ghost.rotation = this.ghostPreferred.rotation;
-                this.ghost.beltType = 0;
-            } else {
-                if (module && module.getGhostRotation) {
-                    this.ghost.rotation = module.getGhostRotation(tile.tx, tile.ty, this.game);
-                }
-                if (module && module.getGhostBeltType) {
-                    this.ghost.beltType = module.getGhostBeltType(tile.tx, tile.ty, this.ghost.rotation, this.game);
-                }
-            }
-        }
+        if (!this.game.selectedType || this.game.selectedType === 'wire') { this.ghost.visible = false; return; }
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
+        this.ghost.tx = tile.tx; this.ghost.ty = tile.ty;
+        this.ghost.type = this.game.selectedType; this.ghost.visible = true;
     }
 
-    // ---------------------------------------------------------------
-    //  АВТОПРОКЛАДКА С ПОВОРОТАМИ, ЗАМЫКАНИЕМ И ВЫХОДОМ
-    // ---------------------------------------------------------------
-    _tryPlaceBeltAt(tx, ty) {
-        const existing = this.getBuildingAt(tx, ty);
-        if (existing && existing.type !== 'belt') return false;
-
-        let newBelt = null;
-
-        if (this.lastPlacedTile) {
-            const prev = this.getBuildingAt(this.lastPlacedTile.tx, this.lastPlacedTile.ty);
-            if (!prev || prev.type !== 'belt') {
-                newBelt = new Building(tx, ty, 'belt', this.ghost.rotation);
-                newBelt.beltType = 0;
-            } else {
-                // Направление от предыдущего к текущей клетке
-                const dx = tx - prev.tx;
-                const dy = ty - prev.ty;
-                let fromDir = null;
-                if (dx === 0 && dy === -1) fromDir = 0;
-                else if (dx === 1 && dy === 0) fromDir = 1;
-                else if (dx === 0 && dy === 1) fromDir = 2;
-                else if (dx === -1 && dy === 0) fromDir = 3;
-                if (fromDir === null) return false;
-
-                if (existing && existing.type === 'belt') {
-                    // Клетка занята конвейером – стыковка или замыкание
-                    const outDir = existing.rotation;
-                    newBelt = new Building(tx, ty, 'belt', outDir);
-                    newBelt.beltType = getBeltTypeFromDirs(fromDir, outDir);
-                } else {
-                    // Пустая клетка: прямое продолжение или поворот
-                    const outDx = [0, 1, 0, -1][prev.rotation];
-                    const outDy = [-1, 0, 1, 0][prev.rotation];
-                    const expectedTX = prev.tx + outDx;
-                    const expectedTY = prev.ty + outDy;
-
-                    if (tx === expectedTX && ty === expectedTY) {
-                        // Прямое продолжение
-                        newBelt = new Building(tx, ty, 'belt', prev.rotation);
-                        newBelt.beltType = 0;
-                    } else {
-                        // Не прямо – это поворот, обработаем снаружи
-                        return false;
-                    }
-                }
-            }
-        } else {
-            // Самый первый конвейер
-            newBelt = new Building(tx, ty, 'belt', this.ghost.rotation);
-            newBelt.beltType = 0;
+    isPlacementValid(tx, ty, type) {
+    if (type === 'quantum_resonator') {
+        const size = BUILDING_SIZES[type] || { w: 1, h: 1 };
+        for (const other of this.buildings) {
+            if (other.type !== 'quantum_resonator') continue;
+            const osize = other.getSize();
+            const ox1 = other.tx - 5, oy1 = other.ty - 5;
+            const ox2 = other.tx + osize.w + 4, oy2 = other.ty + osize.h + 4;
+            const nx1 = tx, ny1 = ty, nx2 = tx + size.w - 1, ny2 = ty + size.h - 1;
+            if (!(nx2 < ox1 || nx1 > ox2 || ny2 < oy1 || ny1 > oy2)) return false;
         }
-
-        if (!newBelt) return false;
-
-        // Если существующий конвейер полностью совпадает – не трогаем, но продолжаем линию
-        if (existing && existing.type === 'belt' &&
-            existing.rotation === newBelt.rotation &&
-            existing.beltType === newBelt.beltType) {
-            this.lastPlacedTile = { tx, ty };
-            return true;
-        }
-
-        // Замена существующего
-        if (existing) {
-            this.buildings = this.buildings.filter(b => b !== existing);
-        }
-        if (this.getBuildingAt(tx, ty)) return false;
-
-        this.buildings.push(newBelt);
-        updateSurroundingBelts(tx, ty, this.game);
-        this.lastPlacedTile = { tx, ty };
-        return true;
+        const count = this.buildings.filter(b => b.type === 'quantum_resonator').length;
+        if (count >= 5) return false;
     }
-
+    // Для остальных — просто проверка занятости
+    const size = BUILDING_SIZES[type] || { w: 1, h: 1 };
+    for (let dx = 0; dx < size.w; dx++)
+        for (let dy = 0; dy < size.h; dy++)
+            if (this.getBuildingAt(tx + dx, ty + dy)) return false;
+    return true;
+}
     _tryPlace() {
-        if (!this.ghost.visible) return false;
+        if (!this.ghost.visible || this.game.selectedType === 'wire') return false;
+        if (!this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type)) return false;
         const size = this.ghost.getSize();
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-        const tx = tile.tx, ty = tile.ty;
-
-        for (let dx = 0; dx < size.w; dx++) {
-            for (let dy = 0; dy < size.h; dy++) {
-                if (this.getBuildingAt(tx + dx, ty + dy)) return false;
-            }
-        }
-        if (this.ghost.type === 'extractor' && !this.game.map.getVeinAt(tx, ty)) return false;
-
-        const newBuilding = new Building(tx, ty, this.ghost.type, this.ghost.rotation);
-        if (this.ghost.type === 'belt') {
-            newBuilding.beltType = this.ghost.beltType || 0;
-        }
-        this.buildings.push(newBuilding);
-        if (this.ghost.type === 'belt') {
-            updateSurroundingBelts(tx, ty, this.game);
-        }
-        this.lastPlacedTile = { tx, ty };
+        const nb = new Building(this.ghost.tx, this.ghost.ty, this.ghost.type, this.ghost.rotation);
+        nb.quarkType = this.ghost.quarkType || 0;
+        nb.filterType = this.ghost.filterType;
+        nb.recipe = this.ghost.recipe || 'proton';
+        this.buildings.push(nb);
         return true;
     }
 
     rotateBuildingUnderCursor() {
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-        const building = this.getBuildingAt(tile.tx, tile.ty);
-        if (!building || building.type === 'hub') return;
-        const module = BUILDING_MODULES[building.type];
-        if (module && module.rotate) {
-            module.rotate(building, this.game);
-            updateSurroundingBelts(building.tx, building.ty, this.game);
-        } else {
-            building.rotation = (building.rotation + 1) % 4;
-        }
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
+        const b = this.getBuildingAt(tile.tx, tile.ty);
+        if (!b || b.type === 'hub') return;
+        const mod = BUILDING_MODULES[b.type];
+        if (mod && mod.rotateGhost) mod.rotateGhost(b);
+        else b.rotation = (b.rotation + 1) % 4;
     }
 
     rotateGhost() {
         if (!this.ghost.visible) return;
-        const module = BUILDING_MODULES[this.ghost.type];
-        if (module && module.rotateGhost) {
-            module.rotateGhost(this.ghost, this.game);
-            this.ghostPreferred.rotation = this.ghost.rotation;
-            this.ghostPreferred.beltType = 0;
-            this.lastGhostTile = { tx: this.ghost.tx, ty: this.ghost.ty };
-        } else {
-            this.ghost.rotation = (this.ghost.rotation + 1) % 4;
-            this.ghostPreferred.rotation = this.ghost.rotation;
-            this.ghostPreferred.beltType = 0;
-        }
+        const mod = BUILDING_MODULES[this.ghost.type];
+        if (mod && mod.rotateGhost) mod.rotateGhost(this.ghost);
+        else this.ghost.rotation = (this.ghost.rotation + 1) % 4;
     }
 
     setMousePosition(x, y) { this.lastMouseX = x; this.lastMouseY = y; }
-
     pipette() {
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
         if (b && b.type !== 'hub') {
-            this.game.selectedType = b.type;
-            this.ghost.rotation = b.rotation;
-            if (b.type === 'belt') this.ghost.beltType = b.beltType;
-            this.game.hud.updateActiveButton();
-            return true;
-        }
+    this.game.selectedType = b.type;
+    this.ghost.rotation = b.rotation;
+    this.ghost.quarkType = b.quarkType || 0;
+    this.ghost.recipe = b.recipe || 'proton';
+    this.ghost.filterType = b.filterType; // <-- добавить
+    this.game.hud.updateActiveButton();
+    return true;
+}
         return false;
     }
 
     _deleteUnderCursor() {
-        const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
         if (b && b.type !== 'hub') {
-            this.buildings = this.buildings.filter(x => x !== b);
-            if (b.type === 'belt') {
-                updateSurroundingBelts(b.tx, b.ty, this.game);
+            if (this.game.input?.shiftKey) {
+                this.game.network.removeAllConnections(b);
+            } else {
+                this.buildings = this.buildings.filter(x => x !== b);
+                this.game.network.removeAllConnections(b);
             }
+        } else if (!b) {
+            const conn = this.game.network.findConnectionAt(wp.x, wp.y);
+            if (conn) this.game.network.removeConnection(conn);
         }
     }
 
     onLeftMouseDown() {
         this.isLeftMouseDown = true;
-        this.lastPlacedTile = null;
-        this.justPlaced = false;
-
-        if (this.game.selectedType === 'belt') {
-            const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-            const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-            const existing = this.getBuildingAt(tile.tx, tile.ty);
-
-            if (existing && existing.type !== 'belt') {
-                this.pendingFirstBeltTile = null;
-                this.isDraggingBelt = false;
-            } else if (existing && existing.type === 'belt') {
-                // Ручная стыковка: вход от призрака, выход существующего
-                const inDir = (this.ghost.rotation + 2) % 4;
-                const outDir = existing.rotation;
-                const newRotation = outDir;
-                const newBeltType = getBeltTypeFromDirs(inDir, outDir);
-                const newBelt = new Building(tile.tx, tile.ty, 'belt', newRotation);
-                newBelt.beltType = newBeltType;
-                if (existing.rotation !== newRotation || existing.beltType !== newBeltType) {
-                    this.buildings = this.buildings.filter(b => b !== existing);
-                    this.buildings.push(newBelt);
-                    updateSurroundingBelts(tile.tx, tile.ty, this.game);
-                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
-                    this.justPlaced = true;
-                }
-                this.pendingFirstBeltTile = null;
-                this.isDraggingBelt = false;
-            } else {
-                this.pendingFirstBeltTile = { tx: tile.tx, ty: tile.ty };
-                this.isDraggingBelt = true;
+        if (this.game.selectedType === 'wire') {
+            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(wp.x, wp.y);
+            const target = this.getBuildingAt(tile.tx, tile.ty);
+            if (!target) { this.wireSource = null; return; }
+            if (!this.wireSource) this.wireSource = target;
+            else if (this.wireSource !== target) {
+                this.game.network.addConnection(this.wireSource, target);
+                this.wireSource = null;
             }
-        } else {
+        } else if (this.game.selectedType) {
             this._tryPlace();
-            this.justPlaced = true;
         }
     }
-
-    onLeftMouseUp() {
-        if (this.pendingFirstBeltTile) {
-            const tile = this.pendingFirstBeltTile;
-            if (!this.getBuildingAt(tile.tx, tile.ty)) {
-                const newBelt = new Building(tile.tx, tile.ty, 'belt', this.ghost.rotation);
-                newBelt.beltType = 0;
-                this.buildings.push(newBelt);
-                updateSurroundingBelts(tile.tx, tile.ty, this.game);
-                this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
-                this.justPlaced = true;
-            }
-            this.pendingFirstBeltTile = null;
-        }
-        this.isLeftMouseDown = false;
-        this.lastPlacedTile = null;
-        this.isDraggingBelt = false;
-        this.pendingFirstBeltTile = null;
-    }
-
+    onLeftMouseUp() { this.isLeftMouseDown = false; }
     onRightMouseDown() {
         this.isRightMouseDown = true;
         if (this.game.selectedType) {
-            this.game.selectedType = null;
-            this.ghost.visible = false;
+            this.game.selectedType = null; this.ghost.visible = false; this.wireSource = null;
             this.game.hud.updateActiveButton();
-        } else {
-            this._deleteUnderCursor();
-        }
-        this.justPlaced = false;
+        } else this._deleteUnderCursor();
     }
-
-    onRightMouseUp() {
-        this.isRightMouseDown = false;
-    }
-
-    onMouseMove() {
-        this.justPlaced = false;
-
-        if (this.isLeftMouseDown && this.game.selectedType === 'belt') {
-            const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-            const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-
-            // Первый конвейер при движении
-            if (this.pendingFirstBeltTile && (tile.tx !== this.pendingFirstBeltTile.tx || tile.ty !== this.pendingFirstBeltTile.ty)) {
-                const ftx = this.pendingFirstBeltTile.tx;
-                const fty = this.pendingFirstBeltTile.ty;
-                if (!this.getBuildingAt(ftx, fty)) {
-                    const newBelt = new Building(ftx, fty, 'belt', this.ghost.rotation);
-                    newBelt.beltType = 0;
-                    this.buildings.push(newBelt);
-                    updateSurroundingBelts(ftx, fty, this.game);
-                    this.lastPlacedTile = { tx: ftx, ty: fty };
-                }
-                this.pendingFirstBeltTile = null;
-            }
-
-            // Продолжение линии
-            if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
-                const success = this._tryPlaceBeltAt(tile.tx, tile.ty);
-                if (!success) {
-                    // Не удалось поставить прямо – обрабатываем поворот или выход из углового
-                    if (this.lastPlacedTile) {
-                        const prev = this.getBuildingAt(this.lastPlacedTile.tx, this.lastPlacedTile.ty);
-                        if (prev && prev.type === 'belt') {
-                            if (prev.beltType === 0) {
-                                // Превращаем предыдущий прямой в угловой
-                                const dx = tile.tx - prev.tx;
-                                const dy = tile.ty - prev.ty;
-                                let newDir = null;
-                                if (dx === 0 && dy === -1) newDir = 0;
-                                else if (dx === 1 && dy === 0) newDir = 1;
-                                else if (dx === 0 && dy === 1) newDir = 2;
-                                else if (dx === -1 && dy === 0) newDir = 3;
-
-                                if (newDir !== null && newDir !== prev.rotation) {
-                                    const inDir = (prev.rotation + 2) % 4;
-                                    prev.rotation = newDir;
-                                    prev.beltType = getBeltTypeFromDirs(inDir, newDir);
-                                    updateSurroundingBelts(prev.tx, prev.ty, this.game);
-                                    // Теперь пробуем поставить конвейер в новой клетке
-                                    if (!this.getBuildingAt(tile.tx, tile.ty) || this.getBuildingAt(tile.tx, tile.ty).type === 'belt') {
-                                        this._tryPlaceBeltAt(tile.tx, tile.ty);
-                                    }
-                                }
-                            } else {
-                                // Предыдущий уже угловой – ставим прямой конвейер в направлении движения
-                                const dx = tile.tx - prev.tx;
-                                const dy = tile.ty - prev.ty;
-                                let dir = 0;
-                                if (dx === 0 && dy === -1) dir = 0;
-                                else if (dx === 1 && dy === 0) dir = 1;
-                                else if (dx === 0 && dy === 1) dir = 2;
-                                else if (dx === -1 && dy === 0) dir = 3;
-                                const newBelt = new Building(tile.tx, tile.ty, 'belt', dir);
-                                newBelt.beltType = 0;
-                                if (!this.getBuildingAt(tile.tx, tile.ty)) {
-                                    this.buildings.push(newBelt);
-                                    updateSurroundingBelts(tile.tx, tile.ty, this.game);
-                                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (this.isLeftMouseDown && this.game.selectedType && this.game.selectedType !== 'belt') {
-            const worldPos = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-            const tile = this.game.map.worldToTile(worldPos.x, worldPos.y);
-            if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
-                this._tryPlace();
-            }
-        }
-    }
-
-    tryPlace() { return this._tryPlace(); }
+    onRightMouseUp() { this.isRightMouseDown = false; }
+    onMouseMove() {}
 
     getBuildingAt(tx, ty) {
         for (const b of this.buildings) {
-            const size = b.getSize();
-            if (tx >= b.tx && tx < b.tx + size.w && ty >= b.ty && ty < b.ty + size.h) return b;
+            const s = b.getSize();
+            if (tx >= b.tx && tx < b.tx + s.w && ty >= b.ty && ty < b.ty + s.h) return b;
         }
         return null;
     }
 
     render(ctx, camera) {
         const tileSize = this.game.map.tileSize;
-        for (const b of this.buildings) {
-            if (b.type === 'belt') b.animationFrame = this.beltAnimFrame;
-        }
-        for (const b of this.buildings) {
-            const module = BUILDING_MODULES[b.type];
-            if (module) {
-                ctx.save();
-                module.render(ctx, b, tileSize, false, this.game);
-                ctx.restore();
-            } else {
-                const x = b.tx * tileSize;
-                const y = b.ty * tileSize;
-                ctx.fillStyle = '#ff00ff';
-                ctx.fillRect(x, y, tileSize, tileSize);
+        // запретные зоны для экстракторов (всех типов)
+        if (this.game.selectedType && ['quantum_resonator', 'gluon_extractor', 'lepton_extractor'].includes(this.game.selectedType)) {
+            for (const other of this.buildings) {
+                if (other.type !== this.game.selectedType) continue;
+                const osize = other.getSize();
+                const x1 = (other.tx - 5) * tileSize;
+                const y1 = (other.ty - 5) * tileSize;
+                const x2 = (other.tx + osize.w + 4) * tileSize;
+                const y2 = (other.ty + osize.h + 4) * tileSize;
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
+                ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)';
+                ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
             }
         }
 
-        if (this.ghost.visible && this.game.selectedType) {
-            const module = BUILDING_MODULES[this.game.selectedType];
-            if (module) {
+        for (const b of this.buildings) {
+            const mod = BUILDING_MODULES[b.type];
+            if (mod) { ctx.save(); mod.render(ctx, b, tileSize, false, this.game); ctx.restore(); }
+            else {
+                const x = b.tx * tileSize, y = b.ty * tileSize, s = b.getSize();
+                ctx.fillStyle = '#ff00ff'; ctx.fillRect(x, y, s.w * tileSize, s.h * tileSize);
+            }
+        }
+
+        if (this.ghost.visible && this.game.selectedType && this.game.selectedType !== 'wire') {
+            const mod = BUILDING_MODULES[this.game.selectedType];
+            if (mod) {
                 ctx.save();
-                ctx.globalAlpha = 0.6;
-                module.render(ctx, this.ghost, tileSize, true, this.game);
+                if (this.ghost.type === 'quantum_resonator' || this.ghost.type === 'gluon_extractor' || this.ghost.type === 'lepton_extractor') {
+                    const canPlace = this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type);
+                    const size = this.ghost.getSize();
+                    ctx.globalAlpha = 0.6;
+                    if (canPlace) {
+                        ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+                        ctx.fillRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
+                        ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+                        ctx.strokeRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
+                    } else {
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                        ctx.fillRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
+                        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                        ctx.strokeRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
+                    }
+                }
+                mod.render(ctx, this.ghost, tileSize, true, this.game);
                 ctx.restore();
             }
         }
