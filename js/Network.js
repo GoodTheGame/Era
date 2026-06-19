@@ -80,6 +80,107 @@ export class Network {
         return null;
     }
 
+    // Универсальная проверка возможности принять ресурс
+    canAcceptResource(building, quarkType) {
+        if (this.isExtractor(building.type)) return false;
+
+        // Энергия идёт только в энергобуфер или если специально разрешено
+        if (quarkType === 'energy') {
+            if (building.type === 'node') return false;
+            if (building.type === 'energy_buffer') {
+                const cur = building.resources?.['energy'] || 0;
+                return cur < NODE_CAPACITY;
+            }
+            // Остальные не принимают энергию (пока)
+            return false;
+        }
+
+        // Материя
+        if (this.isFactory(building.type)) {
+            return this.isResourceNeededByFactory(building, quarkType) && this.canFactoryAccept(building, quarkType);
+        }
+        const cap = building.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
+        const cur = building.resources?.[quarkType] || 0;
+        return cur < cap;
+    }
+
+    isResourceNeededByFactory(building, quarkType) {
+        if (building.type === 'hadron_synthesizer') return ['u', 'd', 'g'].includes(quarkType);
+        if (building.type === 'electron_capture') return ['p', 'e'].includes(quarkType);
+        if (building.type === 'fusion_press') return ['H'].includes(quarkType);
+        return false;
+    }
+
+    canFactoryAccept(factory, quarkType) {
+        if (!factory.inputResources) return true;
+        const cur = factory.inputResources[quarkType] || 0;
+        return cur < STACK_SIZE;
+    }
+
+    hasValidPath(connector, quarkType) {
+        const visited = new Set();
+        const queue = [connector];
+        while (queue.length > 0) {
+            const current = queue.shift();
+            const outConns = this.connections.filter(c => c.from === current);
+            for (const conn of outConns) {
+                const to = conn.to;
+                if (visited.has(to)) continue;
+                visited.add(to);
+                if (to.type === 'connector') {
+                    if (to.filterType && to.filterType !== quarkType) continue;
+                    queue.push(to);
+                } else {
+                    if (this.canAcceptResource(to, quarkType)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    getOutputTargets(connector, quarkType) {
+        const targets = [];
+        const connectorRect = this.getRect(connector);
+
+        for (const b of this.game.buildingManager.buildings) {
+            if (b === connector) continue;
+            if (!this.isFactory(b.type)) continue;
+            if (!this.canAcceptResource(b, quarkType)) continue;
+            const d = this.rectDistance(connectorRect, this.getRect(b));
+            if (d <= 1) {
+                const fromSize = connector.getSize(), toSize = b.getSize();
+                const tileSize = 64;
+                const x1 = (connector.tx + fromSize.w / 2) * tileSize;
+                const y1 = (connector.ty + fromSize.h / 2) * tileSize;
+                const x2 = (b.tx + toSize.w / 2) * tileSize;
+                const y2 = (b.ty + toSize.h / 2) * tileSize;
+                const realDist = Math.max(Math.hypot(x2 - x1, y2 - y1), 32);
+                targets.push({ target: b, dist: realDist });
+            }
+        }
+
+        const outConns = this.connections.filter(c => c.from === connector);
+        for (const conn of outConns) {
+            const to = conn.to;
+            if (to.type === 'connector') {
+                if (to.filterType && to.filterType !== quarkType) continue;
+                if (!this.hasValidPath(to, quarkType)) continue;
+            } else {
+                if (!this.canAcceptResource(to, quarkType)) continue;
+            }
+            const fromSize = connector.getSize(), toSize = to.getSize();
+            const tileSize = 64;
+            const x1 = (connector.tx + fromSize.w / 2) * tileSize;
+            const y1 = (connector.ty + fromSize.h / 2) * tileSize;
+            const x2 = (to.tx + toSize.w / 2) * tileSize;
+            const y2 = (to.ty + toSize.h / 2) * tileSize;
+            const dist = Math.hypot(x2 - x1, y2 - y1);
+            targets.push({ target: to, dist });
+        }
+
+        return targets;
+    }
+
     // ---------- управление проводами ----------
     addConnection(from, to) {
         if (from.type === 'hub' || to.type === 'hub') return;
@@ -102,7 +203,9 @@ export class Network {
         const dist = this.rectDistance(r1, r2);
         if (dist > maxDist) return;
 
-        this.connections.push({ from, to });
+        // Определяем тип соединения на основе текущего режима HUD
+        const connectionType = this.game.hud.wireMode; // 'matter' или 'energy'
+        this.connections.push({ from, to, type: connectionType });
 
         if (to.type === 'connector') {
             const sourceResource = this.getSourceResourceType(from);
@@ -119,15 +222,11 @@ export class Network {
     }
 
     removeConnection(conn) {
-        // Удаляем только соединение. Пачки продолжают лететь к своим целям.
         this.connections = this.connections.filter(c => c !== conn);
-        // Никаких манипуляций с this.packs!
     }
 
     removeAllConnections(building) {
-        // Удаляем все соединения этого здания
         this.connections = this.connections.filter(c => c.from !== building && c.to !== building);
-        // Удаляем все пачки, где это здание является источником или целью (ресурсы не могут быть доставлены)
         this.packs = this.packs.filter(p => p.from !== building && p.to !== building);
     }
 
@@ -145,108 +244,12 @@ export class Network {
         return null;
     }
 
-    // ---------- проверки рецептов и лимитов ----------
-    isResourceNeededByFactory(building, quarkType) {
-        if (building.type === 'hadron_synthesizer') return ['u', 'd', 'g'].includes(quarkType);
-        if (building.type === 'electron_capture') return ['p', 'e'].includes(quarkType);
-        if (building.type === 'fusion_press') return ['H'].includes(quarkType);
-        return false;
-    }
-
-    canFactoryAccept(factory, quarkType) {
-        if (!factory.inputResources) return true;
-        const cur = factory.inputResources[quarkType] || 0;
-        return cur < STACK_SIZE;
-    }
-
-    canAcceptTarget(target, quarkType) {
-        if (this.isExtractor(target.type)) return false;
-        if (target.type === 'node' && quarkType === 'energy') return false;
-        if (target.type === 'energy_buffer') {
-            if (quarkType !== 'energy') return false;
-            if (!target.resources) return true;
-            const cur = target.resources['energy'] || 0;
-            return cur < NODE_CAPACITY;
-        }
-        if (this.isFactory(target.type)) {
-            return this.isResourceNeededByFactory(target, quarkType) && this.canFactoryAccept(target, quarkType);
-        }
-        if (!target.resources) return true;
-        const cap = target.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
-        const cur = target.resources[quarkType] || 0;
-        return cur < cap;
-    }
-
-    hasValidPath(connector, quarkType) {
-        const visited = new Set();
-        const queue = [connector];
-        while (queue.length > 0) {
-            const current = queue.shift();
-            const outConns = this.connections.filter(c => c.from === current);
-            for (const conn of outConns) {
-                const to = conn.to;
-                if (visited.has(to)) continue;
-                visited.add(to);
-                if (to.type === 'connector') {
-                    if (to.filterType && to.filterType !== quarkType) continue;
-                    queue.push(to);
-                } else {
-                    if (this.canAcceptTarget(to, quarkType)) return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    getOutputTargets(connector, quarkType) {
-        const targets = [];
-        const connectorRect = this.getRect(connector);
-
-        for (const b of this.game.buildingManager.buildings) {
-            if (b === connector) continue;
-            if (!this.isFactory(b.type)) continue;
-            if (!this.canAcceptTarget(b, quarkType)) continue;
-            const d = this.rectDistance(connectorRect, this.getRect(b));
-            if (d <= 1) {
-                const fromSize = connector.getSize(), toSize = b.getSize();
-                const tileSize = 64;
-                const x1 = (connector.tx + fromSize.w / 2) * tileSize;
-                const y1 = (connector.ty + fromSize.h / 2) * tileSize;
-                const x2 = (b.tx + toSize.w / 2) * tileSize;
-                const y2 = (b.ty + toSize.h / 2) * tileSize;
-                const realDist = Math.max(Math.hypot(x2 - x1, y2 - y1), 32);
-                targets.push({ target: b, dist: realDist });
-            }
-        }
-
-        const outConns = this.connections.filter(c => c.from === connector);
-        for (const conn of outConns) {
-            const to = conn.to;
-            if (to.type === 'connector') {
-                if (to.filterType && to.filterType !== quarkType) continue;
-                if (!this.hasValidPath(to, quarkType)) continue;
-            } else {
-                if (!this.canAcceptTarget(to, quarkType)) continue;
-            }
-            const fromSize = connector.getSize(), toSize = to.getSize();
-            const tileSize = 64;
-            const x1 = (connector.tx + fromSize.w / 2) * tileSize;
-            const y1 = (connector.ty + fromSize.h / 2) * tileSize;
-            const x2 = (to.tx + toSize.w / 2) * tileSize;
-            const y2 = (to.ty + toSize.h / 2) * tileSize;
-            const dist = Math.hypot(x2 - x1, y2 - y1);
-            targets.push({ target: to, dist });
-        }
-
-        return targets;
-    }
-
     // ========== Активная подтяжка ==========
     pullResourcesForConnectors() {
         for (const b of this.game.buildingManager.buildings) {
             if (b.type !== 'connector') continue;
             const filter = b.filterType;
-            if (!filter || filter === 'energy') continue;
+            if (!filter) continue; // коннектор без фильтра ничего не тянет
 
             const targets = this.getOutputTargets(b, filter);
             const numTargets = targets.length;
@@ -290,7 +293,6 @@ export class Network {
             this.pullResourcesForConnectors();
         }
 
-        // Скорость движения импульсов = 1 тайл/с
         const speed = 1 * 64;
         for (const pack of this.packs) {
             pack.distance -= speed * dt;
@@ -312,11 +314,13 @@ export class Network {
                             this.packs.push(new Pack(to, target, pack.quarkType, cnt, dist));
                         }
                     } else {
-                        // Нет выходов – сохраняем ресурс в буфере коннектора
-                        if (!to.resources) to.resources = {};
-                        const cur = to.resources[pack.quarkType] || 0;
-                        const canAdd = Math.min(pack.count, STACK_SIZE - cur);
-                        if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
+                        if (this.canAcceptResource(to, pack.quarkType)) {
+                            if (!to.resources) to.resources = {};
+                            const cur = to.resources[pack.quarkType] || 0;
+                            const cap = STACK_SIZE;
+                            const canAdd = Math.min(pack.count, cap - cur);
+                            if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
+                        }
                     }
                 } else if (this.isFactory(to.type)) {
                     if (!to.inputResources) to.inputResources = {};
@@ -326,10 +330,10 @@ export class Network {
                 } else if (to.type === 'node') {
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
-                    const canAdd = Math.min(pack.count, NODE_CAPACITY - cur);
+                    const cap = NODE_CAPACITY;
+                    const canAdd = Math.min(pack.count, cap - cur);
                     if (canAdd > 0) {
                         to.resources[pack.quarkType] = cur + canAdd;
-                        // Пересылаем дальше
                         const outConns = this.connections.filter(c => c.from === to && c.to.type !== 'connector');
                         if (outConns.length > 0) {
                             const perConn = Math.floor(canAdd / outConns.length);
@@ -350,10 +354,17 @@ export class Network {
                             to.resources[pack.quarkType] = Math.max(0, (to.resources[pack.quarkType] || 0) - canAdd);
                         }
                     }
+                } else if (to.type === 'energy_buffer') {
+                    if (pack.quarkType === 'energy') {
+                        if (!to.resources) to.resources = {};
+                        const cur = to.resources['energy'] || 0;
+                        const canAdd = Math.min(pack.count, NODE_CAPACITY - cur);
+                        if (canAdd > 0) to.resources['energy'] = cur + canAdd;
+                    }
                 } else if (!this.isExtractor(to.type)) {
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
-                    const cap = to.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
+                    const cap = STACK_SIZE;
                     const canAdd = Math.min(pack.count, cap - cur);
                     if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
                 }
@@ -390,17 +401,7 @@ export class Network {
             let available = stock[q];
             if (available <= 0) continue;
 
-            const validConns = conns.filter(conn => {
-                const to = conn.to;
-                if (this.isFactory(to.type)) {
-                    return this.isResourceNeededByFactory(to, q) && this.canFactoryAccept(to, q);
-                }
-                if (this.isExtractor(to.type)) return false;
-                if (!to.resources) return true;
-                const cap = to.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
-                const cur = to.resources[q] || 0;
-                return cur < cap;
-            });
+            const validConns = conns.filter(conn => this.canAcceptResource(conn.to, q));
 
             if (validConns.length === 0) continue;
 
@@ -436,8 +437,11 @@ export class Network {
     render(ctx) {
         const tileSize = 64;
         const now = performance.now() / 1000;
-        const isHub = (type) => type === 'node' || type === 'connector';
         const showStatic = this.game.hud.showConnections;
+
+        // Цвета для типов связей
+        const MATTER_COLOR = '#8899aa'; // серый для материи
+        const ENERGY_COLOR = '#00ffff'; // голубой для энергии
 
         if (showStatic) {
             for (const conn of this.connections) {
@@ -447,14 +451,7 @@ export class Network {
                 const x2 = (conn.to.tx + toSize.w / 2) * tileSize;
                 const y2 = (conn.to.ty + toSize.h / 2) * tileSize;
 
-                const fromHub = isHub(conn.from.type);
-                const toHub = isHub(conn.to.type);
-
-                let strokeColor = '#00aacc';
-                if (fromHub && toHub) strokeColor = '#00ffff';
-                else if (fromHub && !toHub) strokeColor = '#005566';
-                else if (!fromHub && toHub) strokeColor = '#00ffff';
-
+                const strokeColor = conn.type === 'energy' ? ENERGY_COLOR : MATTER_COLOR;
                 ctx.strokeStyle = strokeColor;
                 ctx.lineWidth = 2;
                 ctx.beginPath();
@@ -485,11 +482,12 @@ export class Network {
             const endX = centerX + (dx / total) * halfLen;
             const endY = centerY + (dy / total) * halfLen;
 
+            const baseColor = pack.quarkType === 'energy' ? ENERGY_COLOR : MATTER_COLOR;
             const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
-            gradient.addColorStop(0, 'rgba(0, 255, 255, 0)');
-            gradient.addColorStop(0.3, '#00ffff');
-            gradient.addColorStop(0.7, '#00ffff');
-            gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+            gradient.addColorStop(0, `rgba(${baseColor === ENERGY_COLOR ? '0, 255, 255' : '136, 153, 170'}, 0)`);
+            gradient.addColorStop(0.3, baseColor);
+            gradient.addColorStop(0.7, baseColor);
+            gradient.addColorStop(1, `rgba(${baseColor === ENERGY_COLOR ? '0, 255, 255' : '136, 153, 170'}, 0)`);
 
             ctx.strokeStyle = gradient;
             ctx.lineWidth = 6;
@@ -525,7 +523,10 @@ export class Network {
         const maxDistPx = maxDist * tileSize;
 
         const outOfRange = length > maxDistPx;
-        ctx.strokeStyle = outOfRange ? 'rgba(255, 50, 50, 0.8)' : 'rgba(0, 255, 255, 0.6)';
+        const MATTER_COLOR = '#8899aa';
+        const ENERGY_COLOR = '#00ffff';
+        const previewColor = this.game.hud.wireMode === 'energy' ? ENERGY_COLOR : MATTER_COLOR;
+        ctx.strokeStyle = outOfRange ? 'rgba(255, 50, 50, 0.8)' : previewColor;
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 4]);
         ctx.beginPath();

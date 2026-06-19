@@ -8,7 +8,7 @@ import { hadronSynthesizerBuilding } from './buildings/hadron_synthesizer.js';
 import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { fusionPressBuilding } from './buildings/fusion_press.js';
 import { energyBufferBuilding } from './buildings/energy_buffer.js';
-import { hubBuilding } from './buildings/hub.js';
+import { starBuilding } from './buildings/star.js';
 
 const BUILDING_MODULES = {
     'quantum_resonator': quantumResonatorBuilding,
@@ -20,7 +20,7 @@ const BUILDING_MODULES = {
     'electron_capture': electronCaptureBuilding,
     'fusion_press': fusionPressBuilding,
     'energy_buffer': energyBufferBuilding,
-    'hub': hubBuilding,
+    'star': starBuilding,
 };
 
 export const BUILDING_SIZES = Object.fromEntries(
@@ -32,7 +32,7 @@ export class Building {
         this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
         this.quarkType = 0; this.recipe = null; this.filterType = null;
         this.resources = {}; this.inputResources = {}; this.outputResources = {};
-        this.timer = 0; this.craftTimer = 0; this.animTimer = 0;
+        this.timer = 0; this.craftTimer = 0; // animTimer убран
 
         if (type === 'connector') this.filterType = 'energy';
         else if (type === 'energy_buffer') this.filterType = 'energy';
@@ -58,7 +58,7 @@ export class BuildingManager {
         this.lastMouseX = 0; this.lastMouseY = 0;
         this.isLeftMouseDown = false; this.isRightMouseDown = false;
         this.wireSource = null;
-        this.wireModeActive = false; // новое поле
+        this.wireModeActive = false;
         this._initGhost();
 
         this.lastPlacedTile = null;
@@ -127,7 +127,7 @@ export class BuildingManager {
         const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (!b || b.type === 'hub') return;
+        if (!b || b.type === 'star') return; // звезду не вращаем
         const mod = BUILDING_MODULES[b.type];
         if (mod && mod.rotateGhost) {
             mod.rotateGhost(b, this.game);
@@ -148,7 +148,7 @@ export class BuildingManager {
         const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (b && b.type !== 'hub') {
+        if (b && b.type !== 'star') {
             this.game.selectedType = b.type;
             this.ghost.rotation = b.rotation;
             this.ghost.quarkType = b.quarkType || 0;
@@ -164,7 +164,7 @@ export class BuildingManager {
         const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (b && b.type !== 'hub') {
+        if (b && b.type !== 'star') {
             if (this.game.input?.shiftKey) {
                 this.game.network.removeAllConnections(b);
             } else {
@@ -188,13 +188,13 @@ export class BuildingManager {
             const tile = this.game.map.worldToTile(wp.x, wp.y);
             const target = this.getBuildingAt(tile.tx, tile.ty);
 
-            if (target && target.type !== 'hub') {
+            if (target && target.type !== 'star') {
                 if (!this.wireSource) {
                     this.wireSource = target;
                     this.wireModeActive = true;
                 } else if (this.wireSource !== target) {
                     this.game.network.addConnection(this.wireSource, target);
-                    this.wireSource = target; // начинаем новую линию от цели
+                    this.wireSource = target;
                 }
             } else {
                 this.wireSource = null;
@@ -203,7 +203,6 @@ export class BuildingManager {
             return;
         }
 
-        // ... остальная логика для других инструментов (без изменений)
         if (this.game.selectedType) {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
@@ -259,7 +258,6 @@ export class BuildingManager {
     }
 
     onMouseMove() {
-        // всё ещё нужно для строительства, для wire превью рендерится отдельно
         if (this.isLeftMouseDown && this.game.selectedType && this.game.selectedType !== 'wire') {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
@@ -292,10 +290,23 @@ export class BuildingManager {
         return null;
     }
 
+    /** Проверяет, попадает ли здание в видимую область камеры */
+    isBuildingVisible(b, view, tileSize) {
+        const size = b.getSize();
+        const x1 = b.tx * tileSize;
+        const y1 = b.ty * tileSize;
+        const x2 = x1 + size.w * tileSize;
+        const y2 = y1 + size.h * tileSize;
+        return !(x2 < view.x1 || x1 > view.x2 || y2 < view.y1 || y1 > view.y2);
+    }
+
     render(ctx, camera) {
         const tileSize = this.game.map.tileSize;
+        const view = camera.getVisibleRect();
 
         for (const b of this.buildings) {
+            if (!this.isBuildingVisible(b, view, tileSize)) continue; // отсечение
+
             const mod = BUILDING_MODULES[b.type];
             if (mod) { ctx.save(); mod.render(ctx, b, tileSize, false, this.game); ctx.restore(); }
             else {

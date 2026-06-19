@@ -6,44 +6,15 @@ export class HUD {
         this.buttons = {};
         this.slot2Main = 'node';          // основной предмет слота 2
         this.slot2Alt = 'energy_buffer';  // альтернативный предмет
-        this.showConnections = true;      // ПО УМОЛЧАНИЮ ВКЛЮЧЕНО
+        this.wireMode = 'matter';         // 'matter' или 'energy' (для слота 1)
+        this.showConnections = false;     // режим отображения постоянной связи (выключен по умолчанию)
         this._createToolbar();
         this._bindHotkeys();
         this._initSlot2Popup();
+        this._initWireModePopup();
     }
 
     _createToolbar() {
-        // Сначала создаём контейнер для переключателя + кнопки 1
-        const group1 = document.createElement('div');
-        group1.style.display = 'flex';
-        group1.style.alignItems = 'center';
-        group1.style.gap = '0px'; // без зазора, чтобы примыкали вплотную
-
-        // Тонкая вертикальная кнопка-переключатель
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'tool-btn toggle-btn';
-        toggleBtn.innerHTML = '🔌';
-        toggleBtn.title = 'Показать соединения';
-        toggleBtn.style.width = '22px';
-        toggleBtn.style.height = '56px'; // как у обычных кнопок
-        toggleBtn.style.borderRadius = '8px 0 0 8px';
-        toggleBtn.style.marginRight = '0';
-        // ЗАДАЁМ НАЧАЛЬНЫЙ ЦВЕТ (СИНИЙ, ТАК КАК ВКЛЮЧЕН)
-        toggleBtn.style.background = 'rgba(0, 255, 255, 0.3)';
-        toggleBtn.style.border = '1px solid rgba(100,120,180,0.3)';
-        toggleBtn.style.cursor = 'pointer';
-        toggleBtn.style.display = 'flex';
-        toggleBtn.style.alignItems = 'center';
-        toggleBtn.style.justifyContent = 'center';
-        toggleBtn.style.fontSize = '14px';
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.showConnections = !this.showConnections;
-            toggleBtn.style.background = this.showConnections ? 'rgba(0, 255, 255, 0.3)' : 'rgba(20,25,45,0.92)';
-        });
-        group1.appendChild(toggleBtn);
-
-        // Обычная кнопка 1 (Связь)
         const items = [
             { key: '1', type: 'wire',          label: '1<br>Связь' },
             { key: '2', type: this.slot2Main,  label: '2<br>Узел' },
@@ -56,6 +27,35 @@ export class HUD {
             { key: '9', type: 'fusion_press',      label: '9<br>Пресс' },
             { key: '0', type: null,            label: '0<br>—' }
         ];
+
+        // Создаём группу для кнопки 1 + переключателя
+        const group1 = document.createElement('div');
+        group1.style.display = 'flex';
+        group1.style.alignItems = 'center';
+        group1.style.gap = '0px';
+
+        // Тонкая вертикальная кнопка-переключатель режима связи
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'tool-btn toggle-btn';
+        toggleBtn.innerHTML = '🔌';
+        toggleBtn.title = 'Показать соединения';
+        toggleBtn.style.width = '22px';
+        toggleBtn.style.height = '56px';
+        toggleBtn.style.borderRadius = '8px 0 0 8px';
+        toggleBtn.style.marginRight = '0';
+        toggleBtn.style.background = 'rgba(20,25,45,0.92)';
+        toggleBtn.style.border = '1px solid rgba(100,120,180,0.3)';
+        toggleBtn.style.cursor = 'pointer';
+        toggleBtn.style.display = 'flex';
+        toggleBtn.style.alignItems = 'center';
+        toggleBtn.style.justifyContent = 'center';
+        toggleBtn.style.fontSize = '14px';
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.showConnections = !this.showConnections;
+            toggleBtn.style.background = this.showConnections ? 'rgba(0, 255, 255, 0.3)' : 'rgba(20,25,45,0.92)';
+        });
+        group1.appendChild(toggleBtn);
 
         items.forEach((item, index) => {
             const btn = document.createElement('button');
@@ -72,6 +72,63 @@ export class HUD {
                 this.toolbar.appendChild(btn);
             }
             this.buttons[item.type] = btn;
+        });
+    }
+
+    _initWireModePopup() {
+        const btn1 = this.buttons['wire'];
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        btn1.parentNode.insertBefore(wrapper, btn1);
+        wrapper.appendChild(btn1);
+
+        const popup = document.createElement('div');
+        popup.className = 'wire-mode-popup';
+        popup.innerHTML = '⚡'; // Энергия
+        popup.style.position = 'absolute';
+        popup.style.bottom = '100%';
+        popup.style.left = '50%';
+        popup.style.transform = 'translateX(-50%)';
+        popup.style.marginBottom = '8px';
+        popup.style.background = 'rgba(20,25,45,0.95)';
+        popup.style.border = '1px solid #7AE0A3';
+        popup.style.borderRadius = '8px';
+        popup.style.padding = '6px 10px';
+        popup.style.cursor = 'pointer';
+        popup.style.display = 'none';
+        popup.style.zIndex = '1000';
+        popup.title = 'Переключить на Энергосвязь';
+        wrapper.appendChild(popup);
+
+        let hideTimer = null;
+
+        wrapper.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer);
+            popup.style.display = 'block';
+        });
+        wrapper.addEventListener('mouseleave', () => {
+            hideTimer = setTimeout(() => {
+                if (!popup.matches(':hover')) {
+                    popup.style.display = 'none';
+                }
+            }, 1000);
+        });
+        popup.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer);
+        });
+        popup.addEventListener('mouseleave', () => {
+            popup.style.display = 'none';
+        });
+        popup.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.wireMode = this.wireMode === 'matter' ? 'energy' : 'matter';
+            popup.innerHTML = this.wireMode === 'energy' ? '🔌' : '⚡';
+            popup.title = `Переключить на ${this.wireMode === 'energy' ? 'Материальную' : 'Энергетическую'} связь`;
+            // Обновляем цвет кнопки 1
+            if (btn1) {
+                btn1.style.background = this.wireMode === 'energy' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(60,70,100,0.4)';
+            }
         });
     }
 
@@ -107,7 +164,6 @@ export class HUD {
             clearTimeout(hideTimer);
             popup.style.display = 'block';
         });
-
         wrapper.addEventListener('mouseleave', () => {
             hideTimer = setTimeout(() => {
                 if (!popup.matches(':hover')) {
@@ -115,15 +171,12 @@ export class HUD {
                 }
             }, 1000);
         });
-
         popup.addEventListener('mouseenter', () => {
             clearTimeout(hideTimer);
         });
-
         popup.addEventListener('mouseleave', () => {
             popup.style.display = 'none';
         });
-
         popup.addEventListener('click', (e) => {
             e.stopPropagation();
             this.toggleSlot2();
@@ -162,7 +215,18 @@ export class HUD {
             if (['1','2','3','4','5','6','7','8','9','0','r','R','к','К','q','Q','й','Й','Escape'].includes(key)) {
                 e.preventDefault();
             }
-            if (key === '1') this.selectBuilding('wire');
+            if (key === '1') {
+                if (this.game.selectedType === 'wire') {
+                    this.wireMode = this.wireMode === 'matter' ? 'energy' : 'matter';
+                    // обновляем визуал кнопки 1
+                    const btn1 = this.buttons['wire'];
+                    if (btn1) {
+                        btn1.style.background = this.wireMode === 'energy' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(60,70,100,0.4)';
+                    }
+                } else {
+                    this.selectBuilding('wire');
+                }
+            }
             else if (key === '2') {
                 if (this.game.selectedType === this.slot2Main || this.game.selectedType === this.slot2Alt) {
                     this.toggleSlot2();
@@ -200,7 +264,13 @@ export class HUD {
     }
 
     updateActiveButton() {
-        Object.values(this.buttons).forEach(btn => btn.classList.remove('active'));
+        Object.values(this.buttons).forEach(btn => {
+            btn.classList.remove('active');
+            // Сбрасываем фон, кроме кнопок 1 и 2, которые управляются отдельно
+            if (btn.dataset.type !== 'wire' && btn.dataset.type !== this.slot2Main && btn.dataset.type !== this.slot2Alt) {
+                btn.style.background = '';
+            }
+        });
         if (this.game.selectedType && this.buttons[this.game.selectedType]) {
             this.buttons[this.game.selectedType].classList.add('active');
         }

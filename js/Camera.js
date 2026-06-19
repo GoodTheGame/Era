@@ -1,8 +1,9 @@
+// Camera.js
 export class Camera {
     constructor(canvas) {
         this.canvas = canvas;
-        this.x = 0; // Мировая координата X центра экрана
-        this.y = 0; // Мировая координата Y центра экрана
+        this.x = 0;
+        this.y = 0;
         this.zoom = 1.0;
         this.targetZoom = 1.0;
         
@@ -13,7 +14,7 @@ export class Camera {
         this.camStartY = 0;
 
         this.keys = {};
-        this.moveSpeed = 500; // Пикселей в секунду
+        this.moveSpeed = 500;
 
         this._bindEvents();
     }
@@ -23,7 +24,7 @@ export class Camera {
         window.addEventListener('keyup', (e) => this.keys[e.key.toLowerCase()] = false);
 
         this.canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 1 || (e.button === 0 && e.shiftKey)) { // Средняя кнопка или Shift+ЛКМ
+            if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
                 this.isDragging = true;
                 this.dragStartX = e.clientX;
                 this.dragStartY = e.clientY;
@@ -58,10 +59,8 @@ export class Camera {
     }
 
     update(dt) {
-        // Плавный зум
         this.zoom += (this.targetZoom - this.zoom) * 0.2;
 
-        // Движение на WASD
         const speed = (this.moveSpeed / this.zoom) * dt;
         if (this.keys['w'] || this.keys['ц']) this.y -= speed;
         if (this.keys['s'] || this.keys['ы']) this.y += speed;
@@ -69,17 +68,27 @@ export class Camera {
         if (this.keys['d'] || this.keys['в']) this.x += speed;
     }
 
-    // Конвертация экранных координат (мыши) в мировые
     screenToWorld(screenX, screenY) {
         const worldX = (screenX - this.canvas.width / 2) / this.zoom + this.x;
         const worldY = (screenY - this.canvas.height / 2) / this.zoom + this.y;
         return { x: worldX, y: worldY };
     }
 
-    // Применяем трансформацию канваса для рендера мира
     applyTransform(ctx) {
         ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
         ctx.scale(this.zoom, this.zoom);
         ctx.translate(-this.x, -this.y);
+    }
+
+    /** Возвращает видимую область в мировых координатах */
+    getVisibleRect() {
+        const topLeft = this.screenToWorld(0, 0);
+        const bottomRight = this.screenToWorld(this.canvas.width, this.canvas.height);
+        return {
+            x1: topLeft.x,
+            y1: topLeft.y,
+            x2: bottomRight.x,
+            y2: bottomRight.y
+        };
     }
 }

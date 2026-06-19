@@ -19,6 +19,15 @@ export const hadronSynthesizerBuilding = createFactory({
         const w = size.w * tileSize, h = size.h * tileSize;
         const cx = x + w/2, cy = y + h/2;
         const maxR = Math.min(w, h) * 0.4;
+        const animTimer = game.globalAnimTime || 0;
+        const zoom = game.camera.zoom;
+
+        if (zoom < 0.5 && !isGhost) {
+            const col = b.recipe === 'proton' ? QUARK_COLORS.p : QUARK_COLORS.n;
+            ctx.fillStyle = col;
+            ctx.fillRect(x + w*0.25, y + h*0.25, w*0.5, h*0.5);
+            return;
+        }
 
         ctx.fillStyle = '#0a0a1a';
         ctx.fillRect(x, y, w, h);
@@ -28,7 +37,7 @@ export const hadronSynthesizerBuilding = createFactory({
 
         if (!isGhost) {
             const progress = b.craftTimer ? Math.min(b.craftTimer / config.recipes[b.recipe].time, 1.0) : 0;
-            const phase = b.animTimer || 0;
+            const phase = animTimer;
 
             const numDots = 12;
             for (let i = 0; i < numDots; i++) {

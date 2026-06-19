@@ -9,8 +9,6 @@ export const gluonExtractorBuilding = {
     update(building, game, dt) {
         if (!building.resources) building.resources = {};
         if (!building.timer) building.timer = 0;
-        if (!building.animTimer) building.animTimer = 0;
-        building.animTimer += dt;
 
         const quark = 'g';
         building.timer += dt;
@@ -28,8 +26,24 @@ export const gluonExtractorBuilding = {
         const s = tileSize;
         const cx = x + s / 2;
         const cy = y + s / 2;
-        const animTimer = isGhost ? 0 : (b.animTimer || 0);
-        const phase = animTimer * 6; // частота пульсации мембраны
+        const animTimer = game.globalAnimTime || 0;
+        const zoom = game.camera.zoom; // <-- получаем текущий зум
+
+        // При сильном отдалении рисуем только значок, без анимации
+        if (zoom < 0.5 && !isGhost) {
+            ctx.fillStyle = '#ff44cc';
+            ctx.fillRect(x + s*0.25, y + s*0.25, s*0.5, s*0.5);
+            const count = b.resources?.['g'] || 0;
+            if (count > 0) {
+                ctx.fillStyle = '#fff';
+                ctx.font = `${s*0.3}px "Segoe UI"`;
+                ctx.textAlign = 'center';
+                ctx.fillText(count, cx, y + s - 2);
+            }
+            return;
+        }
+
+        const phase = animTimer * 6;
 
         // Фоновое свечение
         ctx.fillStyle = '#ff44cc20';
@@ -44,7 +58,6 @@ export const gluonExtractorBuilding = {
         const pulse = 1 + 0.15 * Math.sin(phase);
         const currentRadius = membraneRadius * pulse;
 
-        // Внешняя оболочка мембраны
         ctx.beginPath();
         ctx.arc(cx, membraneY, currentRadius, 0, Math.PI * 2);
         ctx.fillStyle = '#ff44cc40';
@@ -53,10 +66,8 @@ export const gluonExtractorBuilding = {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Сгусток глюонов в центре мембраны
         drawParticle(ctx, cx, membraneY, currentRadius * 0.7, 'g', animTimer);
 
-        // Импульсные волны, расходящиеся при выбросе
         if (Math.sin(phase) > 0.9) {
             for (let i = 1; i <= 2; i++) {
                 const waveRadius = currentRadius * (1 + i * 0.3);
@@ -67,14 +78,12 @@ export const gluonExtractorBuilding = {
                 ctx.lineWidth = 1;
                 ctx.stroke();
             }
-            // Маленькая вспышка
             ctx.beginPath();
             ctx.arc(cx, membraneY, currentRadius * 1.2, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
             ctx.fill();
         }
 
-        // Счётчик ресурса
         if (!isGhost) {
             const count = b.resources['g'] || 0;
             ctx.fillStyle = '#fff';

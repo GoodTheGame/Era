@@ -6,17 +6,21 @@ export const connectorBuilding = {
     type: 'connector',
     size: { w: 1, h: 1 },
 
-    rotateGhost(ghost) {
+    rotateGhost(ghost, game) {
         if (!ghost.filterType) ghost.filterType = 'energy';
         const idx = FILTER_OPTIONS.indexOf(ghost.filterType);
         const nextIdx = (idx + 1) % FILTER_OPTIONS.length;
         ghost.filterType = FILTER_OPTIONS[nextIdx];
+        if (game && game.network) {
+            game.network.updateDownstreamFilters(ghost);
+        }
     },
 
     render(ctx, b, tileSize, isGhost, game) {
         const cx = b.tx * tileSize + tileSize / 2;
         const cy = b.ty * tileSize + tileSize / 2;
         const radius = tileSize * 0.125;
+        const animTimer = game.globalAnimTime || 0;
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -27,9 +31,8 @@ export const connectorBuilding = {
         ctx.stroke();
 
         const filter = isGhost ? b.filterType : (b.filterType || 'energy');
-        drawParticle(ctx, cx, cy, radius * 1.2, filter, 0);
+        drawParticle(ctx, cx, cy, radius * 1.2, filter, animTimer);
 
-        // Только буква фильтра (без числа, коннектор не хранит ресурсы)
         ctx.fillStyle = '#fff';
         ctx.font = `bold ${radius * 1.5}px "Segoe UI"`;
         ctx.textAlign = 'center';

@@ -17,9 +17,7 @@ export const quantumResonatorBuilding = {
         if (building.quarkType === undefined) building.quarkType = 0;
         if (!building.resources) building.resources = {};
         if (!building.timer) building.timer = 0;
-        if (!building.animTimer) building.animTimer = 0;
-        building.animTimer += dt;
-        
+
         const quarkNames = ['u', 'd', 'c', 's', 't', 'b'];
         const quark = quarkNames[building.quarkType];
         building.timer += dt;
@@ -39,9 +37,22 @@ export const quantumResonatorBuilding = {
         const quarkNames = ['u', 'd', 'c', 's', 't', 'b'];
         const quark = isGhost ? quarkNames[b.quarkType || 0] : quarkNames[b.quarkType || 0];
         const color = QUARK_COLORS[quark] || '#fff';
-        const animTimer = isGhost ? 0 : (b.animTimer || 0);
+        const animTimer = game.globalAnimTime || 0;
+        const zoom = game.camera.zoom;
 
-        // Рамка
+        if (zoom < 0.5 && !isGhost) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x + w*0.25, y + h*0.25, w*0.5, h*0.5);
+            const count = b.resources?.[quark] || 0;
+            if (count > 0) {
+                ctx.fillStyle = '#fff';
+                ctx.font = `${tileSize*0.3}px "Segoe UI"`;
+                ctx.textAlign = 'center';
+                ctx.fillText(count, cx, y + h - 10);
+            }
+            return;
+        }
+
         ctx.fillStyle = 'rgba(0, 255, 255, 0.05)';
         ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = '#00ffff';
@@ -49,7 +60,6 @@ export const quantumResonatorBuilding = {
         ctx.strokeRect(x+1, y+1, w-2, h-2);
 
         if (!isGhost) {
-            // Стоячая волна (рябь)
             ctx.strokeStyle = color;
             ctx.lineWidth = 1;
             for (let i = 1; i <= 3; i++) {
@@ -60,7 +70,6 @@ export const quantumResonatorBuilding = {
                 ctx.stroke();
             }
 
-            // Точки, стягивающиеся к центру (из пустоты)
             for (let j = 0; j < 8; j++) {
                 const angle = animTimer * 0.5 + (j * Math.PI * 2) / 8;
                 const dist = maxR * (0.9 + 0.3 * Math.sin(animTimer * 4 + j));
@@ -72,17 +81,14 @@ export const quantumResonatorBuilding = {
                 ctx.fill();
             }
 
-            // Центральная частица
             drawParticle(ctx, cx, cy, maxR * 0.4, quark, animTimer);
 
-            // Счётчик
             const count = b.resources[quark] || 0;
             ctx.fillStyle = '#fff';
             ctx.font = `${tileSize*0.12}px "Segoe UI"`;
             ctx.textAlign = 'center';
             ctx.fillText(count, cx, y + h - 4);
         } else {
-            // Призрак
             drawParticle(ctx, cx, cy, maxR * 0.5, quark, 0);
         }
     }

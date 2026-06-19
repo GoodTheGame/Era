@@ -5,10 +5,14 @@ export const nodeBuilding = {
     size: { w: 2, h: 2 },
 
     render(ctx, b, tileSize, isGhost, game) {
-        const x = b.tx * tileSize, y = b.ty * tileSize;
-        const w = 2 * tileSize, h = 2 * tileSize;
-        const cx = x + w / 2, cy = y + h / 2;
+        const x = b.tx * tileSize;
+        const y = b.ty * tileSize;
+        const w = 2 * tileSize;
+        const h = 2 * tileSize;
+        const cx = x + w / 2;
+        const cy = y + h / 2;
         const radius = w * 0.375;
+        const animTimer = game.globalAnimTime || 0;
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -26,7 +30,7 @@ export const nodeBuilding = {
             keys.forEach((key, i) => {
                 const rx = startX + (i % 3) * w * 0.3 + iconSize / 2;
                 const ry = startY + Math.floor(i / 3) * h * 0.35 + iconSize / 2;
-                drawParticle(ctx, rx, ry, iconSize / 2, key, 0);
+                drawParticle(ctx, rx, ry, iconSize / 2, key, animTimer);
                 ctx.fillStyle = '#fff';
                 ctx.font = `${iconSize * 0.4}px "Segoe UI"`;
                 ctx.textAlign = 'center';

@@ -1,3 +1,4 @@
+// main.js
 import { Camera } from './Camera.js';
 import { GameMap } from './Map.js';
 import { Building, BuildingManager } from './Buildings.js';
@@ -21,10 +22,13 @@ class Game {
         this.lastTime = 0;
         this.assetsLoaded = false;
         this.input = { shiftKey: false };
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+        this.globalAnimTime = 0;   // ← глобальный таймер для всех анимаций
 
-        this._spawnHub();
-        this.camera.x = this.hub.tx * this.map.tileSize + this.map.tileSize * 2;
-        this.camera.y = this.hub.ty * this.map.tileSize + this.map.tileSize * 2;
+        this._spawnStar();
+        this.camera.x = this.star.tx * this.map.tileSize + 2.5 * this.map.tileSize;
+        this.camera.y = this.star.ty * this.map.tileSize + 2.5 * this.map.tileSize;
 
         this._resize();
         window.addEventListener('resize', () => this._resize());
@@ -38,9 +42,9 @@ class Game {
         });
     }
 
-    _spawnHub() {
-        this.hub = new Building(-2, -2, 'hub', 0);
-        this.buildingManager.buildings.push(this.hub);
+    _spawnStar() {
+        this.star = new Building(-2, -2, 'star', 0);
+        this.buildingManager.buildings.push(this.star);
     }
 
     async _loadAssets() {
@@ -62,6 +66,8 @@ class Game {
 
     _bindMouse() {
         this.canvas.addEventListener('mousemove', (e) => {
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
             this.buildingManager.setMousePosition(e.clientX, e.clientY);
             this.buildingManager.onMouseMove();
         });
@@ -70,19 +76,16 @@ class Game {
             const tile = this.map.worldToTile(worldPos.x, worldPos.y);
             const building = this.buildingManager.getBuildingAt(tile.tx, tile.ty);
 
-            // Если открыт любой UI, передаём клик ему и прекращаем игровые действия
             if (this.uiManager.isUIOpen()) {
                 this.uiManager.handleClick(worldPos.x, worldPos.y);
                 return;
             }
 
-            // Клик по узлу открывает его интерфейс
             if (e.button === 0 && building && building.type === 'node' && !this.selectedType) {
                 this.uiManager.openNodeUI(building);
                 return;
             }
 
-            // Обычные игровые клики
             if (e.button === 0 && !e.shiftKey) {
                 this.buildingManager.onLeftMouseDown();
             } else if (e.button === 2) {
@@ -109,6 +112,7 @@ class Game {
     }
 
     _update(dt) {
+        this.globalAnimTime += dt;   // ← обновляем глобальный таймер
         this.camera.update(dt);
         this.buildingManager.update(dt);
         this.network.update(dt);
@@ -121,11 +125,15 @@ class Game {
         this.map.render(this.ctx);
         this.buildingManager.render(this.ctx, this.camera);
         this.network.render(this.ctx);
+
+        if (this.buildingManager.wireModeActive && this.selectedType === 'wire') {
+            const worldPos = this.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            this.network.renderPreview(this.ctx, this.buildingManager.wireSource, worldPos.x, worldPos.y);
+        }
+
         this.ctx.restore();
 
-        // UI рисуется поверх всего в экранных координатах, поэтому без трансформации камеры
         if (this.uiManager.isUIOpen()) {
-            // Переводим камеру обратно для рисования UI
             this.ctx.save();
             this.camera.applyTransform(this.ctx);
             this.uiManager.render(this.ctx);
