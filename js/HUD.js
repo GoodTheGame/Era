@@ -90,7 +90,7 @@ export class HUD {
             btn.className = 'tool-btn';
             btn.innerHTML = item.label;
             btn.dataset.type = item.type;
-            btn.dataset.key = item.key;                     // ← ОБЯЗАТЕЛЬНО!
+            btn.dataset.key = item.key;
             btn.addEventListener('click', () => this.selectBuilding(item.type));
             if (index === 0) {
                 btn.style.borderRadius = '0 8px 8px 0';
@@ -248,20 +248,12 @@ export class HUD {
         this.slot2Main = this.slot2Alt;
         this.slot2Alt = tmp;
         this._updateSlot2Button();
-
-        const popup = document.querySelector('.slot2-popup');
-        if (popup) {
-            popup.innerHTML = this.slot2Alt === 'energy_buffer' ? '⚡' : '⏺';
-            popup.title = `Переключить на ${this.slot2Alt === 'node' ? 'Узел' : 'Буфер энергии'}`;
-        }
-
         const btn2 = document.querySelector('#toolbar button[data-key="2"]');
         if (btn2) {
             btn2.classList.toggle('energy-mode', this.slot2Main === 'energy_buffer');
             delete this.buttons[this.slot2Alt];
             this.buttons[this.slot2Main] = btn2;
         }
-
         if (this.slot2Active) {
             this.game.selectedType = this.slot2Main;
             this.game.buildingManager._updateGhostFromLastMouse();
@@ -274,20 +266,12 @@ export class HUD {
         this.slot3Main = this.slot3Alt;
         this.slot3Alt = tmp;
         this._updateSlot3Button();
-
-        const popup = document.querySelector('.slot3-popup');
-        if (popup) {
-            popup.innerHTML = this.slot3Alt === 'connector_energy' ? '⚡' : '🔹';
-            popup.title = `Переключить на ${this.slot3Alt === 'connector_energy' ? 'Коннектор материи' : 'Коннектор энергии'}`;
-        }
-
         const btn3 = document.querySelector('#toolbar button[data-key="3"]');
         if (btn3) {
             btn3.classList.toggle('energy-mode', this.slot3Main === 'connector_energy');
             delete this.buttons[this.slot3Alt];
             this.buttons[this.slot3Main] = btn3;
         }
-
         if (this.slot3Active) {
             this.game.selectedType = this.slot3Main;
             this.game.buildingManager._updateGhostFromLastMouse();
@@ -367,26 +351,15 @@ export class HUD {
     selectBuilding(type) {
         this.slot2Active = (type === this.slot2Main || type === this.slot2Alt);
         this.slot3Active = (type === this.slot3Main || type === this.slot3Alt);
-
         this.game.selectedType = type;
         this.updateActiveButton();
         if (type) this.game.buildingManager._updateGhostFromLastMouse();
     }
 
     updateActiveButton() {
-        Object.values(this.buttons).forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        if (this.slot2Active) {
-            const btn2 = this.buttons[this.slot2Main];
-            if (btn2) btn2.classList.add('active');
-        }
-        if (this.slot3Active) {
-            const btn3 = this.buttons[this.slot3Main];
-            if (btn3) btn3.classList.add('active');
-        }
-
+        Object.values(this.buttons).forEach(btn => btn.classList.remove('active'));
+        if (this.slot2Active) { const b = this.buttons[this.slot2Main]; if (b) b.classList.add('active'); }
+        if (this.slot3Active) { const b = this.buttons[this.slot3Main]; if (b) b.classList.add('active'); }
         if (this.game.selectedType && this.buttons[this.game.selectedType]) {
             this.buttons[this.game.selectedType].classList.add('active');
         }

@@ -64,11 +64,6 @@ export class Network {
         return type === 'energy_buffer' || type === 'connector_energy' || type === 'star' || type === 'fusion_press';
     }
 
-    /** Может ли здание быть частью материальной сети */
-    isMatterNode(type) {
-        return type === 'node' || type === 'connector' || this.isExtractor(type) || this.isFactory(type);
-    }
-
     getMaxOutputs(type) {
         if (this.isExtractor(type)) return 4;
         if (this.isFactory(type)) return 2;
@@ -96,9 +91,18 @@ export class Network {
 
         if (quarkType === 'energy') {
             if (building.type === 'node') return false;
+            if (building.type === 'fusion_press') return false;
             if (this.isEnergyNode(building.type)) {
                 const cur = building.resources?.['energy'] || 0;
                 return cur < (building.type === 'star' ? 50 : NODE_CAPACITY);
+            }
+            return false;
+        }
+
+        if (building.type === 'star') {
+            if (quarkType === 'p' || quarkType === 'n') {
+                const cur = building.inputResources?.[quarkType] || 0;
+                return cur < STACK_SIZE;
             }
             return false;
         }
@@ -151,7 +155,7 @@ export class Network {
 
         for (const b of this.game.buildingManager.buildings) {
             if (b === connector) continue;
-            if (!this.isFactory(b.type) && !this.isEnergyNode(b.type)) continue;
+            if (!this.isFactory(b.type) && !this.isEnergyNode(b.type) && b.type !== 'star') continue;
             if (!this.canAcceptResource(b, quarkType)) continue;
             const d = this.rectDistance(connectorRect, this.getRect(b));
             if (d <= 1) {
@@ -195,7 +199,7 @@ export class Network {
         const validSources = [
             'quantum_resonator', 'gluon_extractor', 'lepton_extractor', 'node',
             'hadron_synthesizer', 'electron_capture', 'connector', 'fusion_press',
-            'energy_buffer', 'connector_energy'
+            'energy_buffer', 'connector_energy', 'star'
         ];
         if (!validSources.includes(from.type)) return;
         if (this.isExtractor(to.type)) return;
@@ -212,13 +216,10 @@ export class Network {
 
         const connectionType = this.game.hud.wireMode;
 
-        // Проверки совместимости типов сети
         if (connectionType === 'energy') {
-            // Энергосвязь: источник должен быть в энергосети, приёмник тоже (или фабрика, производящая энергию)
-            if (!this.isEnergyNode(from.type) && from.type !== 'fusion_press') return;
-            if (!this.isEnergyNode(to.type) && to.type !== 'fusion_press') return;
+            if (!this.isEnergyNode(from.type)) return;
+            if (!this.isEnergyNode(to.type)) return;
         } else {
-            // Материальная связь: ни источник, ни приёмник не должны быть чисто энергетическими
             if (from.type === 'connector_energy' || from.type === 'energy_buffer') return;
             if (to.type === 'connector_energy' || to.type === 'energy_buffer') return;
         }
@@ -277,6 +278,12 @@ export class Network {
             const filter = b.filterType;
             if (!filter) continue;
 
+            // Энергетические коннекторы тянут только энергию, материальные – только материю
+            if (filter === 'energy') {
+                // Энергия не подтягивается коннектором, она передаётся сама
+                continue;
+            }
+
             const targets = this.getOutputTargets(b, filter);
             const numTargets = targets.length;
             if (numTargets === 0) continue;
@@ -326,6 +333,11 @@ export class Network {
                 pack.done = true;
                 const to = pack.to;
 
+                // Проверяем тип соединения по первому проводу (если цель – коннектор, смотрим его входящие соединения)
+                const connType = this.connections.find(c => c.from === pack.from && c.to === pack.to)?.type;
+                if (connType === 'energy' && pack.quarkType !== 'energy') continue;
+                if (connType === 'matter' && pack.quarkType === 'energy') continue;
+
                 if (to.type === 'connector') {
                     if (to.filterType && pack.quarkType !== to.filterType) continue;
 
@@ -349,6 +361,8 @@ export class Network {
                         }
                     }
                 } else if (to.type === 'connector_energy') {
+                    // Пропускаем только энергию
+                    if (pack.quarkType !== 'energy') continue;
                     const outConns = this.connections.filter(c => c.from === to);
                     for (const conn of outConns) {
                         const fromSize = to.getSize(), toSize = conn.to.getSize();
@@ -361,11 +375,13 @@ export class Network {
                         this.packs.push(new Pack(to, conn.to, pack.quarkType, pack.count, dist));
                     }
                 } else if (this.isFactory(to.type)) {
+                    if (pack.quarkType === 'energy' && to.type === 'fusion_press') continue;
                     if (!to.inputResources) to.inputResources = {};
                     const cur = to.inputResources[pack.quarkType] || 0;
                     const canAdd = Math.min(pack.count, STACK_SIZE - cur);
                     if (canAdd > 0) to.inputResources[pack.quarkType] = cur + canAdd;
                 } else if (to.type === 'node') {
+                    if (pack.quarkType === 'energy') continue;
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
                     const cap = NODE_CAPACITY;
@@ -393,11 +409,18 @@ export class Network {
                         }
                     }
                 } else if (to.type === 'energy_buffer' || to.type === 'star') {
-                    if (!to.resources) to.resources = {};
-                    const cur = to.resources[pack.quarkType] || 0;
-                    const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
-                    const canAdd = Math.min(pack.count, cap - cur);
-                    if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
+                    if (pack.quarkType === 'energy') {
+                        if (!to.resources) to.resources = {};
+                        const cur = to.resources['energy'] || 0;
+                        const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
+                        const canAdd = Math.min(pack.count, cap - cur);
+                        if (canAdd > 0) to.resources['energy'] = cur + canAdd;
+                    } else {
+                        if (!to.inputResources) to.inputResources = {};
+                        const cur = to.inputResources[pack.quarkType] || 0;
+                        const canAdd = Math.min(pack.count, STACK_SIZE - cur);
+                        if (canAdd > 0) to.inputResources[pack.quarkType] = cur + canAdd;
+                    }
                 } else if (!this.isExtractor(to.type)) {
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
@@ -435,10 +458,18 @@ export class Network {
 
         const resTypes = Object.keys(stock);
         for (const q of resTypes) {
+            // Звезда не отдаёт энергию
+            if (source.type === 'star' && q === 'energy') continue;
+
             let available = stock[q];
             if (available <= 0) continue;
 
-            const validConns = conns.filter(conn => this.canAcceptResource(conn.to, q));
+            const validConns = conns.filter(conn => {
+                // Для энергетических соединений пропускаем только энергию
+                if (conn.type === 'energy' && q !== 'energy') return false;
+                if (conn.type === 'matter' && q === 'energy') return false;
+                return this.canAcceptResource(conn.to, q);
+            });
 
             if (validConns.length === 0) continue;
 
@@ -449,7 +480,20 @@ export class Network {
             for (let i = 0; i < totalConns; i++) {
                 let count = perConn + (i < remainder ? 1 : 0);
                 if (count <= 0) continue;
-                count = Math.min(count, 10);
+                const to = validConns[i].to;
+                let cap;
+                if (this.isFactory(to.type)) {
+                    cap = STACK_SIZE - (to.inputResources?.[q] || 0);
+                } else if (to.type === 'star') {
+                    cap = (q === 'energy') ? (50 - (to.resources?.['energy'] || 0)) : (STACK_SIZE - (to.inputResources?.[q] || 0));
+                } else if (to.type === 'energy_buffer') {
+                    cap = NODE_CAPACITY - (to.resources?.[q] || 0);
+                } else {
+                    cap = (to.type === 'node' ? NODE_CAPACITY : STACK_SIZE) - (to.resources?.[q] || 0);
+                }
+                count = Math.min(count, cap);
+                if (count <= 0) continue;
+                count = Math.min(count, available);
                 stock[q] -= count;
                 const conn = validConns[i];
                 const fromSize = source.getSize(), toSize = conn.to.getSize();
@@ -479,7 +523,6 @@ export class Network {
         const MATTER_COLOR = '#8899aa';
         const ENERGY_COLOR = '#00ffff';
 
-        // Статические линии
         for (const conn of this.connections) {
             const show = conn.type === 'energy' ? hud.showEnergyConnections : hud.showMatterConnections;
             if (!show) continue;
@@ -500,7 +543,6 @@ export class Network {
             ctx.stroke();
         }
 
-        // Подсветка ближайшего провода красным (если нет выбранного инструмента)
         if (!this.game.selectedType && this.game.buildingManager.lastMouseX !== undefined) {
             const worldPos = this.game.camera.screenToWorld(this.game.buildingManager.lastMouseX, this.game.buildingManager.lastMouseY);
             const closest = this.findConnectionAt(worldPos.x, worldPos.y);
@@ -520,7 +562,6 @@ export class Network {
             }
         }
 
-        // Паки (ресурсы) с тем же сдвигом
         for (const pack of this.packs) {
             const fromSize = pack.from.getSize(), toSize = pack.to.getSize();
             const yOffset = pack.quarkType === 'energy' ? -3 : 3;

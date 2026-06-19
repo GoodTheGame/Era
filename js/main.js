@@ -7,6 +7,7 @@ import { atlasLoader } from './AtlasLoader.js';
 import { spriteRenderer } from './SpriteRenderer.js';
 import { Network } from './Network.js';
 import { UIManager } from './UIManager.js';
+// import { EnergyGrid } from './EnergyGrid.js';
 
 class Game {
     constructor() {
@@ -25,6 +26,8 @@ class Game {
         this.lastMouseX = 0;
         this.lastMouseY = 0;
         this.globalAnimTime = 0;   // ← глобальный таймер для всех анимаций
+        // this.energyGrid = new EnergyGrid(this);
+
 
         this._spawnStar();
         this.camera.x = this.star.tx * this.map.tileSize + 2.5 * this.map.tileSize;
@@ -116,6 +119,8 @@ class Game {
         this.camera.update(dt);
         this.buildingManager.update(dt);
         this.network.update(dt);
+        // this.energyGrid.update(dt);
+
     }
 
     _render() {

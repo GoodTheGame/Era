@@ -1,69 +1,106 @@
-import { createFactory } from '../FactoryBase.js';
 import { drawParticle } from '../ParticleRenderer.js';
 
-const COLORS = {
-    p: '#ffaa00', e: '#ffff00', H: '#22aaff'
-};
-
-export const electronCaptureBuilding = createFactory({
+export const electronCaptureBuilding = {
     type: 'electron_capture',
     size: { w: 2, h: 1 },
-    recipes: {
-        hydrogen: { inputs: { p: 1, e: 1 }, output: 'H', time: 1.0 }
-    },
-    recipeColors: { hydrogen: '#22aaff' },
-    inputColors: COLORS,
+    recipe: { inputs: { p: 1, e: 1 }, output: 'H', time: 1.0 },
 
-    rotateGhost(ghost, game, reverse = false) {
-        // только один рецепт, ничего не делаем
+    rotateGhost(ghost, game, reverse) {},
+
+    update(building, game, dt) {
+        if (!building.recipe) building.recipe = 'hydrogen';
+        if (!building.inputResources) building.inputResources = {};
+        if (!building.outputResources) building.outputResources = {};
+        if (!building.craftTimer) building.craftTimer = 0;
+
+        const recipe = this.recipe;
+        let can = true;
+        for (const [r, amt] of Object.entries(recipe.inputs)) {
+            if ((building.inputResources[r] || 0) < amt) { can = false; break; }
+        }
+        if (!can) { building.craftTimer = 0; return; }
+
+        building.craftTimer += dt;
+        if (building.craftTimer >= recipe.time) {
+            building.craftTimer = 0;
+            for (const [r, amt] of Object.entries(recipe.inputs)) {
+                building.inputResources[r] -= amt;
+            }
+            building.outputResources['H'] = (building.outputResources['H'] || 0) + 1;
+        }
     },
 
-    render(ctx, b, tileSize, isGhost, game, config) {
+    render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
         const w = size.w * tileSize, h = size.h * tileSize;
-        const cx = x + w/2, cy = y + h/2;
+        const cx = x + w / 2, cy = y + h / 2;
         const maxR = Math.min(w, h) * 0.35;
         const animTimer = game.globalAnimTime || 0;
         const zoom = game.camera.zoom;
 
+        // Упрощённый режим (отдаление)
         if (zoom < 0.5 && !isGhost) {
             ctx.fillStyle = '#22aaff';
-            ctx.fillRect(x + w*0.25, y + h*0.25, w*0.5, h*0.5);
+            ctx.fillRect(x + w * 0.25, y + h * 0.25, w * 0.5, h * 0.5);
             return;
         }
 
-        const progress = b.craftTimer ? Math.min(b.craftTimer / 1.0, 1.0) : 0;
+        const progress = b.craftTimer ? Math.min(b.craftTimer / this.recipe.time, 1.0) : 0;
+        const hasOutput = (b.outputResources?.['H'] || 0) > 0;
 
-        if (!isGhost) {
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = '#22aaff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+
+        // Если призрак — показываем анимированную версию, как после постройки
+        if (isGhost) {
             drawParticle(ctx, cx, cy, maxR * 0.6, 'p', animTimer);
+            const eAngle = animTimer * 3;
+            const orbitR = maxR * 1.2;
+            drawParticle(ctx, cx + Math.cos(eAngle) * orbitR, cy + Math.sin(eAngle) * orbitR, maxR * 0.4, 'e', animTimer);
+            return;
+        }
 
-            if (!progress || progress < 0.8) {
+        // Если есть готовый продукт – показываем только его
+        if (hasOutput && progress === 0) {
+            drawParticle(ctx, cx, cy, maxR * 0.8, 'H', animTimer);
+        } else {
+            // Ингредиенты
+            drawParticle(ctx, cx, cy, maxR * 0.6, 'p', animTimer);
+            if (progress < 0.8) {
                 const eAngle = animTimer * 3;
                 const orbitR = maxR * 1.2;
-                const ex = cx + Math.cos(eAngle) * orbitR;
-                const ey = cy + Math.sin(eAngle) * orbitR;
-                drawParticle(ctx, ex, ey, maxR * 0.4, 'e', animTimer);
+                drawParticle(ctx, cx + Math.cos(eAngle) * orbitR, cy + Math.sin(eAngle) * orbitR, maxR * 0.4, 'e', animTimer);
             }
-
+            // Прогресс
             if (progress > 0) {
                 const alpha = progress;
                 ctx.globalAlpha = alpha;
                 ctx.beginPath();
-                ctx.arc(cx, cy, maxR * 0.3, 0, Math.PI*2);
+                ctx.arc(cx, cy, maxR * 0.3, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
                 ctx.globalAlpha = 1;
-
                 ctx.fillStyle = '#22aaff';
                 ctx.fillRect(x + 2, y + h - 6, (w - 4) * progress, 4);
             }
+        }
 
-            if (!progress && (b.outputResources['H'] || 0) > 0) {
-                drawParticle(ctx, cx, cy, maxR * 0.8, 'H', animTimer);
-            }
-        } else {
-            drawParticle(ctx, cx, cy, maxR * 0.8, 'H', 0);
+        // Входные ресурсы (всегда снизу)
+        if (b.inputResources) {
+            const keys = Object.keys(this.recipe.inputs);
+            const isize = tileSize * 0.15;
+            const sx = x + 2, sy = y + h - 12;
+            keys.forEach((key, i) => {
+                ctx.fillStyle = { p: '#ffaa00', e: '#ffff00' }[key] || '#fff';
+                ctx.fillRect(sx + i * 20, sy, isize, isize);
+                ctx.fillStyle = '#000';
+                ctx.font = `${isize * 0.7}px "Segoe UI"`;
+                ctx.fillText((b.inputResources[key] || 0).toString(), sx + i * 20 + 2, sy + isize - 2);
+            });
         }
     }
-});
+};

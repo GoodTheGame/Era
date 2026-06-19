@@ -194,13 +194,14 @@ export class BuildingManager {
             const tile = this.game.map.worldToTile(wp.x, wp.y);
             const target = this.getBuildingAt(tile.tx, tile.ty);
 
-            if (target && target.type !== 'star') {
+            // Разрешаем начинать связь от любого здания, включая звезду
+            if (target && target.type !== 'hub') {   // hub уже не существует, но на всякий случай
                 if (!this.wireSource) {
                     this.wireSource = target;
                     this.wireModeActive = true;
                 } else if (this.wireSource !== target) {
                     this.game.network.addConnection(this.wireSource, target);
-                    this.wireSource = target;
+                    this.wireSource = target;   // продолжаем тянуть от новой цели
                 }
             } else {
                 this.wireSource = null;
@@ -255,8 +256,19 @@ export class BuildingManager {
     onRightMouseDown() {
         this.isRightMouseDown = true;
         if (this.game.selectedType === 'wire') {
-            this.wireSource = null;
-            this.wireModeActive = false;
+            if (this.wireSource) {
+                // первое ПКМ – отвязываем объект, но остаёмся в режиме
+                this.wireSource = null;
+                this.wireModeActive = false;
+            } else {
+                // второе ПКМ – выключаем инструмент
+                this.game.selectedType = null;
+                this.ghost.visible = false;
+                this.wireSource = null;
+                this.wireModeActive = false;
+                this.game.hud.updateActiveButton();
+            }
+            return;
         }
         if (this.game.selectedType) {
             this.game.selectedType = null; this.ghost.visible = false; this.wireSource = null;
@@ -299,7 +311,6 @@ export class BuildingManager {
                         this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
                     }
                 } else {
-                    // Обновляем lastPlacedTile, чтобы не пытаться строить на том же месте
                     this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
                 }
             }

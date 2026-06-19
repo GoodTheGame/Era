@@ -1,3 +1,4 @@
+// js/buildings/star.js
 export const starBuilding = {
     type: 'star',
     size: { w: 5, h: 5 },
@@ -23,12 +24,24 @@ export const starBuilding = {
                 building.inputResources['n'] -= neutronNeed;
                 building.resources['energy'] -= energyNeed;
                 building.isActive = true;
+                building.shutdownTimer = 0;
             }
         } else {
-            building.resources['energy'] = (building.resources['energy'] || 0) - dt;
-            if (building.resources['energy'] < 0) {
-                building.resources['energy'] = 0;
-                building.isActive = false;
+            // Потребление строго 1 энергии в секунду (целыми шагами)
+            while (building.timer >= 1.0) {
+                building.timer -= 1.0;
+                const current = building.resources['energy'] || 0;
+                building.resources['energy'] = Math.max(0, current - 1);
+            }
+
+            if ((building.resources['energy'] || 0) > 0) {
+                building.shutdownTimer = 0;
+            } else {
+                building.shutdownTimer = (building.shutdownTimer || 0) + dt;
+                if (building.shutdownTimer >= 10) {
+                    building.isActive = false;
+                    building.shutdownTimer = 0;
+                }
             }
         }
     },
@@ -44,20 +57,33 @@ export const starBuilding = {
         const isActive = b.isActive || false;
         const phase = game.globalAnimTime || 0;
         const zoom = game.camera.zoom;
+        const shutdownProgress = b.shutdownTimer ? Math.min(b.shutdownTimer / 10, 1) : 0;
 
+        // === Упрощённый режим (отдаление) ===
         if (zoom < 0.5 && !isGhost) {
-            const pulse = isActive ? (Math.sin(phase * 1.5) * 0.2 + 0.6) : (Math.sin(phase * 1.5) * 0.05 + 0.15);
-            ctx.fillStyle = isActive ? `rgba(0, 200, 255, ${pulse})` : `rgba(255, 150, 50, ${pulse})`;
+            const pulse = isActive
+                ? (Math.sin(phase * 1.5) * 0.2 + 0.6) * (1 - shutdownProgress * 0.8)
+                : (Math.sin(phase * 1.5) * 0.05 + 0.15);
+            ctx.fillStyle = isActive
+                ? `rgba(0, 200, 255, ${pulse})`
+                : `rgba(255, 150, 50, ${pulse})`;
             ctx.beginPath();
             ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = `${tileSize*0.3}px "Segoe UI"`;
-            ctx.textAlign = 'center';
-            ctx.fillText(isActive ? 'АКТИВНА' : 'ЗВЕЗДА', cx, y + h - 10);
+            // Ресурсы в упрощённом режиме
+            if (!isActive) {
+                const pCount = b.inputResources?.['p'] || 0;
+                const nCount = b.inputResources?.['n'] || 0;
+                const eCount = b.resources?.['energy'] || 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${tileSize * 0.35}px "Segoe UI"`;
+                ctx.textAlign = 'center';
+                ctx.fillText(`p:${pCount}/10  n:${nCount}/10  ⚡${Math.floor(eCount)}/50`, cx, y + h - 12);
+            }
             return;
         }
 
+        // === Основная графика ===
         const bgGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 2);
         bgGradient.addColorStop(0, '#0a0a1a');
         bgGradient.addColorStop(1, '#050510');
@@ -65,8 +91,63 @@ export const starBuilding = {
         ctx.fillRect(x, y, w, h);
 
         if (isActive) {
-            // ... (оставь активную анимацию, которая была)
+            // Угасание: альфа снижается с 1 до 0.2 за 10 секунд
+            const alpha = 1 - shutdownProgress * 0.8;
+            ctx.globalAlpha = alpha;
+
+            // Ядро (уменьшаем радиус и яркость при угасании)
+            const coreRadius = maxR * (0.9 - shutdownProgress * 0.4);
+            const coreGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreRadius);
+            coreGradient.addColorStop(0, '#ffffff');
+            coreGradient.addColorStop(0.2, '#00ccff');
+            coreGradient.addColorStop(0.5, '#0066aa');
+            coreGradient.addColorStop(1, 'rgba(0, 0, 50, 0)');
+            ctx.fillStyle = coreGradient;
+            ctx.beginPath();
+            ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Протуберанцы (исчезают при угасании)
+            if (shutdownProgress < 0.8) {
+                for (let j = 0; j < 5; j++) {
+                    const angle = phase * 2 + (j * Math.PI * 2) / 5;
+                    const startX = cx + Math.cos(angle) * maxR * 0.3;
+                    const startY = cy + Math.sin(angle) * maxR * 0.3;
+                    const endX = cx + Math.cos(angle + 0.4) * maxR * 0.7;
+                    const endY = cy + Math.sin(angle + 0.4) * maxR * 0.7;
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.quadraticCurveTo(
+                        cx + Math.cos(angle + 0.2) * maxR * 0.9,
+                        cy + Math.sin(angle + 0.2) * maxR * 0.9,
+                        endX, endY
+                    );
+                    ctx.strokeStyle = `rgba(255, 200, 100, ${0.7 + Math.sin(phase * 5 + j) * 0.3})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+
+            // Кольца (замедляются и тускнеют)
+            if (shutdownProgress < 1) {
+                for (let k = 0; k < 16; k++) {
+                    const angle = (k / 16) * Math.PI * 2 + phase * (0.3 - shutdownProgress * 0.25);
+                    const len = maxR * (1.4 + Math.sin(phase * 3 + k) * 0.2) * (1 - shutdownProgress * 0.5);
+                    const x1 = cx + Math.cos(angle) * maxR * 0.9;
+                    const y1 = cy + Math.sin(angle) * maxR * 0.9;
+                    const x2 = cx + Math.cos(angle) * len;
+                    const y2 = cy + Math.sin(angle) * len;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = `rgba(0, 180, 255, ${0.3 + Math.sin(phase * 4 + k) * 0.1})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+            ctx.globalAlpha = 1;
         } else {
+            // Неактивное ядро
             const pulse = Math.sin(phase * 1.5) * 0.05 + 0.15;
             const outerGlow = ctx.createRadialGradient(cx, cy, maxR * 0.6, cx, cy, maxR * 1.3);
             outerGlow.addColorStop(0, `rgba(255, 150, 50, ${pulse * 0.6})`);
@@ -92,6 +173,27 @@ export const starBuilding = {
             ctx.beginPath();
             ctx.arc(cx, cy, maxR * 0.6, 0, Math.PI * 2);
             ctx.fill();
+        }
+
+        // === Ресурсы всегда ===
+        if (!isGhost) {
+            const pCount = b.inputResources?.['p'] || 0;
+            const nCount = b.inputResources?.['n'] || 0;
+            const eCount = b.resources?.['energy'] || 0;
+            const fontSize = tileSize * 0.25;
+
+            ctx.textAlign = 'left';
+            ctx.font = `bold ${fontSize}px "Segoe UI"`;
+
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillText(`p ${pCount}/10`, x + 6, y + h - 12);
+
+            ctx.fillStyle = '#aa00ff';
+            ctx.fillText(`n ${nCount}/10`, x + 6, y + h - 12 - fontSize - 2);
+
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#00ccff';
+            ctx.fillText(`⚡${Math.floor(eCount)}/50`, x + w - 6, y + h - 12);
         }
     }
 };
