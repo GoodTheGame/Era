@@ -22,9 +22,9 @@ export class Network {
         this.connections = [];
         this.packs = [];
         this.sendTimer = 0;
-        this.sendInterval = 2.0;      // пассивная отправка от не-коннекторов
+        this.sendInterval = 2.0;
         this.pullTimer = 0;
-        this.pullInterval = 1.0;      // активная подтяжка коннекторами раз в секунду
+        this.pullInterval = 1.0;
     }
 
     // ---------- геометрия ----------
@@ -49,14 +49,53 @@ export class Network {
         return 5;
     }
 
+    // ---------- типы зданий ----------
+    isFactory(type) {
+        return type === 'hadron_synthesizer' || type === 'electron_capture' || type === 'fusion_press';
+    }
+
+    isExtractor(type) {
+        return type === 'quantum_resonator' || type === 'gluon_extractor' || type === 'lepton_extractor';
+    }
+
+    // Максимальное количество исходящих проводов для типа здания
+    getMaxOutputs(type) {
+        if (this.isExtractor(type)) return 4;   // источники (добытчики)
+        if (this.isFactory(type)) return 2;     // фабрики
+        return Infinity;                         // узлы, коннекторы — без ограничений
+    }
+
+    /** Определяет выходной тип ресурса для источника (добытчика или фабрики) */
+    getSourceResourceType(building) {
+        if (building.type === 'quantum_resonator') {
+            const quarkNames = ['u', 'd', 'c', 's', 't', 'b'];
+            return quarkNames[building.quarkType || 0];
+        }
+        if (building.type === 'gluon_extractor') return 'g';
+        if (building.type === 'lepton_extractor') return 'e';
+        if (building.type === 'hadron_synthesizer') {
+            return (building.recipe === 'proton') ? 'p' : 'n';
+        }
+        if (building.type === 'electron_capture') return 'H';
+        if (building.type === 'fusion_press') return 'He';
+        return null;
+    }
+
     // ---------- управление проводами ----------
     addConnection(from, to) {
         if (from.type === 'hub' || to.type === 'hub') return;
-        const valid = [
+
+        const validSources = [
             'quantum_resonator', 'gluon_extractor', 'lepton_extractor', 'node',
             'hadron_synthesizer', 'electron_capture', 'connector', 'fusion_press'
         ];
-        if (!valid.includes(from.type)) return;
+        if (!validSources.includes(from.type)) return;
+        if (this.isExtractor(to.type)) return;
+
+        // Проверяем лимит выходных проводов
+        const currentOutputs = this.connections.filter(c => c.from === from).length;
+        const maxOutputs = this.getMaxOutputs(from.type);
+        if (currentOutputs >= maxOutputs) return;
 
         const maxDist = this.getMaxDistance(from.type, to.type);
         const r1 = this.getRect(from);
@@ -65,6 +104,16 @@ export class Network {
         if (dist > maxDist) return;
 
         this.connections.push({ from, to });
+
+        // ---------- НАСЛЕДОВАНИЕ ФИЛЬТРА ----------
+        if (to.type === 'connector') {
+            const sourceResource = this.getSourceResourceType(from);
+            if (sourceResource) {
+                to.filterType = sourceResource;
+            } else if (from.type === 'connector' && from.filterType) {
+                to.filterType = from.filterType;
+            }
+        }
     }
 
     removeConnection(conn) {
@@ -105,19 +154,17 @@ export class Network {
         return cur < STACK_SIZE;
     }
 
-    /** Проверяет, можно ли передать в приёмник (фабрику или узел) с учётом лимита */
     canAcceptTarget(target, quarkType) {
-        if (target.type === 'hadron_synthesizer' || target.type === 'electron_capture' || target.type === 'fusion_press') {
+        if (this.isExtractor(target.type)) return false;
+        if (this.isFactory(target.type)) {
             return this.isResourceNeededByFactory(target, quarkType) && this.canFactoryAccept(target, quarkType);
         }
-        // Узел, добытчик и т.д. — принимают, если не переполнены
         if (!target.resources) return true;
         const cap = target.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
         const cur = target.resources[quarkType] || 0;
         return cur < cap;
     }
 
-    // Проверяет, есть ли от коннектора путь к реальному приёмнику, готовому принять ресурс
     hasValidPath(connector, quarkType) {
         const visited = new Set();
         const queue = [connector];
@@ -139,22 +186,30 @@ export class Network {
         return false;
     }
 
-    /** Собирает все пригодные выходы коннектора (соседи + валидные провода) */
-    getTargetsForConnector(connector, quarkType) {
+    /** Все выходы коннектора: соседние фабрики + валидные провода */
+    getOutputTargets(connector, quarkType) {
         const targets = [];
         const connectorRect = this.getRect(connector);
 
-        // 1) Соседние фабрики / узлы (расстояние <= 1 клетки)
+        // Соседние фабрики
         for (const b of this.game.buildingManager.buildings) {
             if (b === connector) continue;
+            if (!this.isFactory(b.type)) continue;
             if (!this.canAcceptTarget(b, quarkType)) continue;
             const d = this.rectDistance(connectorRect, this.getRect(b));
             if (d <= 1) {
-                targets.push({ target: b, dist: 0 });
+                const fromSize = connector.getSize(), toSize = b.getSize();
+                const tileSize = 64;
+                const x1 = (connector.tx + fromSize.w / 2) * tileSize;
+                const y1 = (connector.ty + fromSize.h / 2) * tileSize;
+                const x2 = (b.tx + toSize.w / 2) * tileSize;
+                const y2 = (b.ty + toSize.h / 2) * tileSize;
+                const realDist = Math.max(Math.hypot(x2 - x1, y2 - y1), 32);
+                targets.push({ target: b, dist: realDist });
             }
         }
 
-        // 2) Исходящие провода (только если ведут к реальному приёмнику)
+        // Исходящие провода
         const outConns = this.connections.filter(c => c.from === connector);
         for (const conn of outConns) {
             const to = conn.to;
@@ -177,22 +232,19 @@ export class Network {
         return targets;
     }
 
-    // ========== НОВАЯ ЛОГИКА ПОДТЯЖКИ КОННЕКТОРОМ ==========
+    // ========== Активная подтяжка: создаёт пачки от источника к коннектору ==========
     pullResourcesForConnectors() {
         for (const b of this.game.buildingManager.buildings) {
             if (b.type !== 'connector') continue;
             const filter = b.filterType;
             if (!filter || filter === 'energy') continue;
 
-            // Собираем все выходы
-            const targets = this.getTargetsForConnector(b, filter);
+            const targets = this.getOutputTargets(b, filter);
             const numTargets = targets.length;
             if (numTargets === 0) continue;
 
-            // Сколько запросит коннектор: 5 * кол-во выходов, но не более 30
             const totalRequest = Math.min(5 * numTargets, 30);
 
-            // Ищем входные провода от источника
             const inConns = this.connections.filter(c => c.to === b);
             let pulled = 0;
             for (const conn of inConns) {
@@ -207,43 +259,32 @@ export class Network {
 
                 const canPull = Math.min(totalRequest - pulled, stock[filter]);
                 if (canPull <= 0) break;
+                // Создаём пачку от источника к коннектору
+                const fromSize = source.getSize(), toSize = b.getSize();
+                const tileSize = 64;
+                const x1 = (source.tx + fromSize.w / 2) * tileSize;
+                const y1 = (source.ty + fromSize.h / 2) * tileSize;
+                const x2 = (b.tx + toSize.w / 2) * tileSize;
+                const y2 = (b.ty + toSize.h / 2) * tileSize;
+                const dist = Math.max(Math.hypot(x2 - x1, y2 - y1), 32);
+                this.packs.push(new Pack(source, b, filter, canPull, dist));
                 stock[filter] -= canPull;
                 pulled += canPull;
-            }
-
-            if (pulled === 0) continue;
-
-            // Равномерно распределяем pulled по всем целям
-            const perTarget = Math.floor(pulled / numTargets);
-            let remainder = pulled % numTargets;
-            for (let i = 0; i < numTargets; i++) {
-                let count = perTarget + (i < remainder ? 1 : 0);
-                if (count <= 0) continue;
-                const { target, dist } = targets[i];
-                // Расстояние: если цель соседняя (dist == 0), всё равно создаём пачку с реальным расстоянием
-                const fromSize = b.getSize(), toSize = target.getSize();
-                const tileSize = 64;
-                const x1 = (b.tx + fromSize.w / 2) * tileSize;
-                const y1 = (b.ty + fromSize.h / 2) * tileSize;
-                const x2 = (target.tx + toSize.w / 2) * tileSize;
-                const y2 = (target.ty + toSize.h / 2) * tileSize;
-                const realDist = Math.hypot(x2 - x1, y2 - y1);
-                this.packs.push(new Pack(b, target, filter, count, realDist || 1));
             }
         }
     }
 
     // ========== основной update ==========
     update(dt) {
-        // 1) Активная подтяжка коннекторами (раз в секунду)
+        // 1) Активная подтяжка (создание пачек источник → коннектор)
         this.pullTimer += dt;
         if (this.pullTimer >= this.pullInterval) {
             this.pullTimer -= this.pullInterval;
             this.pullResourcesForConnectors();
         }
 
-        // 2) Движение и доставка пачек
-        const speed = 10 * 64;
+        // 2) Движение и доставка пачек (скорость 5 тайлов/с для наглядности)
+        const speed = 5 * 64;
         for (const pack of this.packs) {
             pack.distance -= speed * dt;
             if (pack.distance <= 0) {
@@ -253,38 +294,34 @@ export class Network {
                 if (to.type === 'connector') {
                     if (to.filterType && pack.quarkType !== to.filterType) continue;
 
-                    const targets = this.getTargetsForConnector(to, pack.quarkType);
-                    if (targets.length === 0) continue;
-
-                    const perTarget = Math.floor(pack.count / targets.length);
-                    let remainder = pack.count % targets.length;
-                    for (let i = 0; i < targets.length; i++) {
-                        let cnt = perTarget + (i < remainder ? 1 : 0);
-                        if (cnt <= 0) continue;
-                        const { target, dist } = targets[i];
-                        this.packs.push(new Pack(to, target, pack.quarkType, cnt, dist));
+                    const targets = this.getOutputTargets(to, pack.quarkType);
+                    if (targets.length > 0) {
+                        const perTarget = Math.floor(pack.count / targets.length);
+                        let remainder = pack.count % targets.length;
+                        for (let i = 0; i < targets.length; i++) {
+                            let cnt = perTarget + (i < remainder ? 1 : 0);
+                            if (cnt <= 0) continue;
+                            const { target, dist } = targets[i];
+                            this.packs.push(new Pack(to, target, pack.quarkType, cnt, dist));
+                        }
                     }
-                } else if (to.type === 'hadron_synthesizer' || to.type === 'electron_capture' || to.type === 'fusion_press') {
+                } else if (this.isFactory(to.type)) {
                     if (!to.inputResources) to.inputResources = {};
                     const cur = to.inputResources[pack.quarkType] || 0;
                     const canAdd = Math.min(pack.count, STACK_SIZE - cur);
-                    if (canAdd > 0) {
-                        to.inputResources[pack.quarkType] = cur + canAdd;
-                    }
-                } else {
+                    if (canAdd > 0) to.inputResources[pack.quarkType] = cur + canAdd;
+                } else if (!this.isExtractor(to.type)) {
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
                     const cap = to.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
                     const canAdd = Math.min(pack.count, cap - cur);
-                    if (canAdd > 0) {
-                        to.resources[pack.quarkType] = cur + canAdd;
-                    }
+                    if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
                 }
             }
         }
         this.packs = this.packs.filter(p => !p.done);
 
-        // 3) Пассивная отправка от не-коннекторов
+        // 3) Пассивная отправка от не-коннекторов (но НЕ в коннекторы)
         this.sendTimer += dt;
         if (this.sendTimer >= this.sendInterval) {
             this.sendTimer -= this.sendInterval;
@@ -298,7 +335,7 @@ export class Network {
 
     sendFromBuilding(source) {
         const tileSize = 64;
-        const conns = this.connections.filter(c => c.from === source);
+        const conns = this.connections.filter(c => c.from === source && c.to.type !== 'connector');
         if (conns.length === 0) return;
 
         let stock;
@@ -316,14 +353,10 @@ export class Network {
 
             const validConns = conns.filter(conn => {
                 const to = conn.to;
-                if (to.type === 'connector') {
-                    if (to.filterType && to.filterType !== q) return false;
-                    return this.hasValidPath(to, q);
-                }
-                if (to.type === 'hadron_synthesizer' || to.type === 'electron_capture' || to.type === 'fusion_press') {
+                if (this.isFactory(to.type)) {
                     return this.isResourceNeededByFactory(to, q) && this.canFactoryAccept(to, q);
                 }
-                // для узлов, добытчиков — проверяем лимит
+                if (this.isExtractor(to.type)) return false;
                 if (!to.resources) return true;
                 const cap = to.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
                 const cur = to.resources[q] || 0;

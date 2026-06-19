@@ -29,12 +29,11 @@ export class Building {
     constructor(tx, ty, type, rotation = 0) {
         this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
         this.quarkType = 0; this.recipe = 'proton'; this.filterType = null;
-        if (type === 'connector') this.filterType = 'energy'; // коннектор по умолчанию для энергии
-            else this.filterType = null;
-        
         this.resources = {}; this.inputResources = {}; this.outputResources = {};
         this.timer = 0; this.craftTimer = 0; this.animTimer = 0;
-        if (type === 'connector') this.filterType = 'u'; // коннектор всегда с фильтром
+
+        if (type === 'connector') this.filterType = 'energy'; // коннектор по умолчанию для энергии
+        else this.filterType = null;
     }
     getSize() {
         const base = BUILDING_SIZES[this.type] || { w: 1, h: 1 };
@@ -91,12 +90,20 @@ export class BuildingManager {
 
     _tryPlaceAt(tx, ty) {
         if (!this.ghost.visible || this.game.selectedType === 'wire') return false;
+
+        // Разрешаем замену коннектора
+        const existing = this.getBuildingAt(tx, ty);
+        if (existing && existing.type === 'connector' && this.ghost.type === 'connector') {
+            this.buildings = this.buildings.filter(b => b !== existing);
+            if (this.game.network) this.game.network.removeAllConnections(existing);
+        } else if (existing) {
+            return false; // занято другим зданием
+        }
+
         if (!this.isPlacementValid(tx, ty, this.ghost.type)) return false;
         const size = this.ghost.getSize();
         const nb = new Building(tx, ty, this.ghost.type, this.ghost.rotation);
         nb.quarkType = this.ghost.quarkType || 0;
-        if (nb.type === 'connector') nb.filterType = this.ghost.filterType || 'energy';
-        if (nb.type === 'connector') nb.filterType = this.ghost.filterType || 'u';
         nb.recipe = this.ghost.recipe || 'proton';
         nb.filterType = this.ghost.filterType;
         this.buildings.push(nb);
@@ -109,8 +116,15 @@ export class BuildingManager {
         const b = this.getBuildingAt(tile.tx, tile.ty);
         if (!b || b.type === 'hub') return;
         const mod = BUILDING_MODULES[b.type];
-        if (mod && mod.rotateGhost) mod.rotateGhost(b);
-        else b.rotation = (b.rotation + 1) % 4;
+        if (mod && mod.rotateGhost) {
+            mod.rotateGhost(b);
+            // Обновляем фильтры у всех исходящих коннекторов
+            if (this.game.network && this.game.network.updateDownstreamFilters) {
+                this.game.network.updateDownstreamFilters(b);
+            }
+        } else {
+            b.rotation = (b.rotation + 1) % 4;
+        }
     }
 
     rotateGhost() {
@@ -173,8 +187,28 @@ export class BuildingManager {
         } else if (this.game.selectedType) {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
-            this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
-            this.isDragging = true;
+            const existing = this.getBuildingAt(tile.tx, tile.ty);
+
+            if (existing && this.ghost.type === 'connector' && existing.type === 'connector') {
+                // Замена коннектора пипеткой
+                this.buildings = this.buildings.filter(b => b !== existing);
+                if (this.game.network) this.game.network.removeAllConnections(existing);
+                const nb = new Building(tile.tx, tile.ty, 'connector', this.ghost.rotation);
+                nb.filterType = this.ghost.filterType;
+                this.buildings.push(nb);
+                this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                this.justPlaced = true;
+                this.pendingFirstTile = null;
+                this.isDragging = false;
+            } else if (existing) {
+                // Клик по занятой клетке — ничего не делаем
+                this.pendingFirstTile = null;
+                this.isDragging = false;
+            } else {
+                // Пустая клетка — начинаем протяжку
+                this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
+                this.isDragging = true;
+            }
         }
     }
 

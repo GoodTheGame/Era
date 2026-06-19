@@ -5,6 +5,7 @@ import { HUD } from './HUD.js';
 import { atlasLoader } from './AtlasLoader.js';
 import { spriteRenderer } from './SpriteRenderer.js';
 import { Network } from './Network.js';
+import { UIManager } from './UIManager.js';
 
 class Game {
     constructor() {
@@ -14,11 +15,12 @@ class Game {
         this.map = new GameMap(this.camera);
         this.buildingManager = new BuildingManager(this);
         this.network = new Network(this);
+        this.uiManager = new UIManager(this);
         this.hud = new HUD(this);
         this.selectedType = null;
         this.lastTime = 0;
         this.assetsLoaded = false;
-        this.input = { shiftKey: false }; // для Shift+ПКМ
+        this.input = { shiftKey: false };
 
         this._spawnHub();
         this.camera.x = this.hub.tx * this.map.tileSize + this.map.tileSize * 2;
@@ -64,8 +66,28 @@ class Game {
             this.buildingManager.onMouseMove();
         });
         this.canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0 && !e.shiftKey) this.buildingManager.onLeftMouseDown();
-            else if (e.button === 2) this.buildingManager.onRightMouseDown();
+            const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
+            const tile = this.map.worldToTile(worldPos.x, worldPos.y);
+            const building = this.buildingManager.getBuildingAt(tile.tx, tile.ty);
+
+            // Если открыт любой UI, передаём клик ему и прекращаем игровые действия
+            if (this.uiManager.isUIOpen()) {
+                this.uiManager.handleClick(worldPos.x, worldPos.y);
+                return;
+            }
+
+            // Клик по узлу открывает его интерфейс
+            if (e.button === 0 && building && building.type === 'node' && !this.selectedType) {
+                this.uiManager.openNodeUI(building);
+                return;
+            }
+
+            // Обычные игровые клики
+            if (e.button === 0 && !e.shiftKey) {
+                this.buildingManager.onLeftMouseDown();
+            } else if (e.button === 2) {
+                this.buildingManager.onRightMouseDown();
+            }
         });
         this.canvas.addEventListener('mouseup', (e) => {
             if (e.button === 0) this.buildingManager.onLeftMouseUp();
@@ -100,6 +122,16 @@ class Game {
         this.buildingManager.render(this.ctx, this.camera);
         this.network.render(this.ctx);
         this.ctx.restore();
+
+        // UI рисуется поверх всего в экранных координатах, поэтому без трансформации камеры
+        if (this.uiManager.isUIOpen()) {
+            // Переводим камеру обратно для рисования UI
+            this.ctx.save();
+            this.camera.applyTransform(this.ctx);
+            this.uiManager.render(this.ctx);
+            this.ctx.restore();
+        }
+
         if (!this.assetsLoaded) {
             this.ctx.fillStyle = '#fff';
             this.ctx.font = '20px Arial';

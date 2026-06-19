@@ -5,12 +5,9 @@ export const nodeBuilding = {
     size: { w: 2, h: 2 },
 
     render(ctx, b, tileSize, isGhost, game) {
-        const x = b.tx * tileSize;
-        const y = b.ty * tileSize;
-        const w = 2 * tileSize;
-        const h = 2 * tileSize;
-        const cx = x + w / 2;
-        const cy = y + h / 2;
+        const x = b.tx * tileSize, y = b.ty * tileSize;
+        const w = 2 * tileSize, h = 2 * tileSize;
+        const cx = x + w / 2, cy = y + h / 2;
         const radius = w * 0.375;
 
         ctx.beginPath();
@@ -31,10 +28,9 @@ export const nodeBuilding = {
                 const ry = startY + Math.floor(i / 3) * h * 0.35 + iconSize / 2;
                 drawParticle(ctx, rx, ry, iconSize / 2, key, 0);
                 ctx.fillStyle = '#fff';
-                ctx.font = `bold ${iconSize * 0.5}px "Segoe UI"`;
+                ctx.font = `${iconSize * 0.4}px "Segoe UI"`;
                 ctx.textAlign = 'center';
-                ctx.fillText(key, rx, ry + iconSize / 2 + 2);
-                ctx.fillText(b.resources[key], rx, ry + iconSize / 2 + 8);
+                ctx.fillText(b.resources[key], rx, ry + iconSize / 2 + 2);
             });
         }
     }
