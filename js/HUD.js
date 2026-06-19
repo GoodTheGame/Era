@@ -16,7 +16,7 @@ export class HUD {
             { key: '6', type: 'lepton_extractor',  label: '6<br>Лептон' },
             { key: '7', type: 'hadron_synthesizer', label: '7<br>Синтез' },
             { key: '8', type: 'electron_capture',  label: '8<br>Захват' },
-            { key: '9', type: null,                label: '9<br>—' },
+            { key: '9', type: 'fusion_press', label: '9<br>Пресс' },
             { key: '0', type: null,                label: '0<br>—' }
         ];
         items.forEach((item) => {
@@ -43,6 +43,7 @@ export class HUD {
             else if (key === '6') this.selectBuilding('lepton_extractor');
             else if (key === '7') this.selectBuilding('hadron_synthesizer');
             else if (key === '8') this.selectBuilding('electron_capture');
+            else if (key === '9') this.selectBuilding('fusion_press');
             else if (key === 'r' || key === 'R' || key === 'к' || key === 'К') {
                 if (this.game.selectedType) {
                     this.game.buildingManager.rotateGhost();

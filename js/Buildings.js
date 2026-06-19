@@ -1,3 +1,4 @@
+// Buildings.js
 import { quantumResonatorBuilding } from './buildings/quantum_resonator.js';
 import { gluonExtractorBuilding } from './buildings/gluon_extractor.js';
 import { leptonExtractorBuilding } from './buildings/lepton_extractor.js';
@@ -5,6 +6,7 @@ import { nodeBuilding } from './buildings/node.js';
 import { connectorBuilding } from './buildings/connector.js';
 import { hadronSynthesizerBuilding } from './buildings/hadron_synthesizer.js';
 import { electronCaptureBuilding } from './buildings/electron_capture.js';
+import { fusionPressBuilding } from './buildings/fusion_press.js';
 import { hubBuilding } from './buildings/hub.js';
 
 const BUILDING_MODULES = {
@@ -15,6 +17,7 @@ const BUILDING_MODULES = {
     'connector': connectorBuilding,
     'hadron_synthesizer': hadronSynthesizerBuilding,
     'electron_capture': electronCaptureBuilding,
+    'fusion_press': fusionPressBuilding,
     'hub': hubBuilding,
 };
 
@@ -25,13 +28,13 @@ export const BUILDING_SIZES = Object.fromEntries(
 export class Building {
     constructor(tx, ty, type, rotation = 0) {
         this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
-        this.quarkType = 0; // для добытчиков
-        this.recipe = 'proton'; // для фабрик
-        this.resources = {}; // общий для добытчиков и узлов
-        this.inputResources = {}; // для фабрик
-        this.outputResources = {};
-        this.timer = 0;
-        this.craftTimer = 0;
+        this.quarkType = 0; this.recipe = 'proton'; this.filterType = null;
+        if (type === 'connector') this.filterType = 'energy'; // коннектор по умолчанию для энергии
+            else this.filterType = null;
+        
+        this.resources = {}; this.inputResources = {}; this.outputResources = {};
+        this.timer = 0; this.craftTimer = 0; this.animTimer = 0;
+        if (type === 'connector') this.filterType = 'u'; // коннектор всегда с фильтром
     }
     getSize() {
         const base = BUILDING_SIZES[this.type] || { w: 1, h: 1 };
@@ -49,6 +52,10 @@ export class BuildingManager {
         this.isLeftMouseDown = false; this.isRightMouseDown = false;
         this.wireSource = null;
         this._initGhost();
+
+        this.lastPlacedTile = null;
+        this.isDragging = false;
+        this.pendingFirstTile = null;
     }
     _initGhost() {
         this.ghost = new Building(0, 0, 'quantum_resonator', 0);
@@ -71,34 +78,27 @@ export class BuildingManager {
     }
 
     isPlacementValid(tx, ty, type) {
-    if (type === 'quantum_resonator') {
-        const size = BUILDING_SIZES[type] || { w: 1, h: 1 };
-        for (const other of this.buildings) {
-            if (other.type !== 'quantum_resonator') continue;
-            const osize = other.getSize();
-            const ox1 = other.tx - 5, oy1 = other.ty - 5;
-            const ox2 = other.tx + osize.w + 4, oy2 = other.ty + osize.h + 4;
-            const nx1 = tx, ny1 = ty, nx2 = tx + size.w - 1, ny2 = ty + size.h - 1;
-            if (!(nx2 < ox1 || nx1 > ox2 || ny2 < oy1 || ny1 > oy2)) return false;
+        if (type === 'quantum_resonator') {
+            const count = this.buildings.filter(b => b.type === 'quantum_resonator').length;
+            if (count >= 10) return false;
         }
-        const count = this.buildings.filter(b => b.type === 'quantum_resonator').length;
-        if (count >= 5) return false;
+        const size = BUILDING_SIZES[type] || { w: 1, h: 1 };
+        for (let dx = 0; dx < size.w; dx++)
+            for (let dy = 0; dy < size.h; dy++)
+                if (this.getBuildingAt(tx + dx, ty + dy)) return false;
+        return true;
     }
-    // Для остальных — просто проверка занятости
-    const size = BUILDING_SIZES[type] || { w: 1, h: 1 };
-    for (let dx = 0; dx < size.w; dx++)
-        for (let dy = 0; dy < size.h; dy++)
-            if (this.getBuildingAt(tx + dx, ty + dy)) return false;
-    return true;
-}
-    _tryPlace() {
+
+    _tryPlaceAt(tx, ty) {
         if (!this.ghost.visible || this.game.selectedType === 'wire') return false;
-        if (!this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type)) return false;
+        if (!this.isPlacementValid(tx, ty, this.ghost.type)) return false;
         const size = this.ghost.getSize();
-        const nb = new Building(this.ghost.tx, this.ghost.ty, this.ghost.type, this.ghost.rotation);
+        const nb = new Building(tx, ty, this.ghost.type, this.ghost.rotation);
         nb.quarkType = this.ghost.quarkType || 0;
-        nb.filterType = this.ghost.filterType;
+        if (nb.type === 'connector') nb.filterType = this.ghost.filterType || 'energy';
+        if (nb.type === 'connector') nb.filterType = this.ghost.filterType || 'u';
         nb.recipe = this.ghost.recipe || 'proton';
+        nb.filterType = this.ghost.filterType;
         this.buildings.push(nb);
         return true;
     }
@@ -126,14 +126,14 @@ export class BuildingManager {
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
         if (b && b.type !== 'hub') {
-    this.game.selectedType = b.type;
-    this.ghost.rotation = b.rotation;
-    this.ghost.quarkType = b.quarkType || 0;
-    this.ghost.recipe = b.recipe || 'proton';
-    this.ghost.filterType = b.filterType; // <-- добавить
-    this.game.hud.updateActiveButton();
-    return true;
-}
+            this.game.selectedType = b.type;
+            this.ghost.rotation = b.rotation;
+            this.ghost.quarkType = b.quarkType || 0;
+            this.ghost.recipe = b.recipe || 'proton';
+            this.ghost.filterType = b.filterType;
+            this.game.hud.updateActiveButton();
+            return true;
+        }
         return false;
     }
 
@@ -156,6 +156,10 @@ export class BuildingManager {
 
     onLeftMouseDown() {
         this.isLeftMouseDown = true;
+        this.lastPlacedTile = null;
+        this.isDragging = false;
+        this.pendingFirstTile = null;
+
         if (this.game.selectedType === 'wire') {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
@@ -167,10 +171,26 @@ export class BuildingManager {
                 this.wireSource = null;
             }
         } else if (this.game.selectedType) {
-            this._tryPlace();
+            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(wp.x, wp.y);
+            this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
+            this.isDragging = true;
         }
     }
-    onLeftMouseUp() { this.isLeftMouseDown = false; }
+
+    onLeftMouseUp() {
+        if (this.pendingFirstTile && this.game.selectedType && this.game.selectedType !== 'wire') {
+            const tile = this.pendingFirstTile;
+            if (this.isPlacementValid(tile.tx, tile.ty, this.game.selectedType)) {
+                this._tryPlaceAt(tile.tx, tile.ty);
+            }
+        }
+        this.isLeftMouseDown = false;
+        this.lastPlacedTile = null;
+        this.isDragging = false;
+        this.pendingFirstTile = null;
+    }
+
     onRightMouseDown() {
         this.isRightMouseDown = true;
         if (this.game.selectedType) {
@@ -178,8 +198,35 @@ export class BuildingManager {
             this.game.hud.updateActiveButton();
         } else this._deleteUnderCursor();
     }
-    onRightMouseUp() { this.isRightMouseDown = false; }
-    onMouseMove() {}
+
+    onRightMouseUp() {
+        this.isRightMouseDown = false;
+    }
+
+    onMouseMove() {
+        if (this.isLeftMouseDown && this.game.selectedType && this.game.selectedType !== 'wire') {
+            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(wp.x, wp.y);
+
+            if (this.pendingFirstTile && (tile.tx !== this.pendingFirstTile.tx || tile.ty !== this.pendingFirstTile.ty)) {
+                const ftx = this.pendingFirstTile.tx;
+                const fty = this.pendingFirstTile.ty;
+                if (this.isPlacementValid(ftx, fty, this.game.selectedType)) {
+                    this._tryPlaceAt(ftx, fty);
+                    this.lastPlacedTile = { tx: ftx, ty: fty };
+                }
+                this.pendingFirstTile = null;
+            }
+
+            if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
+                if (this.isPlacementValid(tile.tx, tile.ty, this.game.selectedType)) {
+                    if (this._tryPlaceAt(tile.tx, tile.ty)) {
+                        this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                    }
+                }
+            }
+        }
+    }
 
     getBuildingAt(tx, ty) {
         for (const b of this.buildings) {
@@ -191,21 +238,6 @@ export class BuildingManager {
 
     render(ctx, camera) {
         const tileSize = this.game.map.tileSize;
-        // запретные зоны для экстракторов (всех типов)
-        if (this.game.selectedType && ['quantum_resonator', 'gluon_extractor', 'lepton_extractor'].includes(this.game.selectedType)) {
-            for (const other of this.buildings) {
-                if (other.type !== this.game.selectedType) continue;
-                const osize = other.getSize();
-                const x1 = (other.tx - 5) * tileSize;
-                const y1 = (other.ty - 5) * tileSize;
-                const x2 = (other.tx + osize.w + 4) * tileSize;
-                const y2 = (other.ty + osize.h + 4) * tileSize;
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
-                ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-                ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)';
-                ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-            }
-        }
 
         for (const b of this.buildings) {
             const mod = BUILDING_MODULES[b.type];
@@ -220,7 +252,7 @@ export class BuildingManager {
             const mod = BUILDING_MODULES[this.game.selectedType];
             if (mod) {
                 ctx.save();
-                if (this.ghost.type === 'quantum_resonator' || this.ghost.type === 'gluon_extractor' || this.ghost.type === 'lepton_extractor') {
+                if (this.ghost.type === 'quantum_resonator') {
                     const canPlace = this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type);
                     const size = this.ghost.getSize();
                     ctx.globalAlpha = 0.6;
