@@ -58,14 +58,12 @@ export class Network {
         return type === 'quantum_resonator' || type === 'gluon_extractor' || type === 'lepton_extractor';
     }
 
-    // Максимальное количество исходящих проводов для типа здания
     getMaxOutputs(type) {
-        if (this.isExtractor(type)) return 4;   // источники (добытчики)
-        if (this.isFactory(type)) return 2;     // фабрики
-        return Infinity;                         // узлы, коннекторы — без ограничений
+        if (this.isExtractor(type)) return 4;
+        if (this.isFactory(type)) return 2;
+        return Infinity;
     }
 
-    /** Определяет выходной тип ресурса для источника (добытчика или фабрики) */
     getSourceResourceType(building) {
         if (building.type === 'quantum_resonator') {
             const quarkNames = ['u', 'd', 'c', 's', 't', 'b'];
@@ -78,6 +76,7 @@ export class Network {
         }
         if (building.type === 'electron_capture') return 'H';
         if (building.type === 'fusion_press') return 'He';
+        if (building.type === 'energy_buffer') return 'energy';
         return null;
     }
 
@@ -87,12 +86,12 @@ export class Network {
 
         const validSources = [
             'quantum_resonator', 'gluon_extractor', 'lepton_extractor', 'node',
-            'hadron_synthesizer', 'electron_capture', 'connector', 'fusion_press'
+            'hadron_synthesizer', 'electron_capture', 'connector', 'fusion_press',
+            'energy_buffer'
         ];
         if (!validSources.includes(from.type)) return;
         if (this.isExtractor(to.type)) return;
 
-        // Проверяем лимит выходных проводов
         const currentOutputs = this.connections.filter(c => c.from === from).length;
         const maxOutputs = this.getMaxOutputs(from.type);
         if (currentOutputs >= maxOutputs) return;
@@ -105,7 +104,6 @@ export class Network {
 
         this.connections.push({ from, to });
 
-        // ---------- НАСЛЕДОВАНИЕ ФИЛЬТРА ----------
         if (to.type === 'connector') {
             const sourceResource = this.getSourceResourceType(from);
             if (sourceResource) {
@@ -113,16 +111,23 @@ export class Network {
             } else if (from.type === 'connector' && from.filterType) {
                 to.filterType = from.filterType;
             }
+            if (to.filterType && to._lastFilter && to.filterType !== to._lastFilter) {
+                this.removeAllConnections(to);
+            }
+            to._lastFilter = to.filterType;
         }
     }
 
     removeConnection(conn) {
+        // Удаляем только соединение. Пачки продолжают лететь к своим целям.
         this.connections = this.connections.filter(c => c !== conn);
-        this.packs = this.packs.filter(p => !(p.from === conn.from && p.to === conn.to));
+        // Никаких манипуляций с this.packs!
     }
 
     removeAllConnections(building) {
+        // Удаляем все соединения этого здания
         this.connections = this.connections.filter(c => c.from !== building && c.to !== building);
+        // Удаляем все пачки, где это здание является источником или целью (ресурсы не могут быть доставлены)
         this.packs = this.packs.filter(p => p.from !== building && p.to !== building);
     }
 
@@ -156,6 +161,13 @@ export class Network {
 
     canAcceptTarget(target, quarkType) {
         if (this.isExtractor(target.type)) return false;
+        if (target.type === 'node' && quarkType === 'energy') return false;
+        if (target.type === 'energy_buffer') {
+            if (quarkType !== 'energy') return false;
+            if (!target.resources) return true;
+            const cur = target.resources['energy'] || 0;
+            return cur < NODE_CAPACITY;
+        }
         if (this.isFactory(target.type)) {
             return this.isResourceNeededByFactory(target, quarkType) && this.canFactoryAccept(target, quarkType);
         }
@@ -186,12 +198,10 @@ export class Network {
         return false;
     }
 
-    /** Все выходы коннектора: соседние фабрики + валидные провода */
     getOutputTargets(connector, quarkType) {
         const targets = [];
         const connectorRect = this.getRect(connector);
 
-        // Соседние фабрики
         for (const b of this.game.buildingManager.buildings) {
             if (b === connector) continue;
             if (!this.isFactory(b.type)) continue;
@@ -209,7 +219,6 @@ export class Network {
             }
         }
 
-        // Исходящие провода
         const outConns = this.connections.filter(c => c.from === connector);
         for (const conn of outConns) {
             const to = conn.to;
@@ -232,7 +241,7 @@ export class Network {
         return targets;
     }
 
-    // ========== Активная подтяжка: создаёт пачки от источника к коннектору ==========
+    // ========== Активная подтяжка ==========
     pullResourcesForConnectors() {
         for (const b of this.game.buildingManager.buildings) {
             if (b.type !== 'connector') continue;
@@ -259,7 +268,6 @@ export class Network {
 
                 const canPull = Math.min(totalRequest - pulled, stock[filter]);
                 if (canPull <= 0) break;
-                // Создаём пачку от источника к коннектору
                 const fromSize = source.getSize(), toSize = b.getSize();
                 const tileSize = 64;
                 const x1 = (source.tx + fromSize.w / 2) * tileSize;
@@ -276,15 +284,14 @@ export class Network {
 
     // ========== основной update ==========
     update(dt) {
-        // 1) Активная подтяжка (создание пачек источник → коннектор)
         this.pullTimer += dt;
         if (this.pullTimer >= this.pullInterval) {
             this.pullTimer -= this.pullInterval;
             this.pullResourcesForConnectors();
         }
 
-        // 2) Движение и доставка пачек (скорость 5 тайлов/с для наглядности)
-        const speed = 5 * 64;
+        // Скорость движения импульсов = 1 тайл/с
+        const speed = 1 * 64;
         for (const pack of this.packs) {
             pack.distance -= speed * dt;
             if (pack.distance <= 0) {
@@ -304,12 +311,45 @@ export class Network {
                             const { target, dist } = targets[i];
                             this.packs.push(new Pack(to, target, pack.quarkType, cnt, dist));
                         }
+                    } else {
+                        // Нет выходов – сохраняем ресурс в буфере коннектора
+                        if (!to.resources) to.resources = {};
+                        const cur = to.resources[pack.quarkType] || 0;
+                        const canAdd = Math.min(pack.count, STACK_SIZE - cur);
+                        if (canAdd > 0) to.resources[pack.quarkType] = cur + canAdd;
                     }
                 } else if (this.isFactory(to.type)) {
                     if (!to.inputResources) to.inputResources = {};
                     const cur = to.inputResources[pack.quarkType] || 0;
                     const canAdd = Math.min(pack.count, STACK_SIZE - cur);
                     if (canAdd > 0) to.inputResources[pack.quarkType] = cur + canAdd;
+                } else if (to.type === 'node') {
+                    if (!to.resources) to.resources = {};
+                    const cur = to.resources[pack.quarkType] || 0;
+                    const canAdd = Math.min(pack.count, NODE_CAPACITY - cur);
+                    if (canAdd > 0) {
+                        to.resources[pack.quarkType] = cur + canAdd;
+                        // Пересылаем дальше
+                        const outConns = this.connections.filter(c => c.from === to && c.to.type !== 'connector');
+                        if (outConns.length > 0) {
+                            const perConn = Math.floor(canAdd / outConns.length);
+                            let rem = canAdd % outConns.length;
+                            for (const conn of outConns) {
+                                let cnt = perConn + (rem > 0 ? 1 : 0);
+                                if (cnt <= 0) continue;
+                                rem--;
+                                const fromSize = to.getSize(), toSize = conn.to.getSize();
+                                const tileSize = 64;
+                                const x1 = (to.tx + fromSize.w / 2) * tileSize;
+                                const y1 = (to.ty + fromSize.h / 2) * tileSize;
+                                const x2 = (conn.to.tx + toSize.w / 2) * tileSize;
+                                const y2 = (conn.to.ty + toSize.h / 2) * tileSize;
+                                const dist = Math.hypot(x2 - x1, y2 - y1);
+                                this.packs.push(new Pack(to, conn.to, pack.quarkType, cnt, dist));
+                            }
+                            to.resources[pack.quarkType] = Math.max(0, (to.resources[pack.quarkType] || 0) - canAdd);
+                        }
+                    }
                 } else if (!this.isExtractor(to.type)) {
                     if (!to.resources) to.resources = {};
                     const cur = to.resources[pack.quarkType] || 0;
@@ -321,7 +361,6 @@ export class Network {
         }
         this.packs = this.packs.filter(p => !p.done);
 
-        // 3) Пассивная отправка от не-коннекторов (но НЕ в коннекторы)
         this.sendTimer += dt;
         if (this.sendTimer >= this.sendInterval) {
             this.sendTimer -= this.sendInterval;
@@ -386,20 +425,43 @@ export class Network {
         }
     }
 
+    updateDownstreamFilters(building) {
+        if (building.type === 'connector' && building.filterType) {
+            building._lastFilter = building.filterType;
+            this.removeAllConnections(building);
+        }
+    }
+
+    // ========== Рендер ==========
     render(ctx) {
         const tileSize = 64;
-        ctx.strokeStyle = '#00ffff';
-        ctx.lineWidth = 2;
-        for (const conn of this.connections) {
-            const fromSize = conn.from.getSize(), toSize = conn.to.getSize();
-            const x1 = (conn.from.tx + fromSize.w / 2) * tileSize;
-            const y1 = (conn.from.ty + fromSize.h / 2) * tileSize;
-            const x2 = (conn.to.tx + toSize.w / 2) * tileSize;
-            const y2 = (conn.to.ty + toSize.h / 2) * tileSize;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
+        const now = performance.now() / 1000;
+        const isHub = (type) => type === 'node' || type === 'connector';
+        const showStatic = this.game.hud.showConnections;
+
+        if (showStatic) {
+            for (const conn of this.connections) {
+                const fromSize = conn.from.getSize(), toSize = conn.to.getSize();
+                const x1 = (conn.from.tx + fromSize.w / 2) * tileSize;
+                const y1 = (conn.from.ty + fromSize.h / 2) * tileSize;
+                const x2 = (conn.to.tx + toSize.w / 2) * tileSize;
+                const y2 = (conn.to.ty + toSize.h / 2) * tileSize;
+
+                const fromHub = isHub(conn.from.type);
+                const toHub = isHub(conn.to.type);
+
+                let strokeColor = '#00aacc';
+                if (fromHub && toHub) strokeColor = '#00ffff';
+                else if (fromHub && !toHub) strokeColor = '#005566';
+                else if (!fromHub && toHub) strokeColor = '#00ffff';
+
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
         }
 
         for (const pack of this.packs) {
@@ -411,16 +473,66 @@ export class Network {
             const dx = x2 - x1, dy = y2 - y1;
             const total = Math.hypot(dx, dy);
             if (total === 0) continue;
+
             const progress = 1 - pack.distance / pack.totalDistance;
-            const px = x1 + dx * progress;
-            const py = y1 + dy * progress;
-            drawParticle(ctx, px, py, 7, pack.quarkType, this.game.buildingManager.beltAnimTimer || 0);
+            const centerX = x1 + dx * progress;
+            const centerY = y1 + dy * progress;
+
+            const pulseLen = total * 0.25;
+            const halfLen = pulseLen / 2;
+            const startX = centerX - (dx / total) * halfLen;
+            const startY = centerY - (dy / total) * halfLen;
+            const endX = centerX + (dx / total) * halfLen;
+            const endY = centerY + (dy / total) * halfLen;
+
+            const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+            gradient.addColorStop(0, 'rgba(0, 255, 255, 0)');
+            gradient.addColorStop(0.3, '#00ffff');
+            gradient.addColorStop(0.7, '#00ffff');
+            gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            drawParticle(ctx, centerX, centerY, 7, pack.quarkType, now);
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 7px "Segoe UI"';
             ctx.textAlign = 'center';
-            ctx.fillText(pack.count, px, py + 10);
-            ctx.fillText(pack.quarkType, px, py - 6);
+            ctx.fillText(pack.count, centerX, centerY + 12);
         }
+    }
+
+    renderPreview(ctx, fromBuilding, mouseWorldX, mouseWorldY) {
+        if (!fromBuilding) return;
+        const tileSize = 64;
+        const fromSize = fromBuilding.getSize();
+        const x1 = (fromBuilding.tx + fromSize.w / 2) * tileSize;
+        const y1 = (fromBuilding.ty + fromSize.h / 2) * tileSize;
+        const x2 = mouseWorldX;
+        const y2 = mouseWorldY;
+
+        const dx = x2 - x1, dy = y2 - y1;
+        const length = Math.hypot(dx, dy);
+        if (length === 0) return;
+
+        let maxDist = 5;
+        if (fromBuilding.type === 'connector') maxDist = 15;
+        const maxDistPx = maxDist * tileSize;
+
+        const outOfRange = length > maxDistPx;
+        ctx.strokeStyle = outOfRange ? 'rgba(255, 50, 50, 0.8)' : 'rgba(0, 255, 255, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 4]);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.setLineDash([]);
     }
 }
 

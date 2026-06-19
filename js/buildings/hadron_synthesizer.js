@@ -13,7 +13,7 @@ export const hadronSynthesizerBuilding = createFactory({
     },
     recipeColors: { proton: '#ffaa00', neutron: '#aa00ff' },
     inputColors: QUARK_COLORS,
-    render(ctx, b, tileSize, isGhost, game) {
+    render(ctx, b, tileSize, isGhost, game, config) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
         const w = size.w * tileSize, h = size.h * tileSize;
@@ -27,7 +27,7 @@ export const hadronSynthesizerBuilding = createFactory({
         ctx.strokeRect(x+1, y+1, w-2, h-2);
 
         if (!isGhost) {
-            const progress = b.craftTimer ? Math.min(b.craftTimer / this.recipes[b.recipe].time, 1.0) : 0;
+            const progress = b.craftTimer ? Math.min(b.craftTimer / config.recipes[b.recipe].time, 1.0) : 0;
             const phase = b.animTimer || 0;
 
             const numDots = 12;

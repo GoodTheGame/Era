@@ -1,20 +1,24 @@
 // js/FactoryBase.js
 export const STACK_SIZE = 100;
 
-/**
- * Универсальный конструктор фабрики.
- * config должен содержать:
- *   type, size, recipes, recipeColors, inputColors (для отладки),
- *   render (функция отрисовки, как раньше)
- *   rotateCallback (опционально) – если нужно что-то дополнительное при смене рецепта
- */
 export function createFactory(config) {
-    return {
+    const factory = {
         type: config.type,
         size: config.size,
 
+        // Устанавливает первый рецепт, если он ещё не задан
+        initGhost(ghost) {
+            if (!ghost.recipe) {
+                ghost.recipe = Object.keys(config.recipes)[0];
+            }
+        },
+
         rotateGhost(ghost) {
-            if (!ghost.recipe) ghost.recipe = Object.keys(config.recipes)[0];
+            // Если рецепта нет – сначала инициализируем
+            if (!ghost.recipe) {
+                ghost.recipe = Object.keys(config.recipes)[0];
+                return;
+            }
             const keys = Object.keys(config.recipes);
             const idx = keys.indexOf(ghost.recipe);
             const nextIdx = (idx + 1) % keys.length;
@@ -23,20 +27,17 @@ export function createFactory(config) {
         },
 
         update(building, game, dt) {
+            // **Гарантированно задаём рецепт, если его нет**
             if (!building.recipe) building.recipe = Object.keys(config.recipes)[0];
             const recipe = config.recipes[building.recipe];
             if (!recipe) return;
 
-            // Инициализация
             building.inputResources = building.inputResources || {};
             building.outputResources = building.outputResources || {};
             building.craftTimer = building.craftTimer || 0;
 
-            // Определяем, изменился ли рецепт (с прошлого вызова update)
             if (building._lastRecipe && building._lastRecipe !== building.recipe) {
-                // Очищаем выход
                 building.outputResources = {};
-                // Удаляем входные ресурсы, не нужные новому рецепту
                 const newInputs = new Set(Object.keys(recipe.inputs));
                 for (const key of Object.keys(building.inputResources)) {
                     if (!newInputs.has(key)) {
@@ -47,7 +48,6 @@ export function createFactory(config) {
             }
             building._lastRecipe = building.recipe;
 
-            // Проверка возможности крафта
             let canCraft = true;
             for (const [res, amount] of Object.entries(recipe.inputs)) {
                 if ((building.inputResources[res] || 0) < amount) {
@@ -60,7 +60,6 @@ export function createFactory(config) {
                 return;
             }
 
-            // Таймер крафта
             building.craftTimer += dt;
             if (building.craftTimer >= recipe.time) {
                 building.craftTimer = 0;
@@ -71,17 +70,14 @@ export function createFactory(config) {
                 building.outputResources[out] = (building.outputResources[out] || 0) + 1;
             }
 
-            // Анимация
             if (!building.animTimer) building.animTimer = 0;
             building.animTimer += dt;
         },
 
         render(ctx, b, tileSize, isGhost, game) {
-            // Вызываем пользовательскую отрисовку, если она есть
             if (config.render) {
-                config.render(ctx, b, tileSize, isGhost, game);
+                config.render(ctx, b, tileSize, isGhost, game, config);
             } else {
-                // Заглушка
                 const x = b.tx * tileSize, y = b.ty * tileSize;
                 const size = b.getSize();
                 const w = size.w * tileSize, h = size.h * tileSize;
@@ -92,7 +88,7 @@ export function createFactory(config) {
                 ctx.strokeRect(x+1, y+1, w-2, h-2);
             }
 
-            // Отображение входных ресурсов (общее для всех фабрик)
+            // Отображение входных ресурсов
             if (!isGhost && b.inputResources && config.recipes[b.recipe]) {
                 const inputs = config.recipes[b.recipe].inputs;
                 const keys = Object.keys(inputs);
@@ -110,4 +106,5 @@ export function createFactory(config) {
             }
         }
     };
+    return factory;
 }

@@ -7,6 +7,7 @@ import { connectorBuilding } from './buildings/connector.js';
 import { hadronSynthesizerBuilding } from './buildings/hadron_synthesizer.js';
 import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { fusionPressBuilding } from './buildings/fusion_press.js';
+import { energyBufferBuilding } from './buildings/energy_buffer.js';
 import { hubBuilding } from './buildings/hub.js';
 
 const BUILDING_MODULES = {
@@ -18,6 +19,7 @@ const BUILDING_MODULES = {
     'hadron_synthesizer': hadronSynthesizerBuilding,
     'electron_capture': electronCaptureBuilding,
     'fusion_press': fusionPressBuilding,
+    'energy_buffer': energyBufferBuilding,
     'hub': hubBuilding,
 };
 
@@ -28,12 +30,18 @@ export const BUILDING_SIZES = Object.fromEntries(
 export class Building {
     constructor(tx, ty, type, rotation = 0) {
         this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
-        this.quarkType = 0; this.recipe = 'proton'; this.filterType = null;
+        this.quarkType = 0; this.recipe = null; this.filterType = null;
         this.resources = {}; this.inputResources = {}; this.outputResources = {};
         this.timer = 0; this.craftTimer = 0; this.animTimer = 0;
 
-        if (type === 'connector') this.filterType = 'energy'; // коннектор по умолчанию для энергии
-        else this.filterType = null;
+        if (type === 'connector') this.filterType = 'energy';
+        else if (type === 'energy_buffer') this.filterType = 'energy';
+        else if (type === 'quantum_resonator') this.quarkType = 0;
+
+        const mod = BUILDING_MODULES[type];
+        if (mod && mod.initGhost) {
+            mod.initGhost(this);
+        }
     }
     getSize() {
         const base = BUILDING_SIZES[this.type] || { w: 1, h: 1 };
@@ -50,6 +58,7 @@ export class BuildingManager {
         this.lastMouseX = 0; this.lastMouseY = 0;
         this.isLeftMouseDown = false; this.isRightMouseDown = false;
         this.wireSource = null;
+        this.wireModeActive = false; // новое поле
         this._initGhost();
 
         this.lastPlacedTile = null;
@@ -74,6 +83,11 @@ export class BuildingManager {
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         this.ghost.tx = tile.tx; this.ghost.ty = tile.ty;
         this.ghost.type = this.game.selectedType; this.ghost.visible = true;
+
+        const mod = BUILDING_MODULES[this.game.selectedType];
+        if (mod && mod.initGhost) {
+            mod.initGhost(this.ghost);
+        }
     }
 
     isPlacementValid(tx, ty, type) {
@@ -91,20 +105,19 @@ export class BuildingManager {
     _tryPlaceAt(tx, ty) {
         if (!this.ghost.visible || this.game.selectedType === 'wire') return false;
 
-        // Разрешаем замену коннектора
         const existing = this.getBuildingAt(tx, ty);
         if (existing && existing.type === 'connector' && this.ghost.type === 'connector') {
             this.buildings = this.buildings.filter(b => b !== existing);
             if (this.game.network) this.game.network.removeAllConnections(existing);
         } else if (existing) {
-            return false; // занято другим зданием
+            return false;
         }
 
         if (!this.isPlacementValid(tx, ty, this.ghost.type)) return false;
         const size = this.ghost.getSize();
         const nb = new Building(tx, ty, this.ghost.type, this.ghost.rotation);
         nb.quarkType = this.ghost.quarkType || 0;
-        nb.recipe = this.ghost.recipe || 'proton';
+        nb.recipe = this.ghost.recipe;
         nb.filterType = this.ghost.filterType;
         this.buildings.push(nb);
         return true;
@@ -117,11 +130,7 @@ export class BuildingManager {
         if (!b || b.type === 'hub') return;
         const mod = BUILDING_MODULES[b.type];
         if (mod && mod.rotateGhost) {
-            mod.rotateGhost(b);
-            // Обновляем фильтры у всех исходящих коннекторов
-            if (this.game.network && this.game.network.updateDownstreamFilters) {
-                this.game.network.updateDownstreamFilters(b);
-            }
+            mod.rotateGhost(b, this.game);
         } else {
             b.rotation = (b.rotation + 1) % 4;
         }
@@ -130,7 +139,7 @@ export class BuildingManager {
     rotateGhost() {
         if (!this.ghost.visible) return;
         const mod = BUILDING_MODULES[this.ghost.type];
-        if (mod && mod.rotateGhost) mod.rotateGhost(this.ghost);
+        if (mod && mod.rotateGhost) mod.rotateGhost(this.ghost, this.game);
         else this.ghost.rotation = (this.ghost.rotation + 1) % 4;
     }
 
@@ -143,7 +152,7 @@ export class BuildingManager {
             this.game.selectedType = b.type;
             this.ghost.rotation = b.rotation;
             this.ghost.quarkType = b.quarkType || 0;
-            this.ghost.recipe = b.recipe || 'proton';
+            this.ghost.recipe = b.recipe;
             this.ghost.filterType = b.filterType;
             this.game.hud.updateActiveButton();
             return true;
@@ -178,19 +187,29 @@ export class BuildingManager {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
             const target = this.getBuildingAt(tile.tx, tile.ty);
-            if (!target) { this.wireSource = null; return; }
-            if (!this.wireSource) this.wireSource = target;
-            else if (this.wireSource !== target) {
-                this.game.network.addConnection(this.wireSource, target);
+
+            if (target && target.type !== 'hub') {
+                if (!this.wireSource) {
+                    this.wireSource = target;
+                    this.wireModeActive = true;
+                } else if (this.wireSource !== target) {
+                    this.game.network.addConnection(this.wireSource, target);
+                    this.wireSource = target; // начинаем новую линию от цели
+                }
+            } else {
                 this.wireSource = null;
+                this.wireModeActive = false;
             }
-        } else if (this.game.selectedType) {
+            return;
+        }
+
+        // ... остальная логика для других инструментов (без изменений)
+        if (this.game.selectedType) {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
             const existing = this.getBuildingAt(tile.tx, tile.ty);
 
             if (existing && this.ghost.type === 'connector' && existing.type === 'connector') {
-                // Замена коннектора пипеткой
                 this.buildings = this.buildings.filter(b => b !== existing);
                 if (this.game.network) this.game.network.removeAllConnections(existing);
                 const nb = new Building(tile.tx, tile.ty, 'connector', this.ghost.rotation);
@@ -201,11 +220,9 @@ export class BuildingManager {
                 this.pendingFirstTile = null;
                 this.isDragging = false;
             } else if (existing) {
-                // Клик по занятой клетке — ничего не делаем
                 this.pendingFirstTile = null;
                 this.isDragging = false;
             } else {
-                // Пустая клетка — начинаем протяжку
                 this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
                 this.isDragging = true;
             }
@@ -227,6 +244,10 @@ export class BuildingManager {
 
     onRightMouseDown() {
         this.isRightMouseDown = true;
+        if (this.game.selectedType === 'wire') {
+            this.wireSource = null;
+            this.wireModeActive = false;
+        }
         if (this.game.selectedType) {
             this.game.selectedType = null; this.ghost.visible = false; this.wireSource = null;
             this.game.hud.updateActiveButton();
@@ -238,6 +259,7 @@ export class BuildingManager {
     }
 
     onMouseMove() {
+        // всё ещё нужно для строительства, для wire превью рендерится отдельно
         if (this.isLeftMouseDown && this.game.selectedType && this.game.selectedType !== 'wire') {
             const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             const tile = this.game.map.worldToTile(wp.x, wp.y);
