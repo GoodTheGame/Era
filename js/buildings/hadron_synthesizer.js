@@ -13,6 +13,22 @@ export const hadronSynthesizerBuilding = createFactory({
     },
     recipeColors: { proton: '#ffaa00', neutron: '#aa00ff' },
     inputColors: QUARK_COLORS,
+
+    rotateCallback(ghost, reverse) {
+        // rotateCallback вызывается при переключении рецепта (R)
+        // ghost.recipe уже изменён в createFactory
+    },
+
+    rotateGhost(ghost, game, reverse = false) {
+        if (!ghost.recipe) ghost.recipe = 'proton';
+        const keys = Object.keys(this.recipes);
+        const idx = keys.indexOf(ghost.recipe);
+        const nextIdx = reverse
+            ? (idx - 1 + keys.length) % keys.length
+            : (idx + 1) % keys.length;
+        ghost.recipe = keys[nextIdx];
+    },
+
     render(ctx, b, tileSize, isGhost, game, config) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
@@ -28,12 +44,6 @@ export const hadronSynthesizerBuilding = createFactory({
             ctx.fillRect(x + w*0.25, y + h*0.25, w*0.5, h*0.5);
             return;
         }
-
-        ctx.fillStyle = '#0a0a1a';
-        ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = '#444';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x+1, y+1, w-2, h-2);
 
         if (!isGhost) {
             const progress = b.craftTimer ? Math.min(b.craftTimer / config.recipes[b.recipe].time, 1.0) : 0;

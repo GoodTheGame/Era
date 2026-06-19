@@ -2,10 +2,35 @@ export const starBuilding = {
     type: 'star',
     size: { w: 5, h: 5 },
 
-    rotateGhost(ghost) {},
+    rotateGhost(ghost, reverse = false) {},
 
     update(building, game, dt) {
-        // глобальное время в game.globalAnimTime
+        if (!building.resources) building.resources = {};
+        if (!building.inputResources) building.inputResources = {};
+        building.timer = building.timer || 0;
+        building.timer += dt;
+
+        const protonNeed = 10;
+        const neutronNeed = 10;
+        const energyNeed = 50;
+
+        if (!building.isActive) {
+            const p = building.inputResources['p'] || 0;
+            const n = building.inputResources['n'] || 0;
+            const e = building.resources['energy'] || 0;
+            if (p >= protonNeed && n >= neutronNeed && e >= energyNeed) {
+                building.inputResources['p'] -= protonNeed;
+                building.inputResources['n'] -= neutronNeed;
+                building.resources['energy'] -= energyNeed;
+                building.isActive = true;
+            }
+        } else {
+            building.resources['energy'] = (building.resources['energy'] || 0) - dt;
+            if (building.resources['energy'] < 0) {
+                building.resources['energy'] = 0;
+                building.isActive = false;
+            }
+        }
     },
 
     render(ctx, b, tileSize, isGhost, game) {
@@ -20,21 +45,19 @@ export const starBuilding = {
         const phase = game.globalAnimTime || 0;
         const zoom = game.camera.zoom;
 
-        // При сильном отдалении рисуем простой круг
         if (zoom < 0.5 && !isGhost) {
-            const pulse = Math.sin(phase * 1.5) * 0.05 + 0.15;
-            ctx.fillStyle = `rgba(255, 150, 50, ${pulse})`;
+            const pulse = isActive ? (Math.sin(phase * 1.5) * 0.2 + 0.6) : (Math.sin(phase * 1.5) * 0.05 + 0.15);
+            ctx.fillStyle = isActive ? `rgba(0, 200, 255, ${pulse})` : `rgba(255, 150, 50, ${pulse})`;
             ctx.beginPath();
             ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
             ctx.fill();
             ctx.fillStyle = '#fff';
             ctx.font = `${tileSize*0.3}px "Segoe UI"`;
             ctx.textAlign = 'center';
-            ctx.fillText('ЗВЕЗДА', cx, y + h - 10);
+            ctx.fillText(isActive ? 'АКТИВНА' : 'ЗВЕЗДА', cx, y + h - 10);
             return;
         }
 
-        // Фон
         const bgGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 2);
         bgGradient.addColorStop(0, '#0a0a1a');
         bgGradient.addColorStop(1, '#050510');
@@ -42,10 +65,9 @@ export const starBuilding = {
         ctx.fillRect(x, y, w, h);
 
         if (isActive) {
-            // ... активная звезда (оставляем как было)
+            // ... (оставь активную анимацию, которая была)
         } else {
             const pulse = Math.sin(phase * 1.5) * 0.05 + 0.15;
-
             const outerGlow = ctx.createRadialGradient(cx, cy, maxR * 0.6, cx, cy, maxR * 1.3);
             outerGlow.addColorStop(0, `rgba(255, 150, 50, ${pulse * 0.6})`);
             outerGlow.addColorStop(1, 'rgba(255, 150, 50, 0)');

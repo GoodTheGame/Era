@@ -27,9 +27,8 @@ export const gluonExtractorBuilding = {
         const cx = x + s / 2;
         const cy = y + s / 2;
         const animTimer = game.globalAnimTime || 0;
-        const zoom = game.camera.zoom; // <-- получаем текущий зум
+        const zoom = game.camera.zoom;
 
-        // При сильном отдалении рисуем только значок, без анимации
         if (zoom < 0.5 && !isGhost) {
             ctx.fillStyle = '#ff44cc';
             ctx.fillRect(x + s*0.25, y + s*0.25, s*0.5, s*0.5);
@@ -45,14 +44,7 @@ export const gluonExtractorBuilding = {
 
         const phase = animTimer * 6;
 
-        // Фоновое свечение
-        ctx.fillStyle = '#ff44cc20';
-        ctx.fillRect(x, y, s, s);
-        ctx.strokeStyle = '#ff44cc';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x + 1, y + 1, s - 2, s - 2);
-
-        // Мембрана
+        // Без обводки, только мембрана
         const membraneY = cy;
         const membraneRadius = s * 0.28;
         const pulse = 1 + 0.15 * Math.sin(phase);

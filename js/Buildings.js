@@ -1,9 +1,11 @@
 // Buildings.js
+import { drawPlacementGrid } from './PlacementUtils.js';
 import { quantumResonatorBuilding } from './buildings/quantum_resonator.js';
 import { gluonExtractorBuilding } from './buildings/gluon_extractor.js';
 import { leptonExtractorBuilding } from './buildings/lepton_extractor.js';
 import { nodeBuilding } from './buildings/node.js';
 import { connectorBuilding } from './buildings/connector.js';
+import { connectorEnergyBuilding } from './buildings/connector_energy.js';
 import { hadronSynthesizerBuilding } from './buildings/hadron_synthesizer.js';
 import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { fusionPressBuilding } from './buildings/fusion_press.js';
@@ -16,6 +18,7 @@ const BUILDING_MODULES = {
     'lepton_extractor': leptonExtractorBuilding,
     'node': nodeBuilding,
     'connector': connectorBuilding,
+    'connector_energy': connectorEnergyBuilding,
     'hadron_synthesizer': hadronSynthesizerBuilding,
     'electron_capture': electronCaptureBuilding,
     'fusion_press': fusionPressBuilding,
@@ -32,10 +35,11 @@ export class Building {
         this.tx = tx; this.ty = ty; this.type = type; this.rotation = rotation;
         this.quarkType = 0; this.recipe = null; this.filterType = null;
         this.resources = {}; this.inputResources = {}; this.outputResources = {};
-        this.timer = 0; this.craftTimer = 0; // animTimer убран
+        this.timer = 0; this.craftTimer = 0;
 
-        if (type === 'connector') this.filterType = 'energy';
+        if (type === 'connector') this.filterType = 'u';
         else if (type === 'energy_buffer') this.filterType = 'energy';
+        else if (type === 'connector_energy') this.filterType = null;
         else if (type === 'quantum_resonator') this.quarkType = 0;
 
         const mod = BUILDING_MODULES[type];
@@ -106,11 +110,13 @@ export class BuildingManager {
         if (!this.ghost.visible || this.game.selectedType === 'wire') return false;
 
         const existing = this.getBuildingAt(tx, ty);
-        if (existing && existing.type === 'connector' && this.ghost.type === 'connector') {
+        // Разрешаем замену, если оба типа являются коннекторами (обычный или энерго)
+        if (existing && (existing.type === 'connector' || existing.type === 'connector_energy') &&
+            (this.ghost.type === 'connector' || this.ghost.type === 'connector_energy')) {
             this.buildings = this.buildings.filter(b => b !== existing);
             if (this.game.network) this.game.network.removeAllConnections(existing);
         } else if (existing) {
-            return false;
+            return false; // занято другим зданием
         }
 
         if (!this.isPlacementValid(tx, ty, this.ghost.type)) return false;
@@ -123,23 +129,23 @@ export class BuildingManager {
         return true;
     }
 
-    rotateBuildingUnderCursor() {
+    rotateBuildingUnderCursor(reverse = false) {
         const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (!b || b.type === 'star') return; // звезду не вращаем
+        if (!b || b.type === 'star') return;
         const mod = BUILDING_MODULES[b.type];
         if (mod && mod.rotateGhost) {
-            mod.rotateGhost(b, this.game);
+            mod.rotateGhost(b, this.game, reverse);
         } else {
             b.rotation = (b.rotation + 1) % 4;
         }
     }
 
-    rotateGhost() {
+    rotateGhost(reverse = false) {
         if (!this.ghost.visible) return;
         const mod = BUILDING_MODULES[this.ghost.type];
-        if (mod && mod.rotateGhost) mod.rotateGhost(this.ghost, this.game);
+        if (mod && mod.rotateGhost) mod.rotateGhost(this.ghost, this.game, reverse);
         else this.ghost.rotation = (this.ghost.rotation + 1) % 4;
     }
 
@@ -208,17 +214,22 @@ export class BuildingManager {
             const tile = this.game.map.worldToTile(wp.x, wp.y);
             const existing = this.getBuildingAt(tile.tx, tile.ty);
 
-            if (existing && this.ghost.type === 'connector' && existing.type === 'connector') {
+            // Замена любого коннектора на выбранный (даже если тип отличается)
+            if (existing && (existing.type === 'connector' || existing.type === 'connector_energy') &&
+                (this.ghost.type === 'connector' || this.ghost.type === 'connector_energy')) {
                 this.buildings = this.buildings.filter(b => b !== existing);
                 if (this.game.network) this.game.network.removeAllConnections(existing);
-                const nb = new Building(tile.tx, tile.ty, 'connector', this.ghost.rotation);
+                const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
                 nb.filterType = this.ghost.filterType;
                 this.buildings.push(nb);
                 this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
                 this.justPlaced = true;
                 this.pendingFirstTile = null;
                 this.isDragging = false;
-            } else if (existing) {
+                return;
+            }
+
+            if (existing) {
                 this.pendingFirstTile = null;
                 this.isDragging = false;
             } else {
@@ -273,10 +284,23 @@ export class BuildingManager {
             }
 
             if (!this.lastPlacedTile || this.lastPlacedTile.tx !== tile.tx || this.lastPlacedTile.ty !== tile.ty) {
-                if (this.isPlacementValid(tile.tx, tile.ty, this.game.selectedType)) {
+                // Разрешаем замену коннекторов при зажатой кнопке
+                const existing = this.getBuildingAt(tile.tx, tile.ty);
+                if (existing && (existing.type === 'connector' || existing.type === 'connector_energy') &&
+                    (this.ghost.type === 'connector' || this.ghost.type === 'connector_energy')) {
+                    this.buildings = this.buildings.filter(b => b !== existing);
+                    if (this.game.network) this.game.network.removeAllConnections(existing);
+                    const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
+                    nb.filterType = this.ghost.filterType;
+                    this.buildings.push(nb);
+                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                } else if (!existing && this.isPlacementValid(tile.tx, tile.ty, this.game.selectedType)) {
                     if (this._tryPlaceAt(tile.tx, tile.ty)) {
                         this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
                     }
+                } else {
+                    // Обновляем lastPlacedTile, чтобы не пытаться строить на том же месте
+                    this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
                 }
             }
         }
@@ -290,7 +314,6 @@ export class BuildingManager {
         return null;
     }
 
-    /** Проверяет, попадает ли здание в видимую область камеры */
     isBuildingVisible(b, view, tileSize) {
         const size = b.getSize();
         const x1 = b.tx * tileSize;
@@ -305,8 +328,7 @@ export class BuildingManager {
         const view = camera.getVisibleRect();
 
         for (const b of this.buildings) {
-            if (!this.isBuildingVisible(b, view, tileSize)) continue; // отсечение
-
+            if (!this.isBuildingVisible(b, view, tileSize)) continue;
             const mod = BUILDING_MODULES[b.type];
             if (mod) { ctx.save(); mod.render(ctx, b, tileSize, false, this.game); ctx.restore(); }
             else {
@@ -319,22 +341,8 @@ export class BuildingManager {
             const mod = BUILDING_MODULES[this.game.selectedType];
             if (mod) {
                 ctx.save();
-                if (this.ghost.type === 'quantum_resonator') {
-                    const canPlace = this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type);
-                    const size = this.ghost.getSize();
-                    ctx.globalAlpha = 0.6;
-                    if (canPlace) {
-                        ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
-                        ctx.fillRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
-                        ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
-                        ctx.strokeRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
-                    } else {
-                        ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-                        ctx.fillRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
-                        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-                        ctx.strokeRect(this.ghost.tx * tileSize, this.ghost.ty * tileSize, size.w * tileSize, size.h * tileSize);
-                    }
-                }
+                const canPlace = this.isPlacementValid(this.ghost.tx, this.ghost.ty, this.ghost.type);
+                drawPlacementGrid(ctx, this.ghost, tileSize, canPlace);
                 mod.render(ctx, this.ghost, tileSize, true, this.game);
                 ctx.restore();
             }

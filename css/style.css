@@ -9,7 +9,6 @@ canvas { display: block; cursor: crosshair; }
     pointer-events: none;
 }
 
-/* Кнопки интерфейса слева сверху */
 #top-buttons {
     position: absolute;
     top: 20px;
@@ -40,7 +39,6 @@ canvas { display: block; cursor: crosshair; }
     transform: scale(1.05);
 }
 
-/* Тулбар снизу по центру */
 #toolbar {
     position: absolute;
     bottom: 20px;
@@ -88,6 +86,7 @@ canvas { display: block; cursor: crosshair; }
     transform: translateY(-2px);
 }
 
+/* Активная кнопка (зелёная обводка) */
 .tool-btn.active {
     border-color: #7AE0A3;
     background: rgba(122, 224, 163, 0.25);
@@ -95,7 +94,20 @@ canvas { display: block; cursor: crosshair; }
     box-shadow: 0 0 12px rgba(122, 224, 163, 0.3);
 }
 
-/* Информационная панель снизу */
+/* Кнопка в энерго-режиме (синий фон) */
+.tool-btn.energy-mode {
+    background: rgba(0, 150, 255, 0.3) !important;
+    border-color: rgba(0, 150, 255, 0.6);
+}
+
+/* Активная кнопка в энерго-режиме: зелёная обводка + синий фон */
+.tool-btn.active.energy-mode {
+    border-color: #7AE0A3 !important;
+    background: rgba(0, 150, 255, 0.35) !important;
+    color: #7AE0A3;
+    box-shadow: 0 0 12px rgba(122, 224, 163, 0.3);
+}
+
 #info-panel {
     position: absolute;
     bottom: 90px;

@@ -8,9 +8,11 @@ export const quantumResonatorBuilding = {
     type: 'quantum_resonator',
     size: { w: 3, h: 3 },
 
-    rotateGhost(ghost) {
+    rotateGhost(ghost, game, reverse = false) {
         if (ghost.quarkType === undefined) ghost.quarkType = 0;
-        ghost.quarkType = (ghost.quarkType + 1) % 6;
+        ghost.quarkType = reverse
+            ? (ghost.quarkType - 1 + 6) % 6
+            : (ghost.quarkType + 1) % 6;
     },
 
     update(building, game, dt) {
@@ -53,43 +55,35 @@ export const quantumResonatorBuilding = {
             return;
         }
 
-        ctx.fillStyle = 'rgba(0, 255, 255, 0.05)';
-        ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = '#00ffff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x+1, y+1, w-2, h-2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 3; i++) {
+            const r = maxR * (0.2 + i * 0.25);
+            const deformation = Math.sin(animTimer * 2 + i) * 5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + deformation, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        for (let j = 0; j < 8; j++) {
+            const angle = animTimer * 0.5 + (j * Math.PI * 2) / 8;
+            const dist = maxR * (0.9 + 0.3 * Math.sin(animTimer * 4 + j));
+            const px = cx + Math.cos(angle) * dist;
+            const py = cy + Math.sin(angle) * dist;
+            ctx.beginPath();
+            ctx.arc(px, py, 2.5, 0, Math.PI*2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        drawParticle(ctx, cx, cy, maxR * 0.4, quark, animTimer);
 
         if (!isGhost) {
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 1;
-            for (let i = 1; i <= 3; i++) {
-                const r = maxR * (0.2 + i * 0.25);
-                const deformation = Math.sin(animTimer * 2 + i) * 5;
-                ctx.beginPath();
-                ctx.arc(cx, cy, r + deformation, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-
-            for (let j = 0; j < 8; j++) {
-                const angle = animTimer * 0.5 + (j * Math.PI * 2) / 8;
-                const dist = maxR * (0.9 + 0.3 * Math.sin(animTimer * 4 + j));
-                const px = cx + Math.cos(angle) * dist;
-                const py = cy + Math.sin(angle) * dist;
-                ctx.beginPath();
-                ctx.arc(px, py, 2.5, 0, Math.PI*2);
-                ctx.fillStyle = color;
-                ctx.fill();
-            }
-
-            drawParticle(ctx, cx, cy, maxR * 0.4, quark, animTimer);
-
             const count = b.resources[quark] || 0;
             ctx.fillStyle = '#fff';
             ctx.font = `${tileSize*0.12}px "Segoe UI"`;
             ctx.textAlign = 'center';
             ctx.fillText(count, cx, y + h - 4);
-        } else {
-            drawParticle(ctx, cx, cy, maxR * 0.5, quark, 0);
         }
     }
 };

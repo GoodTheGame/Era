@@ -1,15 +1,21 @@
 import { drawParticle } from '../ParticleRenderer.js';
 
-const FILTER_OPTIONS = ['energy', 'u', 'd', 'g', 'e', 'p', 'n', 'H'];
+const FILTER_OPTIONS = ['u', 'd', 'g', 'e', 'p', 'n', 'H'];
 
 export const connectorBuilding = {
     type: 'connector',
     size: { w: 1, h: 1 },
 
-    rotateGhost(ghost, game) {
-        if (!ghost.filterType) ghost.filterType = 'energy';
+    initGhost(ghost) {
+        if (!ghost.filterType) ghost.filterType = 'u';
+    },
+
+    rotateGhost(ghost, game, reverse = false) {
+        if (!ghost.filterType) ghost.filterType = 'u';
         const idx = FILTER_OPTIONS.indexOf(ghost.filterType);
-        const nextIdx = (idx + 1) % FILTER_OPTIONS.length;
+        const nextIdx = reverse
+            ? (idx - 1 + FILTER_OPTIONS.length) % FILTER_OPTIONS.length
+            : (idx + 1) % FILTER_OPTIONS.length;
         ghost.filterType = FILTER_OPTIONS[nextIdx];
         if (game && game.network) {
             game.network.updateDownstreamFilters(ghost);
@@ -30,12 +36,11 @@ export const connectorBuilding = {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        const filter = isGhost ? b.filterType : (b.filterType || 'energy');
+        const filter = isGhost ? b.filterType : (b.filterType || 'u');
         drawParticle(ctx, cx, cy, radius * 1.2, filter, animTimer);
-
         ctx.fillStyle = '#fff';
         ctx.font = `bold ${radius * 1.5}px "Segoe UI"`;
         ctx.textAlign = 'center';
-        ctx.fillText(filter === 'energy' ? '⚡' : filter, cx, cy + radius * 2.5);
+        ctx.fillText(filter, cx, cy + radius * 2.5);
     }
 };

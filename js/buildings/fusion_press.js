@@ -13,6 +13,11 @@ export const fusionPressBuilding = createFactory({
     },
     recipeColors: { fusion: '#ffdd44' },
     inputColors: { H: '#22aaff' },
+
+    rotateGhost(ghost, game, reverse = false) {
+        // один рецепт
+    },
+
     render(ctx, b, tileSize, isGhost, game, config) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
@@ -27,12 +32,6 @@ export const fusionPressBuilding = createFactory({
             ctx.fillRect(x + w*0.25, y + h*0.25, w*0.5, h*0.5);
             return;
         }
-
-        ctx.fillStyle = '#0a0a1a';
-        ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = '#ff8800';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x+1, y+1, w-2, h-2);
 
         if (!isGhost) {
             const progress = b.craftTimer ? Math.min(b.craftTimer / 2.0, 1.0) : 0;

@@ -44,12 +44,7 @@ export const leptonExtractorBuilding = {
 
         const phase = animTimer * 2;
 
-        ctx.fillStyle = '#ffff0020';
-        ctx.fillRect(x, y, s, s);
-        ctx.strokeStyle = '#ffff00';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x + 1, y + 1, s - 2, s - 2);
-
+        // Без обводки, только тарелка
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(phase);

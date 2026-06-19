@@ -13,7 +13,7 @@ const PARTICLE_DEFS = {
     n: { color: '#aa00ff', glow: '#dd88ff', type: 'neutron', name: 'n' },
     H: { color: '#22aaff', glow: '#88ddff', type: 'hydrogen', name: 'H' },
     He: { color: '#ffdd44', glow: '#ffeeaa', type: 'helium', name: 'He' },
-    energy: { color: '#ff8800', glow: '#ffcc88', type: 'energy', name: '⚡' }
+    energy: { color: '#00ccff', glow: '#88eeff', type: 'energy', name: '⚡' }   // ← ГОЛУБОЙ
 };
 
 export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
@@ -198,7 +198,7 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
         const flash = Math.sin(phase * 8) * 0.5 + 0.5;
         ctx.beginPath();
         ctx.arc(0, 0, radius * flash, 0, Math.PI * 2);
-        ctx.fillStyle = color;
+        ctx.fillStyle = color;   // теперь #00ccff
         ctx.fill();
         ctx.shadowBlur = radius * 2;
         ctx.fill();

@@ -13,6 +13,11 @@ export const electronCaptureBuilding = createFactory({
     },
     recipeColors: { hydrogen: '#22aaff' },
     inputColors: COLORS,
+
+    rotateGhost(ghost, game, reverse = false) {
+        // только один рецепт, ничего не делаем
+    },
+
     render(ctx, b, tileSize, isGhost, game, config) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
@@ -29,12 +34,6 @@ export const electronCaptureBuilding = createFactory({
         }
 
         const progress = b.craftTimer ? Math.min(b.craftTimer / 1.0, 1.0) : 0;
-
-        ctx.fillStyle = '#0a0a1a';
-        ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = '#22aaff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x+1, y+1, w-2, h-2);
 
         if (!isGhost) {
             drawParticle(ctx, cx, cy, maxR * 0.6, 'p', animTimer);
