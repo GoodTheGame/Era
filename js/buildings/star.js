@@ -3,8 +3,6 @@ export const starBuilding = {
     type: 'star',
     size: { w: 5, h: 5 },
 
-    rotateGhost(ghost, reverse = false) {},
-
     update(building, game, dt) {
         if (!building.resources) building.resources = {};
         if (!building.inputResources) building.inputResources = {};
@@ -45,6 +43,9 @@ export const starBuilding = {
         }
     },
 
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    },
     getItemPorts() {
         return [
             { type: 'in', x: 0, y: 0.5 },

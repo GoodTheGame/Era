@@ -4,8 +4,10 @@ import { drawParticle } from '../ParticleRenderer.js';
 export const leptonExtractorBuilding = {
     type: 'lepton_extractor',
     size: { w: 1, h: 1 },
-    rotateGhost(ghost) {},
-    update(building, game, dt) {
+    rotateGhost(ghost, game, reverse) {
+    ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+},
+        update(building, game, dt) {
         if (!building.resources) building.resources = {};
         if (!building.timer) building.timer = 0;
         const quark = 'e';

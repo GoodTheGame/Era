@@ -29,15 +29,42 @@ export const hadronSynthesizerBuilding = createFactory({
 
     rotateCallback(ghost, reverse) {},
 
-    rotateGhost(ghost, game, reverse = false) {
-        if (!ghost.recipe) ghost.recipe = 'proton';
-        const keys = Object.keys(this.recipes);
-        const idx = keys.indexOf(ghost.recipe);
-        const nextIdx = reverse
-            ? (idx - 1 + keys.length) % keys.length
-            : (idx + 1) % keys.length;
-        ghost.recipe = keys[nextIdx];
+        rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
     },
+    changeMode(ghost, game, reverse) {
+    if (!ghost.recipe) ghost.recipe = 'proton';
+    const keys = Object.keys(this.recipes);
+    let idx = keys.indexOf(ghost.recipe);
+    if (reverse) {
+        idx = (idx - 1 + keys.length) % keys.length;
+    } else {
+        idx = (idx + 1) % keys.length;
+    }
+    const oldRecipe = ghost.recipe;
+    ghost.recipe = keys[idx];
+
+    // Очищаем выходной продукт
+    ghost.outputResources = {};
+
+    // Если у здания есть входные ресурсы, удаляем только те, что не нужны новому рецепту
+    if (ghost.inputResources) {
+        const newInputs = this.recipes[ghost.recipe].inputs;
+        const newInputKeys = Object.keys(newInputs);
+        for (const key of Object.keys(ghost.inputResources)) {
+            if (!newInputKeys.includes(key)) {
+                delete ghost.inputResources[key];
+            }
+        }
+    }
+
+    // Сбрасываем таймер крафта
+    ghost.craftTimer = 0;
+
+    if (game && game.network) {
+        game.network.refreshOutgoingResourceTypes(ghost);
+    }
+},
 
     render(ctx, b, tileSize, isGhost, game, config) {
         const x = b.tx * tileSize, y = b.ty * tileSize;

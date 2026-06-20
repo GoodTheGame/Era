@@ -306,61 +306,49 @@ export class HUD {
     }
 
     _bindHotkeys() {
-        window.addEventListener('keydown', (e) => {
-            const key = e.key;
-            if (['1','2','3','4','5','6','7','8','9','0','r','R','к','К','q','Q','й','Й','Escape'].includes(key)) {
-                e.preventDefault();
+    window.addEventListener('keydown', (e) => {
+        const key = e.key;
+        if (['1','2','3','4','5','6','7','8','9','0','q','Q','й','Й','Escape'].includes(key)) {
+            e.preventDefault();
+        }
+        if (key === '1') {
+            if (this.game.selectedType === 'wire') {
+                this.wireMode = this.wireMode === 'matter' ? 'energy' : 'matter';
+                const btn1 = this.buttons['wire'];
+                if (btn1) btn1.classList.toggle('energy-mode', this.wireMode === 'energy');
+                this.updateActiveButton();
+            } else {
+                this.selectBuilding('wire');
             }
-            if (key === '1') {
-                if (this.game.selectedType === 'wire') {
-                    this.wireMode = this.wireMode === 'matter' ? 'energy' : 'matter';
-                    const btn1 = this.buttons['wire'];
-                    if (btn1) btn1.classList.toggle('energy-mode', this.wireMode === 'energy');
-                    this.updateActiveButton();
-                } else {
-                    this.selectBuilding('wire');
-                }
+        }
+        else if (key === '2') {
+            if (this.game.selectedType === this.slot2Main || this.game.selectedType === this.slot2Alt) {
+                this.toggleSlot2();
+            } else {
+                this.selectBuilding(this.slot2Main);
             }
-            else if (key === '2') {
-                if (this.game.selectedType === this.slot2Main || this.game.selectedType === this.slot2Alt) {
-                    this.toggleSlot2();
-                } else {
-                    this.selectBuilding(this.slot2Main);
-                }
+        }
+        else if (key === '3') {
+            if (this.game.selectedType === this.slot3Main || this.game.selectedType === this.slot3Alt) {
+                this.toggleSlot3();
+            } else {
+                this.selectBuilding(this.slot3Main);
             }
-            else if (key === '3') {
-                if (this.game.selectedType === this.slot3Main || this.game.selectedType === this.slot3Alt) {
-                    this.toggleSlot3();
-                } else {
-                    this.selectBuilding(this.slot3Main);
-                }
-            }
-            else if (key === '4') this.selectBuilding('quantum_resonator');
-            else if (key === '5') this.selectBuilding('gluon_extractor');
-            else if (key === '6') this.selectBuilding('lepton_extractor');
-            else if (key === '7') this.selectBuilding('hadron_synthesizer');
-            else if (key === '8') this.selectBuilding('electron_capture');
-            else if (key === '9') this.selectBuilding('fusion_press');
-            else if (key === 'r' || key === 'R' || key === 'к' || key === 'К') {
-                if (this.game.selectedType === 'wire') {
-                    this.game.buildingManager.rotateWirePort();
-                    return;
-                }
-                const reverse = e.shiftKey;
-                if (this.game.selectedType) {
-                    this.game.buildingManager.rotateGhost(reverse);
-                } else {
-                    this.game.buildingManager.rotateBuildingUnderCursor(reverse);
-                }
-            }
-            else if (key === 'q' || key === 'Q' || key === 'й' || key === 'Й') {
-                this.game.buildingManager.pipette();
-            }
-            else if (key === 'Escape') {
-                this.selectBuilding(null);
-            }
-        });
-    }
+        }
+        else if (key === '4') this.selectBuilding('quantum_resonator');
+        else if (key === '5') this.selectBuilding('gluon_extractor');
+        else if (key === '6') this.selectBuilding('lepton_extractor');
+        else if (key === '7') this.selectBuilding('hadron_synthesizer');
+        else if (key === '8') this.selectBuilding('electron_capture');
+        else if (key === '9') this.selectBuilding('fusion_press');
+        else if (key === 'q' || key === 'Q' || key === 'й' || key === 'Й') {
+            this.game.buildingManager.pipette();
+        }
+        else if (key === 'Escape') {
+            this.selectBuilding(null);
+        }
+    });
+}
 
     selectBuilding(type) {
         this.slot2Active = (type === this.slot2Main || type === this.slot2Alt);

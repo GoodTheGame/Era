@@ -6,8 +6,9 @@ export const connectorEnergyBuilding = {
     size: { w: 1, h: 1 },
 
     initGhost(ghost) {},
-    rotateGhost(ghost, game, reverse = false) {},
-
+    rotateGhost(ghost, game, reverse) {
+    ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+},
     // Только два энергетических порта (any)
     getItemPorts() {
         return [];

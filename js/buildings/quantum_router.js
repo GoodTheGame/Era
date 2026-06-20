@@ -10,19 +10,16 @@ export const quantumRouterBuilding = {
         if (ghost.filterType === undefined) ghost.filterType = null;
     },
 
-    rotateGhost(ghost, game, reverse = false) {
-        if (reverse) {
-            let idx = FILTER_OPTIONS.indexOf(ghost.filterType);
-            if (idx === -1) idx = 0;
-            idx = (idx + 1) % FILTER_OPTIONS.length;
-            ghost.filterType = FILTER_OPTIONS[idx];
-        } else {
-            const modes = ['split', 'priority_left', 'priority_right'];
-            let idx = modes.indexOf(ghost.routerMode);
-            if (idx === -1) idx = 0;
-            idx = (idx + 1) % modes.length;
-            ghost.routerMode = modes[idx];
-        }
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    },
+    changeMode(ghost, game, reverse) {
+        // смена фильтра (Shift+R теперь не используется, фильтр меняется по F/Shift+F)
+        const FILTER_OPTIONS = [null, 'u','d','g','e','p','n','H','He','energy'];
+        let idx = FILTER_OPTIONS.indexOf(ghost.filterType);
+        if (idx === -1) idx = 0;
+        idx = reverse ? (idx - 1 + FILTER_OPTIONS.length) % FILTER_OPTIONS.length : (idx + 1) % FILTER_OPTIONS.length;
+        ghost.filterType = FILTER_OPTIONS[idx];
     },
 
     update(building, game, dt) {},

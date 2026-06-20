@@ -103,9 +103,8 @@ export class BuildingManager {
         this.lastMouseX = 0; this.lastMouseY = 0;
         this.isLeftMouseDown = false; this.isRightMouseDown = false;
         this.wireSource = null;
-        this.wireSourcePortIndex = 0;   // индекс выбранного порта на источнике
-        this.wireTargetPortIndex = 0;   // индекс выбранного порта на потенциальном приёмнике
-        this.wireHoveredPortIndex = -1;   // индекс порта под курсором (для источника или цели)
+        this.wireSourcePortIndex = 0;
+        this.wireTargetPortIndex = 0;
         this.wireModeActive = false;
         this.wireHoveredBuilding = null;
         this.wireHoveredPortIndex = -1;
@@ -184,17 +183,17 @@ export class BuildingManager {
     }
 
     rotateBuildingUnderCursor(reverse = false) {
-        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(wp.x, wp.y);
-        const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (!b || b.type === 'star') return;
-        const mod = BUILDING_MODULES[b.type];
-        if (mod && mod.rotateGhost) {
-            mod.rotateGhost(b, this.game, reverse);
-        } else {
-            b.rotation = (b.rotation + 1) % 4;
-        }
+    const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+    const tile = this.game.map.worldToTile(wp.x, wp.y);
+    const b = this.getBuildingAt(tile.tx, tile.ty);
+    if (!b) return;   // убрали проверку на star
+    const mod = BUILDING_MODULES[b.type];
+    if (mod && mod.rotateGhost) {
+        mod.rotateGhost(b, this.game, reverse);
+    } else {
+        b.rotation = (b.rotation + 1) % 4;
     }
+}
 
     rotateGhost(reverse = false) {
         if (!this.ghost.visible) return;
@@ -240,71 +239,79 @@ export class BuildingManager {
     }
 
     onLeftMouseDown() {
-        this.isLeftMouseDown = true;
-        this.lastPlacedTile = null;
-        this.isDragging = false;
-        this.pendingFirstTile = null;
+    this.isLeftMouseDown = true;
+    this.lastPlacedTile = null;
+    this.isDragging = false;
+    this.pendingFirstTile = null;
 
-        if (this.game.selectedType === 'wire') {
-    // Цель — здание с подсвеченным портом (если порт рядом с курсором)
-    const target = this.wireHoveredBuilding;
-    if (target && target.type !== 'star') {
-        const connectionType = this.game.hud.wireMode;
-        const portType = this.wireHoveredPortType || (connectionType === 'energy' ? 'energy' : 'item');
+    if (this.game.selectedType === 'wire') {
+        const target = this.wireHoveredBuilding;
+        if (target && target.type !== 'star') {
+            const connectionType = this.game.hud.wireMode;
+            const portType = this.wireHoveredPortType || (connectionType === 'energy' ? 'energy' : 'item');
 
-        if (!this.wireSource) {
-            // Первый клик — выбираем источник и конкретный порт
-            this.wireSource = target;
-            this.wireSourcePortIndex = this.wireHoveredPortIndex;
-            this.wireModeActive = true;
-        } else if (this.wireSource !== target) {
-            // Второй клик — соединяем выбранные порты
-            this.game.network.addConnection(
-                this.wireSource,
-                target,
-                this.wireSourcePortIndex,
-                this.wireHoveredPortIndex
-            );
-            // Переключаем источник на цель для продолжения цепочки
-            this.wireSource = target;
-            this.wireSourcePortIndex = this.wireHoveredPortIndex;
+            if (!this.wireSource) {
+                this.wireSource = target;
+                this.wireSourcePortIndex = this.wireHoveredPortIndex;
+                this.wireModeActive = true;
+            } else if (this.wireSource !== target) {
+                let src = this.wireSource;
+                let dst = target;
+                let srcPortIdx = this.wireSourcePortIndex;
+                let dstPortIdx = this.wireHoveredPortIndex;
+
+                const srcPorts = this.game.network.getPortPositions(src, portType);
+                const dstPorts = this.game.network.getPortPositions(dst, portType);
+                const srcPort = srcPorts[srcPortIdx];
+                const dstPort = dstPorts[dstPortIdx];
+
+                if (srcPort && dstPort &&
+                    (srcPort.type === 'in' || srcPort.type === 'any') &&
+                    dstPort.type === 'out') {
+                    [src, dst] = [dst, src];
+                    [srcPortIdx, dstPortIdx] = [dstPortIdx, srcPortIdx];
+                }
+
+                this.game.network.addConnection(src, dst, srcPortIdx, dstPortIdx);
+
+                this.wireSource = dst;
+                this.wireSourcePortIndex = this._getPreferredSourcePort(dst);
+            }
+        } else {
+            this.wireSource = null;
+            this.wireModeActive = false;
         }
-    } else {
-        // Клик мимо всех портов — сброс
-        this.wireSource = null;
-        this.wireModeActive = false;
+        return;
     }
-    return;
+
+    if (this.game.selectedType) {
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
+        const existing = this.getBuildingAt(tile.tx, tile.ty);
+
+        if (existing && (existing.type === 'quantum_router' || existing.type === 'connector_energy') &&
+            (this.ghost.type === 'quantum_router' || this.ghost.type === 'connector_energy')) {
+            this.buildings = this.buildings.filter(b => b !== existing);
+            if (this.game.network) this.game.network.removeAllConnections(existing);
+            const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
+            nb.filterType = this.ghost.filterType;
+            nb.routerMode = this.ghost.routerMode || 'split';
+            this.buildings.push(nb);
+            this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+            this.pendingFirstTile = null;
+            this.isDragging = false;
+            return;
+        }
+
+        if (existing) {
+            this.pendingFirstTile = null;
+            this.isDragging = false;
+        } else {
+            this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
+            this.isDragging = true;
+        }
+    }
 }
-
-        if (this.game.selectedType) {
-            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-            const tile = this.game.map.worldToTile(wp.x, wp.y);
-            const existing = this.getBuildingAt(tile.tx, tile.ty);
-
-            if (existing && (existing.type === 'quantum_router' || existing.type === 'connector_energy') &&
-                (this.ghost.type === 'quantum_router' || this.ghost.type === 'connector_energy')) {
-                this.buildings = this.buildings.filter(b => b !== existing);
-                if (this.game.network) this.game.network.removeAllConnections(existing);
-                const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
-                nb.filterType = this.ghost.filterType;
-                nb.routerMode = this.ghost.routerMode || 'split';
-                this.buildings.push(nb);
-                this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
-                this.pendingFirstTile = null;
-                this.isDragging = false;
-                return;
-            }
-
-            if (existing) {
-                this.pendingFirstTile = null;
-                this.isDragging = false;
-            } else {
-                this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
-                this.isDragging = true;
-            }
-        }
-    }
 
     onLeftMouseUp() {
         if (this.pendingFirstTile && this.game.selectedType && this.game.selectedType !== 'wire') {
@@ -434,9 +441,7 @@ export class BuildingManager {
     const itemPorts = network.getPortPositions(building, 'item');
     const energyPorts = network.getPortPositions(building, 'energy');
     const portRadius = 5;
-    const captureRadius = portRadius + 8;
 
-    // Функция получения роли порта по соединениям
     const getPortRole = (b, portIndex, portType) => {
         const conns = network.connections.filter(c => {
             return portType === 'item' ? c.type === 'matter' : c.type === 'energy';
@@ -446,11 +451,8 @@ export class BuildingManager {
             if (conn.to === b && conn.toPortIndex === portIndex) return conn.toRole || 'in';
         }
         return null;
-        this.updateWirePortHover();
-        this.drawWirePortHighlight(ctx);
     };
 
-    // Отрисовка предметных портов
     for (let i = 0; i < itemPorts.length; i++) {
         const port = itemPorts[i];
         const px = port.worldX, py = port.worldY;
@@ -472,7 +474,6 @@ export class BuildingManager {
         ctx.stroke();
     }
 
-    // Отрисовка энергетических портов
     for (let i = 0; i < energyPorts.length; i++) {
         const port = energyPorts[i];
         const px = port.worldX, py = port.worldY;
@@ -492,7 +493,6 @@ export class BuildingManager {
         ctx.stroke();
     }
 }
-
     rotateWirePort() {
         if (!this.wireSource || this.game.selectedType !== 'wire') return;
         const connectionType = this.game.hud.wireMode;
@@ -508,6 +508,33 @@ export class BuildingManager {
         // Для перебора портов приёмника можно допилить позже
     }
 
+    _getPreferredSourcePort(building) {
+    const connectionType = this.game.hud.wireMode;
+    const portType = connectionType === 'energy' ? 'energy' : 'item';
+    const ports = this.game.network.getPortPositions(building, portType);
+    if (!ports.length) return 0;
+
+    // Ищем первый свободный выходной порт (out или any) по часовой стрелке, начиная с текущего индекса + 1
+    let start = (this.wireHoveredPortIndex + 1) % ports.length;
+    for (let i = 0; i < ports.length; i++) {
+        const idx = (start + i) % ports.length;
+        const port = ports[idx];
+        const role = this.game.network.getConnectionRole(building, idx, portType);
+        const effectiveType = role || port.type;
+        if ((effectiveType === 'out' || effectiveType === 'any') &&
+            this.game.network.isPortFree(building, idx, connectionType)) {
+            return idx;
+        }
+    }
+
+    // Если не нашли выходной, берём любой свободный
+    for (let i = 0; i < ports.length; i++) {
+        if (this.game.network.isPortFree(building, i, connectionType)) {
+            return i;
+        }
+    }
+    return 0; // fallback
+}
     /** Ищет ближайший порт среди всех зданий и обновляет индексы для wire */
 updateWirePortHover() {
     if (this.game.selectedType !== 'wire') {
@@ -550,7 +577,30 @@ updateWirePortHover() {
         this.wireHoveredPortIndex = -1;
     }
 }
+// Добавить в BuildingManager:
 
+changeMode(reverse = false) {
+    // Меняем режим у призрака или у выделенного здания
+    if (this.ghost.visible) {
+        this._changeBuildingMode(this.ghost, reverse);
+    } else {
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
+        const b = this.getBuildingAt(tile.tx, tile.ty);
+        if (b) this._changeBuildingMode(b, reverse);
+    }
+}
+
+_changeBuildingMode(building, reverse) {
+    const mod = BUILDING_MODULES[building.type];
+    if (!mod) return;
+    // Если у модуля есть метод смены режима (кроме rotateGhost), вызываем его
+    if (mod.changeMode) {
+        mod.changeMode(building, this.game, reverse);
+    }
+    // Для резонатора смена кварка уже есть rotateGhost? Нет, уберём из rotateGhost.
+    // Добавим changeMode в quantum_resonator.js
+}
 /** Рисует подсветку найденного порта (вызывать после drawPorts для всех зданий) */
 drawWirePortHighlight(ctx) {
     const portRadius = 5;

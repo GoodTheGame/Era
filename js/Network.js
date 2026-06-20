@@ -1,6 +1,7 @@
 // js/Network.js
 import { drawParticle } from './ParticleRenderer.js';
 
+const FACTORY_INPUT_LIMIT = 10;
 const STACK_SIZE = 100;
 const NODE_CAPACITY = 1000;
 const MATTER_COLOR = '#8899aa';
@@ -127,7 +128,8 @@ export class Network {
             return false;
         }
         if (this.isFactory(building.type)) {
-            return this.isResourceNeededByFactory(building, quarkType) && this.canFactoryAccept(building, quarkType);
+            const cur = building.inputResources?.[quarkType] || 0;
+            return cur < FACTORY_INPUT_LIMIT;
         }
         const cap = building.type === 'node' ? NODE_CAPACITY : STACK_SIZE;
         const cur = building.resources?.[quarkType] || 0;
@@ -149,18 +151,17 @@ export class Network {
     addConnection(from, to, fromPortIndex = -1, toPortIndex = -1) {
     if (from === to || (from.type === 'star' && to.type === 'star')) return;
     const connectionType = this.game.hud.wireMode;
-    const portType = connectionType === 'energy' ? 'energy' : 'item';
+    if (connectionType === 'matter' && !this.isPathClear(from, to)) return;
 
+    const portType = connectionType === 'energy' ? 'energy' : 'item';
     const fromPorts = this.getPortPositions(from, portType);
     const toPorts = this.getPortPositions(to, portType);
     if (!fromPorts.length || !toPorts.length) return;
 
-    // Проверка по тайловому расстоянию, а не по позиции конкретного порта
     const maxDistTiles = connectionType === 'energy' ? 15 : 5;
     const tileDist = this.rectDistance(this.getRect(from), this.getRect(to));
     if (tileDist > maxDistTiles) return;
 
-    // Если индексы не заданы, ищем автоматически
     if (fromPortIndex < 0) {
         for (const fp of fromPorts) {
             if ((fp.type === 'out' || fp.type === 'any') && this.isPortFree(from, fp.index, connectionType)) {
@@ -178,20 +179,25 @@ export class Network {
         }
     }
     if (fromPortIndex === -1 || toPortIndex === -1) return;
+    if (!this.isPortFree(from, fromPortIndex, connectionType) || !this.isPortFree(to, toPortIndex, connectionType)) return;
 
     const fromPort = fromPorts[fromPortIndex];
     const toPort = toPorts[toPortIndex];
     if (!fromPort || !toPort) return;
 
-    // Определяем роли для any-портов
     let fromRole = fromPort.type;
     let toRole = toPort.type;
     if (fromRole === 'any') fromRole = 'out';
     if (toRole === 'any') toRole = 'in';
 
+    if (fromRole === 'in') return;
+    if (toRole === 'out') return;
+    if (from === to && fromPortIndex === toPortIndex) return;
+
     let resourceType = null;
+    const strict = connectionType === 'matter' && (this.isExtractor(from.type) || this.isFactory(from.type) || from.type === 'star');
     if (connectionType === 'matter') {
-        resourceType = this.getSourceResourceType(from) || null;
+        resourceType = strict ? this.getSourceResourceType(from) : null;
     } else {
         resourceType = 'energy';
     }
@@ -199,9 +205,10 @@ export class Network {
     this.connections.push({
         from, to,
         type: connectionType,
-        resourceType: resourceType,
+        resourceType,
         fromPortIndex, toPortIndex,
-        fromRole, toRole
+        fromRole, toRole,
+        strict
     });
 }
     getRect(building) {
@@ -290,77 +297,90 @@ export class Network {
 }
 
     update(dt) {
-        for (const pack of this.packs) {
-            const speed = pack.quarkType === 'energy' ? 100 * 64 : 1 * 64;
-            pack.distance -= speed * dt;
-            if (pack.distance <= 0) {
-                pack.done = true;
-                const to = pack.to;
-                if (to.type === 'quantum_router') {
-                    this.processRouter(to, pack);
-                    continue;
+    for (const pack of this.packs) {
+        const speed = pack.quarkType === 'energy' ? 100 * 64 : 1 * 64;
+        pack.distance -= speed * dt;
+        if (pack.distance <= 0) {
+            pack.done = true;
+            const to = pack.to;
+            if (to.type === 'quantum_router') {
+                this.processRouter(to, pack);
+                continue;
+            }
+            if (to.type === 'connector_energy') {
+                if (pack.quarkType !== 'energy') continue;
+                const outConns = this.connections.filter(c => c.from === to && c.type === 'energy');
+                for (const conn of outConns) {
+                    const fp = this.getPortPositions(to, 'energy')[conn.fromPortIndex];
+                    const tp = this.getPortPositions(conn.to, 'energy')[conn.toPortIndex];
+                    if (!fp || !tp) continue;
+                    const dist = Math.hypot(tp.worldX - fp.worldX, tp.worldY - fp.worldY);
+                    this.packs.push(new Pack(to, conn.to, pack.quarkType, pack.count, dist, conn.fromPortIndex, conn.toPortIndex));
                 }
-                if (to.type === 'connector_energy') {
-                    if (pack.quarkType !== 'energy') continue;
-                    const outConns = this.connections.filter(c => c.from === to && c.type === 'energy');
-                    for (const conn of outConns) {
-                        const fp = this.getPortPositions(to, 'energy')[conn.fromPortIndex];
-                        const tp = this.getPortPositions(conn.to, 'energy')[conn.toPortIndex];
-                        if (!fp || !tp) continue;
-                        const dist = Math.hypot(tp.worldX - fp.worldX, tp.worldY - fp.worldY);
-                        this.packs.push(new Pack(to, conn.to, pack.quarkType, pack.count, dist, conn.fromPortIndex, conn.toPortIndex));
-                    }
-                    continue;
-                }
-                if (this.canAcceptResource(to, pack.quarkType)) {
-                    if (pack.quarkType === 'energy') {
+                continue;
+            }
+            if (this.canAcceptResource(to, pack.quarkType)) {
+                if (pack.quarkType === 'energy') {
+                    if (!to.resources) to.resources = {};
+                    const cur = to.resources['energy'] || 0;
+                    const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
+                    const add = Math.min(pack.count, cap - cur);
+                    if (add > 0) to.resources['energy'] = cur + add;
+                } else {
+                    if (this.isFactory(to.type)) {
+                        if (!to.inputResources) to.inputResources = {};
+                        const cur = to.inputResources[pack.quarkType] || 0;
+                        const add = Math.min(pack.count, STACK_SIZE - cur);
+                        if (add > 0) to.inputResources[pack.quarkType] = cur + add;
+                    } else if (to.type === 'node') {
                         if (!to.resources) to.resources = {};
-                        const cur = to.resources['energy'] || 0;
-                        const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
-                        const add = Math.min(pack.count, cap - cur);
-                        if (add > 0) to.resources['energy'] = cur + add;
-                    } else {
-                        if (this.isFactory(to.type)) {
+                        const cur = to.resources[pack.quarkType] || 0;
+                        const add = Math.min(pack.count, NODE_CAPACITY - cur);
+                        if (add > 0) to.resources[pack.quarkType] = cur + add;
+                    } else if (to.type === 'star') {
+                        if (pack.quarkType === 'p' || pack.quarkType === 'n') {
                             if (!to.inputResources) to.inputResources = {};
                             const cur = to.inputResources[pack.quarkType] || 0;
                             const add = Math.min(pack.count, STACK_SIZE - cur);
                             if (add > 0) to.inputResources[pack.quarkType] = cur + add;
-                        } else if (to.type === 'node') {
-                            if (!to.resources) to.resources = {};
-                            const cur = to.resources[pack.quarkType] || 0;
-                            const add = Math.min(pack.count, NODE_CAPACITY - cur);
-                            if (add > 0) to.resources[pack.quarkType] = cur + add;
-                        } else if (to.type === 'star') {
-                            if (pack.quarkType === 'p' || pack.quarkType === 'n') {
-                                if (!to.inputResources) to.inputResources = {};
-                                const cur = to.inputResources[pack.quarkType] || 0;
-                                const add = Math.min(pack.count, STACK_SIZE - cur);
-                                if (add > 0) to.inputResources[pack.quarkType] = cur + add;
-                            }
-                        } else {
-                            if (!to.resources) to.resources = {};
-                            const cur = to.resources[pack.quarkType] || 0;
-                            const add = Math.min(pack.count, STACK_SIZE - cur);
-                            if (add > 0) to.resources[pack.quarkType] = cur + add;
                         }
+                    } else {
+                        if (!to.resources) to.resources = {};
+                        const cur = to.resources[pack.quarkType] || 0;
+                        const add = Math.min(pack.count, STACK_SIZE - cur);
+                        if (add > 0) to.resources[pack.quarkType] = cur + add;
                     }
                 }
             }
-        }
-        this.packs = this.packs.filter(p => !p.done);
-
-        this.sendTimer += dt;
-        if (this.sendTimer >= this.sendInterval) {
-            this.sendTimer -= this.sendInterval;
-            const sources = new Set(this.connections.map(c => c.from));
-            for (const src of sources) {
-                if (src.type === 'connector_energy' || src.type === 'quantum_router') continue;
-                this.sendFromBuilding(src);
-            }
+            // Больше не вызываем refreshOutgoingResourceTypes, чтобы линия не сбрасывалась
         }
     }
+    this.packs = this.packs.filter(p => !p.done);
 
+    this.sendTimer += dt;
+    if (this.sendTimer >= this.sendInterval) {
+        this.sendTimer -= this.sendInterval;
+        const sources = new Set(this.connections.map(c => c.from));
+        for (const src of sources) {
+            if (src.type === 'connector_energy' || src.type === 'quantum_router') continue;
+            this.sendFromBuilding(src);
+        }
+    }
+}
+
+    getConnectionRole(building, portIndex, portType) {
+    const conns = this.connections.filter(c => {
+        if (portType === 'item') return c.type === 'matter';
+        else return c.type === 'energy';
+    });
+    for (const conn of conns) {
+        if (conn.from === building && conn.fromPortIndex === portIndex) return conn.fromRole || 'out';
+        if (conn.to === building && conn.toPortIndex === portIndex) return conn.toRole || 'in';
+    }
+    return null;
+}
     sendFromBuilding(source) {
+    const TRANSFER_LIMIT = 10;
     const tileSize = this.game.map.tileSize;
     const conns = this.connections.filter(c => c.from === source && c.type !== 'energy' && c.fromRole !== 'in');
     if (conns.length === 0) return;
@@ -372,42 +392,94 @@ export class Network {
     }
     if (!stock) return;
 
+    const isSourceStrict = this.isExtractor(source.type) || this.isFactory(source.type) || source.type === 'star';
+
     for (const q of Object.keys(stock)) {
         if (source.type === 'star' && q === 'energy') continue;
         let available = stock[q];
         if (available <= 0) continue;
 
         const validConns = conns.filter(conn => {
-            if (!this.canAcceptResource(conn.to, q)) return false;
-            if (conn.resourceType && conn.resourceType !== q) return false;
+            if (isSourceStrict) {
+                if (conn.resourceType && conn.resourceType !== q) return false;
+                conn.resourceType = q;
+            } else {
+                // для нестрогих соединений не фиксируем resourceType
+                // если уже есть другой тип, оставляем без изменений (не перезаписываем)
+            }
             return true;
         });
         if (validConns.length === 0) continue;
 
+        const totalToSend = Math.min(available, TRANSFER_LIMIT);
         const total = validConns.length;
-        const perConn = Math.floor(available / total);
-        let remainder = available % total;
+        const perConn = Math.floor(totalToSend / total);
+        let remainder = totalToSend % total;
         for (let i = 0; i < total; i++) {
             let count = perConn + (i < remainder ? 1 : 0);
             if (count <= 0) continue;
             const conn = validConns[i];
-            if (!conn.resourceType) conn.resourceType = q;
 
             const to = conn.to;
             let cap = STACK_SIZE;
-            if (this.isFactory(to.type)) cap = STACK_SIZE - (to.inputResources?.[q] || 0);
-            else if (to.type === 'star') cap = (q === 'p' || q === 'n') ? STACK_SIZE - (to.inputResources?.[q] || 0) : 0;
+            if (this.isFactory(to.type)) cap = FACTORY_INPUT_LIMIT - (to.inputResources?.[q] || 0);
+            else if (to.type === 'star') cap = (q === 'p' || q === 'n') ? FACTORY_INPUT_LIMIT - (to.inputResources?.[q] || 0) : 0;
             else if (to.type === 'node') cap = NODE_CAPACITY - (to.resources?.[q] || 0);
             else cap = STACK_SIZE - (to.resources?.[q] || 0);
             count = Math.min(count, cap, available);
             if (count <= 0) continue;
             stock[q] -= count;
+            available = stock[q];
 
             const fp = this.getPortPositions(source, 'item')[conn.fromPortIndex];
             const tp = this.getPortPositions(to, 'item')[conn.toPortIndex];
             if (!fp || !tp) continue;
             const dist = Math.hypot(tp.worldX - fp.worldX, tp.worldY - fp.worldY);
             this.packs.push(new Pack(source, to, q, count, dist, conn.fromPortIndex, conn.toPortIndex));
+        }
+
+        if (stock[q] <= 0) {
+            delete stock[q];
+            if (isSourceStrict) {
+                for (const conn of conns) {
+                    if (conn.resourceType === q) {
+                        conn.resourceType = null;
+                    }
+                }
+            }
+        }
+    }
+}
+isPathClear(fromBuilding, toBuilding) {
+    // Только для matter-соединений
+    const fromSize = fromBuilding.getSize();
+    const toSize = toBuilding.getSize();
+    const tileSize = this.game.map.tileSize;
+    const x1 = (fromBuilding.tx + fromSize.w/2) * tileSize;
+    const y1 = (fromBuilding.ty + fromSize.h/2) * tileSize;
+    const x2 = (toBuilding.tx + toSize.w/2) * tileSize;
+    const y2 = (toBuilding.ty + toSize.h/2) * tileSize;
+
+    // Перебираем тайлы, которые пересекает отрезок
+    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) / tileSize;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const wx = x1 + (x2 - x1) * t;
+        const wy = y1 + (y2 - y1) * t;
+        const tile = this.game.map.worldToTile(wx, wy);
+        const building = this.game.buildingManager.getBuildingAt(tile.tx, tile.ty);
+        if (building && building !== fromBuilding && building !== toBuilding &&
+            !['node', 'quantum_router', 'star', 'connector_energy'].includes(building.type)) {
+            return false;
+        }
+    }
+    return true;
+}
+refreshOutgoingResourceTypes(building) {
+    const newType = this.getSourceResourceType(building);
+    for (const conn of this.connections) {
+        if (conn.from === building && conn.type === 'matter') {
+            conn.resourceType = newType;
         }
     }
 }
@@ -418,20 +490,48 @@ export class Network {
         const hud = this.game.hud;
 
         for (const conn of this.connections) {
-            const show = conn.type === 'energy' ? hud.showEnergyConnections : hud.showMatterConnections;
-            if (!show) continue;
-            const fp = this.getPortPositions(conn.from, conn.type === 'energy' ? 'energy' : 'item')[conn.fromPortIndex];
-            const tp = this.getPortPositions(conn.to, conn.type === 'energy' ? 'energy' : 'item')[conn.toPortIndex];
-            if (!fp || !tp) continue;
-            let strokeColor = conn.resourceType ? (QUARK_COLORS[conn.resourceType] || MATTER_COLOR) : MATTER_COLOR;
-            if (conn.type === 'energy') strokeColor = ENERGY_COLOR;
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(fp.worldX, fp.worldY);
-            ctx.lineTo(tp.worldX, tp.worldY);
-            ctx.stroke();
+    const show = conn.type === 'energy' ? hud.showEnergyConnections : hud.showMatterConnections;
+    if (!show) continue;
+    const fp = this.getPortPositions(conn.from, conn.type === 'energy' ? 'energy' : 'item')[conn.fromPortIndex];
+    const tp = this.getPortPositions(conn.to, conn.type === 'energy' ? 'energy' : 'item')[conn.toPortIndex];
+    if (!fp || !tp) continue;
+
+    let strokeColor;
+    if (conn.type === 'energy') {
+        strokeColor = ENERGY_COLOR;
+    } else {
+        // Собираем типы всех пачек, которые сейчас движутся по этому соединению
+        const packTypes = new Set();
+        for (const pack of this.packs) {
+            if ((pack.from === conn.from && pack.to === conn.to && pack.fromPortIndex === conn.fromPortIndex && pack.toPortIndex === conn.toPortIndex) ||
+                (pack.from === conn.to && pack.to === conn.from && pack.fromPortIndex === conn.toPortIndex && pack.toPortIndex === conn.fromPortIndex)) {
+                packTypes.add(pack.quarkType);
+            }
         }
+        if (packTypes.size > 1) {
+            strokeColor = '#555555';   // тёмно-серый для смешанного потока
+        } else if (packTypes.size === 1) {
+            const singleType = packTypes.values().next().value;
+            strokeColor = QUARK_COLORS[singleType] || MATTER_COLOR;
+        } else {
+            // Нет активных пачек
+            if (conn.strict) {
+                // Для строгих источников берём resourceType соединения
+                strokeColor = conn.resourceType ? (QUARK_COLORS[conn.resourceType] || MATTER_COLOR) : MATTER_COLOR;
+            } else {
+                // Для нестрогих (узлы) показываем светло-серый, если ресурс не зафиксирован
+                strokeColor = conn.resourceType ? (QUARK_COLORS[conn.resourceType] || MATTER_COLOR) : MATTER_COLOR;
+            }
+        }
+    }
+
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(fp.worldX, fp.worldY);
+    ctx.lineTo(tp.worldX, tp.worldY);
+    ctx.stroke();
+}
 
         // Подсветка при наведении
         if (!this.game.selectedType && this.game.buildingManager.lastMouseX !== undefined) {
@@ -495,6 +595,8 @@ export class Network {
     const portType = connectionType === 'energy' ? 'energy' : 'item';
     const fromPorts = this.getPortPositions(fromBuilding, portType);
     if (!fromPorts.length) return;
+    
+    
 
     let fromPos = null;
     const manager = this.game.buildingManager;
@@ -534,6 +636,11 @@ export class Network {
         outOfRange = dist > maxDistTiles;
     }
 
+
+    let blocked = false;
+        if (connectionType === 'matter' && targetBuilding) {
+            blocked = !this.isPathClear(fromBuilding, targetBuilding);
+        }
     ctx.strokeStyle = outOfRange ? 'rgba(255, 50, 50, 0.8)' : (connectionType === 'energy' ? ENERGY_COLOR : MATTER_COLOR);
     ctx.lineWidth = 2;
     ctx.setLineDash([8, 4]);

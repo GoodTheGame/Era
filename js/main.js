@@ -7,8 +7,7 @@ import { atlasLoader } from './AtlasLoader.js';
 import { spriteRenderer } from './SpriteRenderer.js';
 import { Network } from './Network.js';
 import { UIManager } from './UIManager.js';
-// import { EnergyGrid } from './EnergyGrid.js';
-
+import { KeybindManager } from './config/keybindManager.js';
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
@@ -26,7 +25,8 @@ class Game {
         this.lastMouseX = 0;
         this.lastMouseY = 0;
         this.globalAnimTime = 0;   // ← глобальный таймер для всех анимаций
-        // this.energyGrid = new EnergyGrid(this);
+        this.showRecipeInfo = false;
+        this.keybindManager = new KeybindManager(this);
 
 
         this._spawnStar();

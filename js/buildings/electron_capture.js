@@ -6,8 +6,9 @@ export const electronCaptureBuilding = {
     size: { w: 2, h: 1 },
     recipe: { inputs: { p: 1, e: 1 }, output: 'H', time: 1.0 },
 
-    rotateGhost(ghost, game, reverse) {},
-
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    },
     update(building, game, dt) {
         if (!building.recipe) building.recipe = 'hydrogen';
         if (!building.inputResources) building.inputResources = {};

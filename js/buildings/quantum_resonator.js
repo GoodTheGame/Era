@@ -9,13 +9,20 @@ export const quantumResonatorBuilding = {
     type: 'quantum_resonator',
     size: { w: 3, h: 3 },
 
-    rotateGhost(ghost, game, reverse = false) {
-        if (ghost.quarkType === undefined) ghost.quarkType = 0;
-        ghost.quarkType = reverse
-            ? (ghost.quarkType - 1 + 6) % 6
-            : (ghost.quarkType + 1) % 6;
-    },
-
+    rotateGhost(ghost, game, reverse) {
+    ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+},
+    changeMode(ghost, game, reverse) {
+    if (ghost.quarkType === undefined) ghost.quarkType = 0;
+    ghost.quarkType = reverse
+        ? (ghost.quarkType - 1 + 6) % 6
+        : (ghost.quarkType + 1) % 6;
+    // Сбрасываем накопленные ресурсы, чтобы старые кварки не ушли в сеть
+    ghost.resources = {};
+    if (game && game.network) {
+        game.network.refreshOutgoingResourceTypes(ghost);
+    }
+},
     update(building, game, dt) {
         if (building.quarkType === undefined) building.quarkType = 0;
         if (!building.resources) building.resources = {};

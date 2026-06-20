@@ -6,8 +6,9 @@ export const fusionPressBuilding = {
     size: { w: 2, h: 2 },
     recipe: { inputs: { H: 2 }, output: 'He', time: 2.0 },
 
-    rotateGhost(ghost, game, reverse) {},
-
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    },
     update(building, game, dt) {
         if (!building.recipe) building.recipe = 'fusion';
         if (!building.inputResources) building.inputResources = {};

@@ -16,8 +16,9 @@ export const energyBufferBuilding = {
         ];
     },
 
-    rotateGhost(ghost, reverse = false) {},
-
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    },
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize;
         const y = b.ty * tileSize;

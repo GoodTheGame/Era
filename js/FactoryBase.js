@@ -30,14 +30,22 @@ export function createFactory(config) {
             }
         },
 
-        rotateGhost(ghost) {
+                rotateGhost(ghost, game, reverse) {
+            // Если здание предоставило свой rotateGhost (например, синтезатор для поворота)
+            if (config.rotateGhost) {
+                config.rotateGhost.call(this, ghost, game, reverse);
+                return;
+            }
+            // Стандартное переключение рецепта (для фабрик, у которых нет кастомного rotateGhost)
             if (!ghost.recipe) {
                 ghost.recipe = Object.keys(config.recipes)[0];
                 return;
             }
             const keys = Object.keys(config.recipes);
             const idx = keys.indexOf(ghost.recipe);
-            const nextIdx = (idx + 1) % keys.length;
+            const nextIdx = reverse
+                ? (idx - 1 + keys.length) % keys.length
+                : (idx + 1) % keys.length;
             ghost.recipe = keys[nextIdx];
             if (config.rotateCallback) config.rotateCallback(ghost);
         },
