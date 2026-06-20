@@ -1,40 +1,65 @@
+// js/buildings/node.js
 import { drawParticle } from '../ParticleRenderer.js';
 
 export const nodeBuilding = {
     type: 'node',
-    size: { w: 2, h: 2 },
+    size: { w: 1, h: 1 },
+
+    getItemPorts() {
+        return [
+            { type: 'any', x: 0.5, y: 0 },   // верх
+            { type: 'any', x: 1, y: 0.5 },   // право
+            { type: 'any', x: 0.5, y: 1 },   // низ
+            { type: 'any', x: 0, y: 0.5 }    // лево
+        ];
+    },
+    getEnergyPorts() {
+        return [];
+    },
 
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize;
         const y = b.ty * tileSize;
-        const w = 2 * tileSize;
-        const h = 2 * tileSize;
+        const w = tileSize;
+        const h = tileSize;
         const cx = x + w / 2;
         const cy = y + h / 2;
         const radius = w * 0.375;
         const animTimer = game.globalAnimTime || 0;
 
+        // Круг
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fillStyle = '#336699';
         ctx.fill();
         ctx.strokeStyle = '#6699cc';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
         if (!isGhost && b.resources) {
             const keys = Object.keys(b.resources);
-            const iconSize = tileSize * 0.2;
-            const startX = x + w * 0.15;
-            const startY = y + h * 0.2;
+            const cols = Math.min(keys.length, 3);
+            const rows = Math.ceil(keys.length / 3);
+            const padding = 2;
+            // Иконки внутри круга: ограничиваем размер, чтобы вписаться в радиус
+            const maxIconSize = (radius * 2 - padding * (cols + 1)) / cols;
+            const startX = cx - (cols * (maxIconSize + padding) - padding) / 2;
+            const startY = cy - (rows * (maxIconSize + padding) - padding) / 2;
+
             keys.forEach((key, i) => {
-                const rx = startX + (i % 3) * w * 0.3 + iconSize / 2;
-                const ry = startY + Math.floor(i / 3) * h * 0.35 + iconSize / 2;
-                drawParticle(ctx, rx, ry, iconSize / 2, key, animTimer);
-                ctx.fillStyle = '#fff';
-                ctx.font = `${iconSize * 0.4}px "Segoe UI"`;
-                ctx.textAlign = 'center';
-                ctx.fillText(b.resources[key], rx, ry + iconSize / 2 + 2);
+                const col = i % 3;
+                const row = Math.floor(i / 3);
+                const ix = startX + col * (maxIconSize + padding);
+                const iy = startY + row * (maxIconSize + padding);
+
+                // Иконка ресурса
+                drawParticle(ctx, ix + maxIconSize / 2, iy + maxIconSize / 2, maxIconSize * 0.35, key, animTimer);
+
+                // Количество (в правом нижнем углу иконки)
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${maxIconSize * 0.4}px "Segoe UI"`;
+                ctx.textAlign = 'right';
+                ctx.fillText(b.resources[key], ix + maxIconSize - 1, iy + maxIconSize - 1);
             });
         }
     }

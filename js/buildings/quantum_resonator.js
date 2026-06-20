@@ -1,3 +1,4 @@
+// js/buildings/quantum_resonator.js
 import { drawParticle } from '../ParticleRenderer.js';
 
 const QUARK_COLORS = {
@@ -29,6 +30,17 @@ export const quantumResonatorBuilding = {
             const cur = building.resources[quark] || 0;
             if (cur < 500) building.resources[quark] = cur + 1;
         }
+    },
+
+    getItemPorts() {
+        return [
+            { type: 'out', x: 0.5, y: 0 }   // верхняя граница по центру
+        ];
+    },
+    getEnergyPorts() {
+        return [
+            { type: 'any', x: 0.5, y: 0.5 }  // центр
+        ];
     },
 
     render(ctx, b, tileSize, isGhost, game) {

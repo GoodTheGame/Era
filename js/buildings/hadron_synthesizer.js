@@ -1,3 +1,4 @@
+// js/buildings/hadron_synthesizer.js
 import { createFactory } from '../FactoryBase.js';
 
 const QUARK_COLORS = {
@@ -14,10 +15,19 @@ export const hadronSynthesizerBuilding = createFactory({
     recipeColors: { proton: '#ffaa00', neutron: '#aa00ff' },
     inputColors: QUARK_COLORS,
 
-    rotateCallback(ghost, reverse) {
-        // rotateCallback вызывается при переключении рецепта (R)
-        // ghost.recipe уже изменён в createFactory
+    getItemPorts() {
+        return [
+            { type: 'in', x: 0, y: 0.25 },
+            { type: 'in', x: 0, y: 0.5 },
+            { type: 'in', x: 0, y: 0.75 },
+            { type: 'out', x: 1, y: 0.5 }
+        ];
     },
+    getEnergyPorts() {
+        return [];
+    },
+
+    rotateCallback(ghost, reverse) {},
 
     rotateGhost(ghost, game, reverse = false) {
         if (!ghost.recipe) ghost.recipe = 'proton';

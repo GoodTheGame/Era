@@ -6,7 +6,24 @@ export function createFactory(config) {
         type: config.type,
         size: config.size,
 
-        // Устанавливает первый рецепт, если он ещё не задан
+        // Порты по умолчанию, если не заданы в config
+        getItemPorts() {
+            if (config.getItemPorts) {
+                return config.getItemPorts.call(this);
+            }
+            return [
+                { type: 'in',  x: 0, y: 0.5 },
+                { type: 'out', x: 1, y: 0.5 }
+            ];
+        },
+
+        getEnergyPorts() {
+            if (config.getEnergyPorts) {
+                return config.getEnergyPorts.call(this);
+            }
+            return [];   // по умолчанию энергопортов нет
+        },
+
         initGhost(ghost) {
             if (!ghost.recipe) {
                 ghost.recipe = Object.keys(config.recipes)[0];
@@ -14,7 +31,6 @@ export function createFactory(config) {
         },
 
         rotateGhost(ghost) {
-            // Если рецепта нет – сначала инициализируем
             if (!ghost.recipe) {
                 ghost.recipe = Object.keys(config.recipes)[0];
                 return;
@@ -27,7 +43,6 @@ export function createFactory(config) {
         },
 
         update(building, game, dt) {
-            // **Гарантированно задаём рецепт, если его нет**
             if (!building.recipe) building.recipe = Object.keys(config.recipes)[0];
             const recipe = config.recipes[building.recipe];
             if (!recipe) return;
@@ -74,6 +89,7 @@ export function createFactory(config) {
             building.animTimer += dt;
         },
 
+        // Рендер без дополнительного параметра config (используем замыкание)
         render(ctx, b, tileSize, isGhost, game) {
             if (config.render) {
                 config.render(ctx, b, tileSize, isGhost, game, config);

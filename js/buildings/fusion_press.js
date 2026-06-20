@@ -1,3 +1,4 @@
+// js/buildings/fusion_press.js
 import { drawParticle } from '../ParticleRenderer.js';
 
 export const fusionPressBuilding = {
@@ -29,6 +30,18 @@ export const fusionPressBuilding = {
         }
     },
 
+    getItemPorts() {
+        return [
+            { type: 'in', x: 0, y: 0.5 },
+            { type: 'out', x: 1, y: 0.5 }
+        ];
+    },
+    getEnergyPorts() {
+        return [
+            { type: 'out', x: 0.5, y: 0.5 }  // энерговыход
+        ];
+    },
+
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
@@ -38,7 +51,6 @@ export const fusionPressBuilding = {
         const animTimer = game.globalAnimTime || 0;
         const zoom = game.camera.zoom;
 
-        // Упрощённый режим
         if (zoom < 0.5 && !isGhost) {
             ctx.fillStyle = '#ff8800';
             ctx.fillRect(x + w * 0.25, y + h * 0.25, w * 0.5, h * 0.5);
@@ -54,7 +66,6 @@ export const fusionPressBuilding = {
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
 
-        // Призрак – анимированная версия
         if (isGhost) {
             const dist = maxR;
             const angle = animTimer * 2;
@@ -63,11 +74,9 @@ export const fusionPressBuilding = {
             return;
         }
 
-        // Если продукт готов – только гелий
         if (hasOutput && progress === 0) {
             drawParticle(ctx, cx, cy, maxR * 0.8, 'He', animTimer);
         } else {
-            // Ингредиенты
             const dist = maxR * (1 - progress);
             const angle = animTimer * 2;
             drawParticle(ctx, cx + Math.cos(angle) * dist, cy + Math.sin(angle) * dist, maxR * 0.6, 'H', animTimer);
@@ -91,7 +100,6 @@ export const fusionPressBuilding = {
             }
         }
 
-        // Энергия
         const eCount = b.outputResources?.['energy'] || 0;
         if (eCount > 0) {
             ctx.fillStyle = '#ff8800';
@@ -100,7 +108,6 @@ export const fusionPressBuilding = {
             ctx.fillText(`⚡${eCount}`, x + w - 4, y + h - 10);
         }
 
-        // Входные ресурсы
         if (b.inputResources) {
             const keys = Object.keys(this.recipe.inputs);
             const isize = tileSize * 0.15;

@@ -6,8 +6,8 @@ export class HUD {
         this.buttons = {};
         this.slot2Main = 'node';
         this.slot2Alt = 'energy_buffer';
-        this.slot3Main = 'connector';
-        this.slot3Alt = 'connector_energy';
+        this.slot3Main = 'quantum_router';      // маршрутизатор по умолчанию
+        this.slot3Alt = 'connector_energy';    // энергоконнектор
         this.wireMode = 'matter';
         this.showMatterConnections = true;
         this.showEnergyConnections = true;
@@ -26,7 +26,7 @@ export class HUD {
         const items = [
             { key: '1', type: 'wire',          label: '1<br>Связь' },
             { key: '2', type: this.slot2Main,  label: '2<br>Узел' },
-            { key: '3', type: this.slot3Main,  label: '3<br>Коннект' },
+            { key: '3', type: this.slot3Main,  label: '3<br>Маршрут' }, // новая подпись
             { key: '4', type: 'quantum_resonator', label: '4<br>Резонат' },
             { key: '5', type: 'gluon_extractor',   label: '5<br>Глюоны' },
             { key: '6', type: 'lepton_extractor',  label: '6<br>Лептон' },
@@ -198,7 +198,7 @@ export class HUD {
     }
 
     _initSlot3Popup() {
-        const btn3 = this.buttons['connector'];
+        const btn3 = this.buttons['quantum_router']; // новая кнопка
         const wrapper = document.createElement('div');
         wrapper.style.position = 'relative';
         wrapper.style.display = 'inline-block';
@@ -207,7 +207,7 @@ export class HUD {
 
         const popup = document.createElement('div');
         popup.className = 'slot3-popup';
-        popup.innerHTML = '⚡';
+        popup.innerHTML = '⚡'; // значок энергоконнектора
         popup.style.position = 'absolute';
         popup.style.bottom = '100%';
         popup.style.left = '50%';
@@ -220,7 +220,7 @@ export class HUD {
         popup.style.cursor = 'pointer';
         popup.style.display = 'none';
         popup.style.zIndex = '1000';
-        popup.title = 'Переключить на Коннектор энергии';
+        popup.title = 'Переключить на Энергоконнектор';
         wrapper.appendChild(popup);
 
         let hideTimer = null;
@@ -248,6 +248,11 @@ export class HUD {
         this.slot2Main = this.slot2Alt;
         this.slot2Alt = tmp;
         this._updateSlot2Button();
+        const popup = document.querySelector('.slot2-popup');
+        if (popup) {
+            popup.innerHTML = this.slot2Alt === 'energy_buffer' ? '⚡' : '⏺';
+            popup.title = `Переключить на ${this.slot2Alt === 'node' ? 'Узел' : 'Буфер энергии'}`;
+        }
         const btn2 = document.querySelector('#toolbar button[data-key="2"]');
         if (btn2) {
             btn2.classList.toggle('energy-mode', this.slot2Main === 'energy_buffer');
@@ -266,6 +271,11 @@ export class HUD {
         this.slot3Main = this.slot3Alt;
         this.slot3Alt = tmp;
         this._updateSlot3Button();
+        const popup = document.querySelector('.slot3-popup');
+        if (popup) {
+            popup.innerHTML = this.slot3Alt === 'connector_energy' ? '⚡' : '🔹';
+            popup.title = `Переключить на ${this.slot3Alt === 'connector_energy' ? 'Маршрутизатор' : 'Энергоконнектор'}`;
+        }
         const btn3 = document.querySelector('#toolbar button[data-key="3"]');
         if (btn3) {
             btn3.classList.toggle('energy-mode', this.slot3Main === 'connector_energy');
@@ -291,7 +301,7 @@ export class HUD {
         const btn3 = document.querySelector('#toolbar button[data-key="3"]');
         if (btn3) {
             btn3.dataset.type = this.slot3Main;
-            btn3.innerHTML = `3<br>${this.slot3Main === 'connector' ? 'Коннект' : 'ЭнергоКон'}`;
+            btn3.innerHTML = `3<br>${this.slot3Main === 'quantum_router' ? 'Маршрут' : 'ЭнергоКон'}`;
         }
     }
 
@@ -332,6 +342,10 @@ export class HUD {
             else if (key === '8') this.selectBuilding('electron_capture');
             else if (key === '9') this.selectBuilding('fusion_press');
             else if (key === 'r' || key === 'R' || key === 'к' || key === 'К') {
+                if (this.game.selectedType === 'wire') {
+                    this.game.buildingManager.rotateWirePort();
+                    return;
+                }
                 const reverse = e.shiftKey;
                 if (this.game.selectedType) {
                     this.game.buildingManager.rotateGhost(reverse);
@@ -357,9 +371,18 @@ export class HUD {
     }
 
     updateActiveButton() {
-        Object.values(this.buttons).forEach(btn => btn.classList.remove('active'));
-        if (this.slot2Active) { const b = this.buttons[this.slot2Main]; if (b) b.classList.add('active'); }
-        if (this.slot3Active) { const b = this.buttons[this.slot3Main]; if (b) b.classList.add('active'); }
+        Object.values(this.buttons).forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        if (this.slot2Active) {
+            const b = this.buttons[this.slot2Main];
+            if (b) b.classList.add('active');
+        }
+        if (this.slot3Active) {
+            const b = this.buttons[this.slot3Main];
+            if (b) b.classList.add('active');
+        }
         if (this.game.selectedType && this.buttons[this.game.selectedType]) {
             this.buttons[this.game.selectedType].classList.add('active');
         }

@@ -1,3 +1,4 @@
+// js/buildings/electron_capture.js
 import { drawParticle } from '../ParticleRenderer.js';
 
 export const electronCaptureBuilding = {
@@ -30,6 +31,17 @@ export const electronCaptureBuilding = {
         }
     },
 
+    getItemPorts() {
+        return [
+            { type: 'in', x: 0, y: 0.3 },
+            { type: 'in', x: 0, y: 0.7 },
+            { type: 'out', x: 1, y: 0.5 }
+        ];
+    },
+    getEnergyPorts() {
+        return [];
+    },
+
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
@@ -39,7 +51,6 @@ export const electronCaptureBuilding = {
         const animTimer = game.globalAnimTime || 0;
         const zoom = game.camera.zoom;
 
-        // Упрощённый режим (отдаление)
         if (zoom < 0.5 && !isGhost) {
             ctx.fillStyle = '#22aaff';
             ctx.fillRect(x + w * 0.25, y + h * 0.25, w * 0.5, h * 0.5);
@@ -55,7 +66,6 @@ export const electronCaptureBuilding = {
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
 
-        // Если призрак — показываем анимированную версию, как после постройки
         if (isGhost) {
             drawParticle(ctx, cx, cy, maxR * 0.6, 'p', animTimer);
             const eAngle = animTimer * 3;
@@ -64,18 +74,15 @@ export const electronCaptureBuilding = {
             return;
         }
 
-        // Если есть готовый продукт – показываем только его
         if (hasOutput && progress === 0) {
             drawParticle(ctx, cx, cy, maxR * 0.8, 'H', animTimer);
         } else {
-            // Ингредиенты
             drawParticle(ctx, cx, cy, maxR * 0.6, 'p', animTimer);
             if (progress < 0.8) {
                 const eAngle = animTimer * 3;
                 const orbitR = maxR * 1.2;
                 drawParticle(ctx, cx + Math.cos(eAngle) * orbitR, cy + Math.sin(eAngle) * orbitR, maxR * 0.4, 'e', animTimer);
             }
-            // Прогресс
             if (progress > 0) {
                 const alpha = progress;
                 ctx.globalAlpha = alpha;
@@ -89,7 +96,6 @@ export const electronCaptureBuilding = {
             }
         }
 
-        // Входные ресурсы (всегда снизу)
         if (b.inputResources) {
             const keys = Object.keys(this.recipe.inputs);
             const isize = tileSize * 0.15;

@@ -27,7 +27,6 @@ export const starBuilding = {
                 building.shutdownTimer = 0;
             }
         } else {
-            // Потребление строго 1 энергии в секунду (целыми шагами)
             while (building.timer >= 1.0) {
                 building.timer -= 1.0;
                 const current = building.resources['energy'] || 0;
@@ -46,6 +45,18 @@ export const starBuilding = {
         }
     },
 
+    getItemPorts() {
+        return [
+            { type: 'in', x: 0, y: 0.5 },
+            { type: 'in', x: 1, y: 0.5 }
+        ];
+    },
+    getEnergyPorts() {
+        return [
+            { type: 'in', x: 0.5, y: 0.5 }
+        ];
+    },
+
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize;
         const y = b.ty * tileSize;
@@ -59,7 +70,6 @@ export const starBuilding = {
         const zoom = game.camera.zoom;
         const shutdownProgress = b.shutdownTimer ? Math.min(b.shutdownTimer / 10, 1) : 0;
 
-        // === Упрощённый режим (отдаление) ===
         if (zoom < 0.5 && !isGhost) {
             const pulse = isActive
                 ? (Math.sin(phase * 1.5) * 0.2 + 0.6) * (1 - shutdownProgress * 0.8)
@@ -70,7 +80,6 @@ export const starBuilding = {
             ctx.beginPath();
             ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
             ctx.fill();
-            // Ресурсы в упрощённом режиме
             if (!isActive) {
                 const pCount = b.inputResources?.['p'] || 0;
                 const nCount = b.inputResources?.['n'] || 0;
@@ -83,7 +92,6 @@ export const starBuilding = {
             return;
         }
 
-        // === Основная графика ===
         const bgGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 2);
         bgGradient.addColorStop(0, '#0a0a1a');
         bgGradient.addColorStop(1, '#050510');
@@ -91,11 +99,9 @@ export const starBuilding = {
         ctx.fillRect(x, y, w, h);
 
         if (isActive) {
-            // Угасание: альфа снижается с 1 до 0.2 за 10 секунд
             const alpha = 1 - shutdownProgress * 0.8;
             ctx.globalAlpha = alpha;
 
-            // Ядро (уменьшаем радиус и яркость при угасании)
             const coreRadius = maxR * (0.9 - shutdownProgress * 0.4);
             const coreGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreRadius);
             coreGradient.addColorStop(0, '#ffffff');
@@ -107,7 +113,6 @@ export const starBuilding = {
             ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2);
             ctx.fill();
 
-            // Протуберанцы (исчезают при угасании)
             if (shutdownProgress < 0.8) {
                 for (let j = 0; j < 5; j++) {
                     const angle = phase * 2 + (j * Math.PI * 2) / 5;
@@ -128,7 +133,6 @@ export const starBuilding = {
                 }
             }
 
-            // Кольца (замедляются и тускнеют)
             if (shutdownProgress < 1) {
                 for (let k = 0; k < 16; k++) {
                     const angle = (k / 16) * Math.PI * 2 + phase * (0.3 - shutdownProgress * 0.25);
@@ -147,7 +151,6 @@ export const starBuilding = {
             }
             ctx.globalAlpha = 1;
         } else {
-            // Неактивное ядро
             const pulse = Math.sin(phase * 1.5) * 0.05 + 0.15;
             const outerGlow = ctx.createRadialGradient(cx, cy, maxR * 0.6, cx, cy, maxR * 1.3);
             outerGlow.addColorStop(0, `rgba(255, 150, 50, ${pulse * 0.6})`);
@@ -175,7 +178,6 @@ export const starBuilding = {
             ctx.fill();
         }
 
-        // === Ресурсы всегда ===
         if (!isGhost) {
             const pCount = b.inputResources?.['p'] || 0;
             const nCount = b.inputResources?.['n'] || 0;

@@ -1,3 +1,4 @@
+// js/buildings/lepton_extractor.js
 import { drawParticle } from '../ParticleRenderer.js';
 
 export const leptonExtractorBuilding = {
@@ -16,6 +17,14 @@ export const leptonExtractorBuilding = {
             if (cur < 500) building.resources[quark] = cur + 1;
         }
     },
+    getItemPorts() {
+        return [
+            { type: 'out', x: 1, y: 0.5 }
+        ];
+    },
+    getEnergyPorts() {
+        return [];
+    },
     render(ctx, b, tileSize, isGhost, game) {
         const x = b.tx * tileSize, y = b.ty * tileSize, s = tileSize;
         const cx = x + s/2, cy = y + s/2;
@@ -26,7 +35,7 @@ export const leptonExtractorBuilding = {
             ctx.fillRect(x + s*0.25, y + s*0.25, s*0.5, s*0.5);
             const count = b.resources?.['e'] || 0;
             if (count > 0) {
-                ctx.fillStyle = '#fff';   // ← белый
+                ctx.fillStyle = '#fff';
                 ctx.font = `${s*0.3}px "Segoe UI"`;
                 ctx.textAlign = 'center';
                 ctx.fillText(count, cx, y + s - 2);
@@ -59,7 +68,7 @@ export const leptonExtractorBuilding = {
         }
         if (!isGhost) {
             const count = b.resources['e'] || 0;
-            ctx.fillStyle = '#fff';   // ← белый
+            ctx.fillStyle = '#fff';
             ctx.font = `${s*0.2}px "Segoe UI"`;
             ctx.textAlign = 'center';
             ctx.fillText(count, cx, y + s - 2);
