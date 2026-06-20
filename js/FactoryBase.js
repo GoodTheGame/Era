@@ -5,8 +5,8 @@ export function createFactory(config) {
     const factory = {
         type: config.type,
         size: config.size,
+        _factoryConfig: config,   // чтобы здание видело рецепты
 
-        // Порты по умолчанию, если не заданы в config
         getItemPorts() {
             if (config.getItemPorts) {
                 return config.getItemPorts.call(this);
@@ -21,7 +21,7 @@ export function createFactory(config) {
             if (config.getEnergyPorts) {
                 return config.getEnergyPorts.call(this);
             }
-            return [];   // по умолчанию энергопортов нет
+            return [];
         },
 
         initGhost(ghost) {
@@ -30,13 +30,11 @@ export function createFactory(config) {
             }
         },
 
-                rotateGhost(ghost, game, reverse) {
-            // Если здание предоставило свой rotateGhost (например, синтезатор для поворота)
+        rotateGhost(ghost, game, reverse) {
             if (config.rotateGhost) {
                 config.rotateGhost.call(this, ghost, game, reverse);
                 return;
             }
-            // Стандартное переключение рецепта (для фабрик, у которых нет кастомного rotateGhost)
             if (!ghost.recipe) {
                 ghost.recipe = Object.keys(config.recipes)[0];
                 return;
@@ -48,6 +46,30 @@ export function createFactory(config) {
                 : (idx + 1) % keys.length;
             ghost.recipe = keys[nextIdx];
             if (config.rotateCallback) config.rotateCallback(ghost);
+        },
+
+        changeMode(ghost, game, reverse) {
+            if (!ghost.recipe) ghost.recipe = Object.keys(config.recipes)[0];
+            const keys = Object.keys(config.recipes);
+            let idx = keys.indexOf(ghost.recipe);
+            idx = reverse ? (idx - 1 + keys.length) % keys.length : (idx + 1) % keys.length;
+            const oldRecipe = ghost.recipe;
+            ghost.recipe = keys[idx];
+
+            ghost.outputResources = {};
+            if (ghost.inputResources) {
+                const newInputs = config.recipes[ghost.recipe].inputs;
+                const newInputKeys = Object.keys(newInputs);
+                for (const key of Object.keys(ghost.inputResources)) {
+                    if (!newInputKeys.includes(key)) {
+                        delete ghost.inputResources[key];
+                    }
+                }
+            }
+            ghost.craftTimer = 0;
+            if (game && game.network) {
+                game.network.refreshOutgoingResourceTypes(ghost);
+            }
         },
 
         update(building, game, dt) {
@@ -97,10 +119,9 @@ export function createFactory(config) {
             building.animTimer += dt;
         },
 
-        // Рендер без дополнительного параметра config (используем замыкание)
         render(ctx, b, tileSize, isGhost, game) {
             if (config.render) {
-                config.render(ctx, b, tileSize, isGhost, game, config);
+                config.render.call(this, ctx, b, tileSize, isGhost, game);
             } else {
                 const x = b.tx * tileSize, y = b.ty * tileSize;
                 const size = b.getSize();
@@ -110,23 +131,6 @@ export function createFactory(config) {
                 ctx.strokeStyle = '#444';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x+1, y+1, w-2, h-2);
-            }
-
-            // Отображение входных ресурсов
-            if (!isGhost && b.inputResources && config.recipes[b.recipe]) {
-                const inputs = config.recipes[b.recipe].inputs;
-                const keys = Object.keys(inputs);
-                const iconSize = tileSize * 0.15;
-                const startX = b.tx * tileSize + 2;
-                const startY = b.ty * tileSize + tileSize * b.getSize().h - 12;
-                keys.forEach((key, i) => {
-                    const rx = startX + i * 20;
-                    ctx.fillStyle = config.inputColors?.[key] || '#fff';
-                    ctx.fillRect(rx, startY, iconSize, iconSize);
-                    ctx.fillStyle = '#000';
-                    ctx.font = `${iconSize * 0.7}px "Segoe UI"`;
-                    ctx.fillText((b.inputResources[key] || 0).toString(), rx + 2, startY + iconSize - 2);
-                });
             }
         }
     };

@@ -7,10 +7,10 @@ const NODE_CAPACITY = 1000;
 const MATTER_COLOR = '#8899aa';
 const ENERGY_COLOR = '#00ffff';
 
-const QUARK_COLORS = {
+export const QUARK_COLORS = {
     u: '#e74c3c', d: '#3498db', c: '#2ecc71', s: '#f1c40f', t: '#9b59b6', b: '#e67e22',
     g: '#ff44cc', e: '#ffff00', p: '#ffaa00', n: '#aa00ff', H: '#22aaff',
-    He: '#ffdd44', energy: '#00ffff'
+    He: '#ffdd44', energy: '#00ffff', u: '#e74c3c',
 };
 
 class Pack {
@@ -184,6 +184,22 @@ export class Network {
     const fromPort = fromPorts[fromPortIndex];
     const toPort = toPorts[toPortIndex];
     if (!fromPort || !toPort) return;
+
+    // === Проверка совместимости ресурсов портов ===
+    if (connectionType === 'matter') {
+        // Если выходной порт жёстко привязан к одному ресурсу, а входной порт принимает конкретные ресурсы,
+        // проверяем пересечение.
+        const sourceRes = this.getSourceResourceType(from);
+        if (fromPort.produces && toPort.accepts && toPort.accepts.length > 0) {
+            if (!toPort.accepts.includes(fromPort.produces)) {
+                return; // несовместимы
+            }
+        } else if (fromPort.produces && toPort.accepts) {
+            if (!toPort.accepts.includes(fromPort.produces)) return;
+        } else if (sourceRes && toPort.accepts && toPort.accepts.length > 0) {
+            if (!toPort.accepts.includes(sourceRes)) return;
+        }
+    }
 
     let fromRole = fromPort.type;
     let toRole = toPort.type;
@@ -405,7 +421,11 @@ export class Network {
                 conn.resourceType = q;
             } else {
                 // для нестрогих соединений не фиксируем resourceType
-                // если уже есть другой тип, оставляем без изменений (не перезаписываем)
+                if (conn.resourceType && conn.resourceType !== q) {
+                    // оставляем старый, линия будет тёмно-серой
+                } else {
+                    conn.resourceType = q;
+                }
             }
             return true;
         });
@@ -419,6 +439,12 @@ export class Network {
             let count = perConn + (i < remainder ? 1 : 0);
             if (count <= 0) continue;
             const conn = validConns[i];
+
+            // Проверка, разрешён ли ресурс для входного порта приёмника
+            const toPort = this.getPortPositions(conn.to, 'item')[conn.toPortIndex];
+            if (toPort && toPort.accepts && !toPort.accepts.includes(q)) {
+                continue; // пропускаем этот ресурс, если порт его не принимает
+            }
 
             const to = conn.to;
             let cap = STACK_SIZE;

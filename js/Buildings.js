@@ -11,7 +11,7 @@ import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { fusionPressBuilding } from './buildings/fusion_press.js';
 import { energyBufferBuilding } from './buildings/energy_buffer.js';
 import { starBuilding } from './buildings/star.js';
-
+import { QUARK_COLORS } from './Network.js';
 const BUILDING_MODULES = {
     'quantum_resonator': quantumResonatorBuilding,
     'gluon_extractor': gluonExtractorBuilding,
@@ -43,6 +43,8 @@ export class Building {
         else if (type === 'quantum_resonator') this.quarkType = 0;
 
         const mod = BUILDING_MODULES[type];
+        // Копируем _factoryConfig из модуля в здание, чтобы методы портов имели доступ к рецептам
+        this._factoryConfig = mod ? mod._factoryConfig : null;
         if (mod) {
             if (mod.initGhost) {
                 mod.initGhost(this);
@@ -74,9 +76,13 @@ export class Building {
         ];
     }
 
-    /** Обновляет методы портов из модуля при изменении типа здания */
+        /** Обновляет методы портов из модуля при изменении типа здания */
     _refreshPorts() {
         const mod = BUILDING_MODULES[this.type];
+        // Если у здания ещё нет _factoryConfig, берём его из модуля
+        if (!this._factoryConfig && mod && mod._factoryConfig) {
+            this._factoryConfig = mod._factoryConfig;
+        }
         if (mod) {
             if (mod.getItemPorts) {
                 this.getItemPorts = () => mod.getItemPorts.call(this);
@@ -454,25 +460,51 @@ export class BuildingManager {
     };
 
     for (let i = 0; i < itemPorts.length; i++) {
-        const port = itemPorts[i];
-        const px = port.worldX, py = port.worldY;
-        const role = getPortRole(building, port.index, 'item') || port.type;
+    const port = itemPorts[i];
+    const px = port.worldX, py = port.worldY;
+    const role = getPortRole(building, port.index, 'item') || port.type;
 
-        let strokeColor;
-        if (role === 'in') strokeColor = '#00ff00';
-        else if (role === 'out') strokeColor = '#0088ff';
-        else strokeColor = '#888888';
+    let strokeColor;
+    if (role === 'in') strokeColor = '#00ff00';
+    else if (role === 'out') strokeColor = '#0088ff';
+    else strokeColor = '#888888';
 
+    ctx.beginPath();
+    ctx.arc(px, py, portRadius, 0, Math.PI * 2);
+    ctx.fillStyle = '#aaaaaa';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(px, py, portRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Значок ресурса, если есть accepts или produces
+    if (port.accepts && port.accepts.length === 1) {
+        // Одиночный ресурс на входе
+        const res = port.accepts[0];
+        const color = QUARK_COLORS[res] || '#ffffff';  // QUARK_COLORS надо передать или определить локально
         ctx.beginPath();
-        ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#aaaaaa';
+        ctx.arc(px - portRadius - 2, py, 3, 0, Math.PI*2);
+        ctx.fillStyle = color;
         ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 4px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.fillText(res, px - portRadius - 2, py + 1.5);
+    } else if (port.produces) {
+        const res = port.produces;
+        const color = QUARK_COLORS[res] || '#ffffff';
         ctx.beginPath();
-        ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
+        ctx.arc(px + portRadius + 2, py, 3, 0, Math.PI*2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 4px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.fillText(res, px + portRadius + 2, py + 1.5);
     }
+}
 
     for (let i = 0; i < energyPorts.length; i++) {
         const port = energyPorts[i];

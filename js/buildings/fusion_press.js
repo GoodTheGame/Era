@@ -33,8 +33,8 @@ export const fusionPressBuilding = {
 
     getItemPorts() {
         return [
-            { type: 'in', x: 0, y: 0.5 },
-            { type: 'out', x: 1, y: 0.5 }
+            { type: 'in', x: 0, y: 0.5, accepts: ['H'] },
+            { type: 'out', x: 1, y: 0.5, produces: 'He' }
         ];
     },
     getEnergyPorts() {

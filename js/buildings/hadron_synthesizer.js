@@ -16,57 +16,50 @@ export const hadronSynthesizerBuilding = createFactory({
     inputColors: QUARK_COLORS,
 
     getItemPorts() {
+        const config = this._factoryConfig;
+        const recipe = this.recipe || Object.keys(config.recipes)[0];
+        const inputs = config.recipes[recipe].inputs;
+        const inputKeys = Object.keys(inputs);
         return [
-            { type: 'in', x: 0, y: 0.25 },
-            { type: 'in', x: 0, y: 0.5 },
-            { type: 'in', x: 0, y: 0.75 },
-            { type: 'out', x: 1, y: 0.5 }
+            { type: 'in', x: 0, y: 0.25, accepts: [inputKeys[0]] },
+            { type: 'in', x: 0, y: 0.5,  accepts: [inputKeys[1]] },
+            { type: 'in', x: 0, y: 0.75, accepts: [inputKeys[2]] },
+            { type: 'out', x: 1, y: 0.5, produces: config.recipes[recipe].output }
         ];
     },
     getEnergyPorts() {
         return [];
     },
 
-    rotateCallback(ghost, reverse) {},
-
-        rotateGhost(ghost, game, reverse) {
-        ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
+    rotateGhost(ghost, game, reverse) {
+        ghost.rotation = (ghost.rotation + 1) % 4;
     },
+
     changeMode(ghost, game, reverse) {
-    if (!ghost.recipe) ghost.recipe = 'proton';
-    const keys = Object.keys(this.recipes);
-    let idx = keys.indexOf(ghost.recipe);
-    if (reverse) {
-        idx = (idx - 1 + keys.length) % keys.length;
-    } else {
-        idx = (idx + 1) % keys.length;
-    }
-    const oldRecipe = ghost.recipe;
-    ghost.recipe = keys[idx];
-
-    // Очищаем выходной продукт
-    ghost.outputResources = {};
-
-    // Если у здания есть входные ресурсы, удаляем только те, что не нужны новому рецепту
-    if (ghost.inputResources) {
-        const newInputs = this.recipes[ghost.recipe].inputs;
-        const newInputKeys = Object.keys(newInputs);
-        for (const key of Object.keys(ghost.inputResources)) {
-            if (!newInputKeys.includes(key)) {
-                delete ghost.inputResources[key];
+        const config = this._factoryConfig;
+        if (!ghost.recipe) ghost.recipe = Object.keys(config.recipes)[0];
+        const keys = Object.keys(config.recipes);
+        let idx = keys.indexOf(ghost.recipe);
+        idx = reverse ? (idx - 1 + keys.length) % keys.length : (idx + 1) % keys.length;
+        ghost.recipe = keys[idx];
+        ghost.outputResources = {};
+        if (ghost.inputResources) {
+            const newInputs = config.recipes[ghost.recipe].inputs;
+            const newInputKeys = Object.keys(newInputs);
+            for (const key of Object.keys(ghost.inputResources)) {
+                if (!newInputKeys.includes(key)) {
+                    delete ghost.inputResources[key];
+                }
             }
         }
-    }
+        ghost.craftTimer = 0;
+        if (game && game.network) {
+            game.network.refreshOutgoingResourceTypes(ghost);
+        }
+    },
 
-    // Сбрасываем таймер крафта
-    ghost.craftTimer = 0;
-
-    if (game && game.network) {
-        game.network.refreshOutgoingResourceTypes(ghost);
-    }
-},
-
-    render(ctx, b, tileSize, isGhost, game, config) {
+    render(ctx, b, tileSize, isGhost, game) {
+        const config = this._factoryConfig;
         const x = b.tx * tileSize, y = b.ty * tileSize;
         const size = b.getSize();
         const w = size.w * tileSize, h = size.h * tileSize;
@@ -83,7 +76,8 @@ export const hadronSynthesizerBuilding = createFactory({
         }
 
         if (!isGhost) {
-            const progress = b.craftTimer ? Math.min(b.craftTimer / config.recipes[b.recipe].time, 1.0) : 0;
+            const recipe = config.recipes[b.recipe];
+            const progress = b.craftTimer ? Math.min(b.craftTimer / recipe.time, 1.0) : 0;
             const phase = animTimer;
 
             const numDots = 12;

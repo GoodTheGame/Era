@@ -34,9 +34,9 @@ export const electronCaptureBuilding = {
 
     getItemPorts() {
         return [
-            { type: 'in', x: 0, y: 0.3 },
-            { type: 'in', x: 0, y: 0.7 },
-            { type: 'out', x: 1, y: 0.5 }
+            { type: 'in', x: 0, y: 0.3, accepts: ['p'] },
+            { type: 'in', x: 0, y: 0.7, accepts: ['e'] },
+            { type: 'out', x: 1, y: 0.5, produces: 'H' }
         ];
     },
     getEnergyPorts() {
