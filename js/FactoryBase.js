@@ -5,7 +5,7 @@ export function createFactory(config) {
     const factory = {
         type: config.type,
         size: config.size,
-        _factoryConfig: config,   // чтобы здание видело рецепты
+        _factoryConfig: config,
 
         getItemPorts() {
             if (config.getItemPorts) {
@@ -25,9 +25,7 @@ export function createFactory(config) {
         },
 
         initGhost(ghost) {
-            if (!ghost.recipe) {
-                ghost.recipe = Object.keys(config.recipes)[0];
-            }
+            // Рецепт больше не назначается автоматически – игрок выберет сам
         },
 
         rotateGhost(ghost, game, reverse) {
@@ -35,27 +33,16 @@ export function createFactory(config) {
                 config.rotateGhost.call(this, ghost, game, reverse);
                 return;
             }
-            if (!ghost.recipe) {
-                ghost.recipe = Object.keys(config.recipes)[0];
-                return;
-            }
-            const keys = Object.keys(config.recipes);
-            const idx = keys.indexOf(ghost.recipe);
-            const nextIdx = reverse
-                ? (idx - 1 + keys.length) % keys.length
-                : (idx + 1) % keys.length;
-            ghost.recipe = keys[nextIdx];
-            if (config.rotateCallback) config.rotateCallback(ghost);
+            // поворот без смены рецепта
         },
 
         changeMode(ghost, game, reverse) {
+            if (!config.recipes) return;
             if (!ghost.recipe) ghost.recipe = Object.keys(config.recipes)[0];
             const keys = Object.keys(config.recipes);
             let idx = keys.indexOf(ghost.recipe);
             idx = reverse ? (idx - 1 + keys.length) % keys.length : (idx + 1) % keys.length;
-            const oldRecipe = ghost.recipe;
             ghost.recipe = keys[idx];
-
             ghost.outputResources = {};
             if (ghost.inputResources) {
                 const newInputs = config.recipes[ghost.recipe].inputs;
@@ -73,7 +60,7 @@ export function createFactory(config) {
         },
 
         update(building, game, dt) {
-            if (!building.recipe) building.recipe = Object.keys(config.recipes)[0];
+            if (!building.recipe) return;
             const recipe = config.recipes[building.recipe];
             if (!recipe) return;
 

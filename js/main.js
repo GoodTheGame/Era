@@ -9,6 +9,7 @@ import { Network } from './Network.js';
 import { UIManager } from './UIManager.js';
 import { KeybindManager } from './config/keybindManager.js';
 import { FactoryUI } from './FactoryUI.js';
+import { RESOURCE_COLORS } from './resources.js';
 
 class Game {
     constructor() {
@@ -19,7 +20,7 @@ class Game {
         this.buildingManager = new BuildingManager(this);
         this.network = new Network(this);
         this.uiManager = new UIManager(this);
-        this.factoryUI = new FactoryUI(this);   // ← универсальный интерфейс фабрик
+        this.factoryUI = new FactoryUI(this);
         this.hud = new HUD(this);
         this.selectedType = null;
         this.lastTime = 0;
@@ -30,6 +31,7 @@ class Game {
         this.globalAnimTime = 0;
         this.showRecipeInfo = false;
         this.keybindManager = new KeybindManager(this);
+        this.dragPreview = null; // { type, count, x, y }
 
         this._spawnStar();
         this.camera.x = this.star.tx * this.map.tileSize + 2.5 * this.map.tileSize;
@@ -40,6 +42,16 @@ class Game {
         this._bindMouse();
         window.addEventListener('keydown', (e) => this.input.shiftKey = e.shiftKey);
         window.addEventListener('keyup', (e) => this.input.shiftKey = e.shiftKey);
+
+        window.addEventListener('keydown', (e) => {
+            if (!this.factoryUI.visible && !this.uiManager.isUIOpen()) return;
+            const key = e.key.toLowerCase();
+            if (['w','a','s','d','ц','ф','ы','в','arrowup','arrowdown','arrowleft','arrowright','shift','control','alt'].includes(key)) {
+                return;
+            }
+            if (this.factoryUI.visible) this.factoryUI.close();
+            if (this.uiManager.isUIOpen()) this.uiManager.closeUI();
+        });
 
         this._loadAssets().then(() => {
             this.assetsLoaded = true;
@@ -75,15 +87,68 @@ class Game {
             this.lastMouseY = e.clientY;
             this.buildingManager.setMousePosition(e.clientX, e.clientY);
             this.buildingManager.onMouseMove();
+
+            // Обновляем позицию drag preview
+            if (this.dragPreview) {
+                this.dragPreview.x = e.clientX;
+                this.dragPreview.y = e.clientY;
+            }
         });
+
         this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 1 || (e.button === 0 && e.shiftKey)) return;
+
             const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
+
+            // Правая кнопка мыши для удаления из UI
+            if (e.button === 2) {
+                if (this.factoryUI.visible && this.factoryUI.hitTest(worldPos.x, worldPos.y)) {
+                    this.factoryUI.onRightClick(worldPos.x, worldPos.y);
+                    return;
+                }
+                if (this.uiManager.isUIOpen() && this.uiManager.isPointInsideUI(worldPos.x, worldPos.y)) {
+                    this.uiManager.onRightClick(worldPos.x, worldPos.y);
+                    return;
+                }
+            }
+
+            // Перетаскивание левой кнопкой
+            if (this.factoryUI.visible) {
+                if (this.factoryUI.onMouseDown(worldPos.x, worldPos.y)) {
+                    const slot = this.factoryUI.dragging;
+                    if (slot) {
+                        const b = this.factoryUI.activeFactory;
+                        let type = null, count = 0;
+                        if (slot.slotType === 'input' && slot.port.accepts) {
+                            type = slot.port.accepts[0];
+                            count = Math.min(b.inputResources?.[type] || 0, 100);
+                        } else if (slot.slotType === 'output' && slot.port.produces) {
+                            type = slot.port.produces;
+                            count = Math.min(b.outputResources?.[type] || 0, 100);
+                        }
+                        if (type) {
+                            this.dragPreview = { type, count, x: e.clientX, y: e.clientY };
+                        }
+                    }
+                    return;
+                }
+            }
+            if (this.uiManager.isUIOpen()) {
+                if (this.uiManager.onMouseDown(worldPos.x, worldPos.y)) {
+                    const drag = this.uiManager.dragging;
+                    if (drag && this.uiManager.activeNode.resources?.[drag.key]) {
+                        const count = Math.min(this.uiManager.activeNode.resources[drag.key], 100);
+                        this.dragPreview = { type: drag.key, count, x: e.clientX, y: e.clientY };
+                    }
+                    return;
+                }
+            }
+
             const tile = this.map.worldToTile(worldPos.x, worldPos.y);
             const building = this.buildingManager.getBuildingAt(tile.tx, tile.ty);
 
-            // Внутри mousedown, где уже есть this.factoryUI.visible
+            // Фабричный UI
             if (this.factoryUI.visible) {
-                const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
                 if (this.factoryUI.onClick(worldPos.x, worldPos.y)) {
                     return;
                 } else {
@@ -97,13 +162,7 @@ class Game {
                 this.uiManager.handleClick(worldPos.x, worldPos.y);
                 return;
             }
-            // Закрытие UI фабрик при клике мимо окна
-                if (this.factoryUI.visible) {
-                    const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
-                    if (!this.factoryUI.hitTest(worldPos.x, worldPos.y)) {
-                        this.factoryUI.close();
-                    }
-                }
+
             // Открытие UI узла или фабрики
             if (e.button === 0 && building && !this.selectedType) {
                 if (building.type === 'node') {
@@ -115,20 +174,39 @@ class Game {
                 }
             }
 
+            // Строительство / провода
             if (e.button === 0 && !e.shiftKey) {
                 this.buildingManager.onLeftMouseDown();
             } else if (e.button === 2) {
                 this.buildingManager.onRightMouseDown();
             }
         });
+
         this.canvas.addEventListener('mouseup', (e) => {
+            const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
+            if (this.factoryUI.visible && this.factoryUI.dragging) {
+                this.factoryUI.onMouseUp(worldPos.x, worldPos.y);
+                this.dragPreview = null;
+                return;
+            }
+            if (this.uiManager.isUIOpen() && this.uiManager.dragging) {
+                this.uiManager.onMouseUp(worldPos.x, worldPos.y);
+                this.dragPreview = null;
+                return;
+            }
+
             if (e.button === 0) this.buildingManager.onLeftMouseUp();
             else if (e.button === 2) this.buildingManager.onRightMouseUp();
         });
+
         this.canvas.addEventListener('mouseleave', () => {
             this.buildingManager.onLeftMouseUp();
             this.buildingManager.onRightMouseUp();
+            if (this.factoryUI.visible) this.factoryUI.onMouseUp(0, 0);
+            if (this.uiManager.isUIOpen()) this.uiManager.onMouseUp(0, 0);
+            this.dragPreview = null;
         });
+
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 
@@ -145,8 +223,7 @@ class Game {
         this.camera.update(dt);
         this.buildingManager.update(dt);
         this.network.update(dt);
-        this.factoryUI.closeIfInvalid();   // ← добавить
-
+        this.factoryUI.closeIfInvalid();
     }
 
     _render() {
@@ -162,7 +239,6 @@ class Game {
             this.network.renderPreview(this.ctx, this.buildingManager.wireSource, worldPos.x, worldPos.y);
         }
 
-        // Рендер UI фабрик
         if (this.factoryUI.visible) {
             this.factoryUI.render(this.ctx);
         }
@@ -174,6 +250,20 @@ class Game {
             this.camera.applyTransform(this.ctx);
             this.uiManager.render(this.ctx);
             this.ctx.restore();
+        }
+
+        // Drag preview (поверх всего)
+        if (this.dragPreview) {
+            const { type, count, x, y } = this.dragPreview;
+            const color = RESOURCE_COLORS[type] || '#ffffff';
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 12, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = 'bold 11px "Segoe UI"';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(count, x, y + 14);
         }
 
         if (!this.assetsLoaded) {

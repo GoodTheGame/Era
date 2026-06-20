@@ -80,7 +80,6 @@ export class Camera {
         ctx.translate(-this.x, -this.y);
     }
 
-    /** Возвращает видимую область в мировых координатах */
     getVisibleRect() {
         const topLeft = this.screenToWorld(0, 0);
         const bottomRight = this.screenToWorld(this.canvas.width, this.canvas.height);

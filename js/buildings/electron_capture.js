@@ -97,17 +97,5 @@ export const electronCaptureBuilding = {
             }
         }
 
-        if (b.inputResources) {
-            const keys = Object.keys(this.recipe.inputs);
-            const isize = tileSize * 0.15;
-            const sx = x + 2, sy = y + h - 12;
-            keys.forEach((key, i) => {
-                ctx.fillStyle = { p: '#ffaa00', e: '#ffff00' }[key] || '#fff';
-                ctx.fillRect(sx + i * 20, sy, isize, isize);
-                ctx.fillStyle = '#000';
-                ctx.font = `${isize * 0.7}px "Segoe UI"`;
-                ctx.fillText((b.inputResources[key] || 0).toString(), sx + i * 20 + 2, sy + isize - 2);
-            });
-        }
     }
 };

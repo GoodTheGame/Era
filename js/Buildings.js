@@ -12,6 +12,7 @@ import { fusionPressBuilding } from './buildings/fusion_press.js';
 import { energyBufferBuilding } from './buildings/energy_buffer.js';
 import { starBuilding } from './buildings/star.js';
 import { RESOURCE_COLORS } from './resources.js';
+
 const BUILDING_MODULES = {
     'quantum_resonator': quantumResonatorBuilding,
     'gluon_extractor': gluonExtractorBuilding,
@@ -43,14 +44,17 @@ export class Building {
         else if (type === 'quantum_resonator') this.quarkType = 0;
 
         const mod = BUILDING_MODULES[type];
-        // Копируем _factoryConfig из модуля в здание, чтобы методы портов имели доступ к рецептам
-        this._factoryConfig = mod ? mod._factoryConfig : null;
+        // Гарантируем _factoryConfig
+        if (mod && mod._factoryConfig) {
+            this._factoryConfig = mod._factoryConfig;
+        } else {
+            this._factoryConfig = null;
+        }
         if (mod) {
             if (mod.initGhost) {
                 mod.initGhost(this);
             }
         }
-        // Обновляем методы портов из модуля
         this._refreshPorts();
     }
 
@@ -60,7 +64,6 @@ export class Building {
         return base;
     }
 
-    // Дефолтные порты, если модуль не предоставил свои
     getItemPorts() {
         const size = this.getSize();
         const midY = 0.5;
@@ -76,10 +79,9 @@ export class Building {
         ];
     }
 
-        /** Обновляет методы портов из модуля при изменении типа здания */
     _refreshPorts() {
         const mod = BUILDING_MODULES[this.type];
-        // Если у здания ещё нет _factoryConfig, берём его из модуля
+        // Если у здания нет _factoryConfig, берём из модуля
         if (!this._factoryConfig && mod && mod._factoryConfig) {
             this._factoryConfig = mod._factoryConfig;
         }
@@ -115,13 +117,12 @@ export class BuildingManager {
         this.wireHoveredBuilding = null;
         this.wireHoveredPortIndex = -1;
         this.wireHoveredPortType = 'item';
-        
+
         this._initGhost();
 
         this.lastPlacedTile = null;
         this.isDragging = false;
         this.pendingFirstTile = null;
-        
     }
 
     _initGhost() {
@@ -144,7 +145,7 @@ export class BuildingManager {
         const tile = this.game.map.worldToTile(wp.x, wp.y);
         this.ghost.tx = tile.tx; this.ghost.ty = tile.ty;
         this.ghost.type = this.game.selectedType;
-        this.ghost._refreshPorts();        // обновляем порты под новый тип
+        this.ghost._refreshPorts();
         this.ghost.visible = true;
 
         const mod = BUILDING_MODULES[this.game.selectedType];
@@ -189,17 +190,17 @@ export class BuildingManager {
     }
 
     rotateBuildingUnderCursor(reverse = false) {
-    const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-    const tile = this.game.map.worldToTile(wp.x, wp.y);
-    const b = this.getBuildingAt(tile.tx, tile.ty);
-    if (!b) return;   // убрали проверку на star
-    const mod = BUILDING_MODULES[b.type];
-    if (mod && mod.rotateGhost) {
-        mod.rotateGhost(b, this.game, reverse);
-    } else {
-        b.rotation = (b.rotation + 1) % 4;
+        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const tile = this.game.map.worldToTile(wp.x, wp.y);
+        const b = this.getBuildingAt(tile.tx, tile.ty);
+        if (!b) return;
+        const mod = BUILDING_MODULES[b.type];
+        if (mod && mod.rotateGhost) {
+            mod.rotateGhost(b, this.game, reverse);
+        } else {
+            b.rotation = (b.rotation + 1) % 4;
+        }
     }
-}
 
     rotateGhost(reverse = false) {
         if (!this.ghost.visible) return;
@@ -245,79 +246,78 @@ export class BuildingManager {
     }
 
     onLeftMouseDown() {
-    this.isLeftMouseDown = true;
-    this.lastPlacedTile = null;
-    this.isDragging = false;
-    this.pendingFirstTile = null;
+        this.isLeftMouseDown = true;
+        this.lastPlacedTile = null;
+        this.isDragging = false;
+        this.pendingFirstTile = null;
 
-    if (this.game.selectedType === 'wire') {
-        const target = this.wireHoveredBuilding;
-        if (target && target.type !== 'star') {
-            const connectionType = this.game.hud.wireMode;
-            const portType = this.wireHoveredPortType || (connectionType === 'energy' ? 'energy' : 'item');
+        if (this.game.selectedType === 'wire') {
+            const target = this.wireHoveredBuilding;
+            if (target && target.type !== 'star') {
+                const connectionType = this.game.hud.wireMode;
+                const portType = this.wireHoveredPortType || (connectionType === 'energy' ? 'energy' : 'item');
 
-            if (!this.wireSource) {
-                this.wireSource = target;
-                this.wireSourcePortIndex = this.wireHoveredPortIndex;
-                this.wireModeActive = true;
-            } else if (this.wireSource !== target) {
-                let src = this.wireSource;
-                let dst = target;
-                let srcPortIdx = this.wireSourcePortIndex;
-                let dstPortIdx = this.wireHoveredPortIndex;
+                if (!this.wireSource) {
+                    this.wireSource = target;
+                    this.wireSourcePortIndex = this.wireHoveredPortIndex;
+                    this.wireModeActive = true;
+                } else if (this.wireSource !== target) {
+                    let src = this.wireSource;
+                    let dst = target;
+                    let srcPortIdx = this.wireSourcePortIndex;
+                    let dstPortIdx = this.wireHoveredPortIndex;
 
-                const srcPorts = this.game.network.getPortPositions(src, portType);
-                const dstPorts = this.game.network.getPortPositions(dst, portType);
-                const srcPort = srcPorts[srcPortIdx];
-                const dstPort = dstPorts[dstPortIdx];
+                    const srcPorts = this.game.network.getPortPositions(src, portType);
+                    const dstPorts = this.game.network.getPortPositions(dst, portType);
+                    const srcPort = srcPorts[srcPortIdx];
+                    const dstPort = dstPorts[dstPortIdx];
 
-                if (srcPort && dstPort &&
-                    (srcPort.type === 'in' || srcPort.type === 'any') &&
-                    dstPort.type === 'out') {
-                    [src, dst] = [dst, src];
-                    [srcPortIdx, dstPortIdx] = [dstPortIdx, srcPortIdx];
+                    if (srcPort && dstPort &&
+                        (srcPort.type === 'in' || srcPort.type === 'any') &&
+                        dstPort.type === 'out') {
+                        [src, dst] = [dst, src];
+                        [srcPortIdx, dstPortIdx] = [dstPortIdx, srcPortIdx];
+                    }
+
+                    this.game.network.addConnection(src, dst, srcPortIdx, dstPortIdx);
+                    this.wireSource = dst;
+                    this.wireSourcePortIndex = this._getPreferredSourcePort(dst);
                 }
-
-                this.game.network.addConnection(src, dst, srcPortIdx, dstPortIdx);
-
-                this.wireSource = dst;
-                this.wireSourcePortIndex = this._getPreferredSourcePort(dst);
+            } else {
+                this.wireSource = null;
+                this.wireModeActive = false;
             }
-        } else {
-            this.wireSource = null;
-            this.wireModeActive = false;
-        }
-        return;
-    }
-
-    if (this.game.selectedType) {
-        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(wp.x, wp.y);
-        const existing = this.getBuildingAt(tile.tx, tile.ty);
-
-        if (existing && (existing.type === 'quantum_router' || existing.type === 'connector_energy') &&
-            (this.ghost.type === 'quantum_router' || this.ghost.type === 'connector_energy')) {
-            this.buildings = this.buildings.filter(b => b !== existing);
-            if (this.game.network) this.game.network.removeAllConnections(existing);
-            const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
-            nb.filterType = this.ghost.filterType;
-            nb.routerMode = this.ghost.routerMode || 'split';
-            this.buildings.push(nb);
-            this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
-            this.pendingFirstTile = null;
-            this.isDragging = false;
             return;
         }
 
-        if (existing) {
-            this.pendingFirstTile = null;
-            this.isDragging = false;
-        } else {
-            this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
-            this.isDragging = true;
+        if (this.game.selectedType) {
+            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(wp.x, wp.y);
+            const existing = this.getBuildingAt(tile.tx, tile.ty);
+
+            if (existing && (existing.type === 'quantum_router' || existing.type === 'connector_energy') &&
+                (this.ghost.type === 'quantum_router' || this.ghost.type === 'connector_energy')) {
+                this.buildings = this.buildings.filter(b => b !== existing);
+                if (this.game.network) this.game.network.removeAllConnections(existing);
+                const nb = new Building(tile.tx, tile.ty, this.ghost.type, this.ghost.rotation);
+                nb.filterType = this.ghost.filterType;
+                nb.routerMode = this.ghost.routerMode || 'split';
+                this.buildings.push(nb);
+                this.lastPlacedTile = { tx: tile.tx, ty: tile.ty };
+                this.pendingFirstTile = null;
+                this.isDragging = false;
+                return;
+            }
+
+            if (existing) {
+                this.pendingFirstTile = null;
+                this.isDragging = false;
+            } else {
+                this.pendingFirstTile = { tx: tile.tx, ty: tile.ty };
+                this.isDragging = true;
+            }
         }
     }
-}
 
     onLeftMouseUp() {
         if (this.pendingFirstTile && this.game.selectedType && this.game.selectedType !== 'wire') {
@@ -434,7 +434,6 @@ export class BuildingManager {
             }
         }
 
-        // Рисуем порты, передавая network для правильного расчёта позиций с учётом поворота
         const allBuildings = this.buildings.concat(this.ghost.visible ? [this.ghost] : []);
         for (const b of allBuildings) {
             this.drawPorts(ctx, b, tileSize, this.game.network);
@@ -444,251 +443,239 @@ export class BuildingManager {
     }
 
     drawPorts(ctx, building, tileSize, network) {
-    const itemPorts = network.getPortPositions(building, 'item');
-    const energyPorts = network.getPortPositions(building, 'energy');
-    const portRadius = 5;
+        const itemPorts = network.getPortPositions(building, 'item');
+        const energyPorts = network.getPortPositions(building, 'energy');
+        const portRadius = 5;
 
-    const getPortRole = (b, portIndex, portType) => {
-        const conns = network.connections.filter(c => {
-            return portType === 'item' ? c.type === 'matter' : c.type === 'energy';
-        });
-        for (const conn of conns) {
-            if (conn.from === b && conn.fromPortIndex === portIndex) return conn.fromRole || 'out';
-            if (conn.to === b && conn.toPortIndex === portIndex) return conn.toRole || 'in';
-        }
-        return null;
-    };
-
-    for (let i = 0; i < itemPorts.length; i++) {
-    const port = itemPorts[i];
-    const px = port.worldX, py = port.worldY;
-    const role = getPortRole(building, port.index, 'item') || port.type;
-
-    let strokeColor;
-    if (role === 'in') strokeColor = '#00ff00';
-    else if (role === 'out') strokeColor = '#0088ff';
-    else strokeColor = '#888888';
-
-    ctx.beginPath();
-    ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#aaaaaa';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Значок ресурса, если есть accepts или produces
-    if (port.accepts && port.accepts.length === 1) {
-        // Одиночный ресурс на входе
-        const res = port.accepts[0];
-        const color = RESOURCE_COLORS[res] || '#ffffff';        ctx.beginPath();
-        ctx.arc(px - portRadius - 2, py, 3, 0, Math.PI*2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 4px "Segoe UI"';
-        ctx.textAlign = 'center';
-        ctx.fillText(res, px - portRadius - 2, py + 1.5);
-    } else if (port.produces) {
-        const res = port.produces;
-        const color = RESOURCE_COLORS[res] || '#ffffff';        ctx.beginPath();
-        ctx.arc(px + portRadius + 2, py, 3, 0, Math.PI*2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 4px "Segoe UI"';
-        ctx.textAlign = 'center';
-        ctx.fillText(res, px + portRadius + 2, py + 1.5);
-    }
-}
-
-    for (let i = 0; i < energyPorts.length; i++) {
-        const port = energyPorts[i];
-        const px = port.worldX, py = port.worldY;
-        const role = getPortRole(building, port.index, 'energy') || port.type;
-        let strokeColor = '#00ffff';
-        if (role === 'in') strokeColor = '#00ff00';
-        else if (role === 'out') strokeColor = '#0088ff';
-
-        ctx.beginPath();
-        ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#00ffff';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(px, py, portRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
-}
-    rotateWirePort() {
-        if (!this.wireSource || this.game.selectedType !== 'wire') return;
-        const connectionType = this.game.hud.wireMode;
-        const portType = connectionType === 'energy' ? 'energy' : 'item';
-
-        if (this.wireSource) {
-            // Перебираем порты источника
-            const ports = this.game.network.getPortPositions(this.wireSource, portType);
-            if (ports.length > 0) {
-                this.wireSourcePortIndex = (this.wireSourcePortIndex + 1) % ports.length;
-            }
-        }
-        // Для перебора портов приёмника можно допилить позже
-    }
-
-    _getPreferredSourcePort(building) {
-    const connectionType = this.game.hud.wireMode;
-    const portType = connectionType === 'energy' ? 'energy' : 'item';
-    const ports = this.game.network.getPortPositions(building, portType);
-    if (!ports.length) return 0;
-
-    // Ищем первый свободный выходной порт (out или any) по часовой стрелке, начиная с текущего индекса + 1
-    let start = (this.wireHoveredPortIndex + 1) % ports.length;
-    for (let i = 0; i < ports.length; i++) {
-        const idx = (start + i) % ports.length;
-        const port = ports[idx];
-        const role = this.game.network.getConnectionRole(building, idx, portType);
-        const effectiveType = role || port.type;
-        if ((effectiveType === 'out' || effectiveType === 'any') &&
-            this.game.network.isPortFree(building, idx, connectionType)) {
-            return idx;
-        }
-    }
-
-    // Если не нашли выходной, берём любой свободный
-    for (let i = 0; i < ports.length; i++) {
-        if (this.game.network.isPortFree(building, i, connectionType)) {
-            return i;
-        }
-    }
-    return 0; // fallback
-}
-    /** Ищет ближайший порт среди всех зданий и обновляет индексы для wire */
-updateWirePortHover() {
-    if (this.game.selectedType !== 'wire') {
-        this.wireHoveredBuilding = null;
-        this.wireHoveredPortIndex = -1;
-        return;
-    }
-
-    const mouseWorld = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-    const captureRadius = 13;
-    let bestDist = captureRadius;
-    let bestBuilding = null;
-    let bestPortIndex = -1;
-    let bestPortType = 'item';
-
-    for (const b of this.buildings) {
-        const checkPorts = (ports, type) => {
-            ports.forEach((port, idx) => {
-                const dx = port.worldX - mouseWorld.x;
-                const dy = port.worldY - mouseWorld.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestBuilding = b;
-                    bestPortIndex = idx;
-                    bestPortType = type;
-                }
+        const getPortRole = (b, portIndex, portType) => {
+            const conns = network.connections.filter(c => {
+                return portType === 'item' ? c.type === 'matter' : c.type === 'energy';
             });
+            for (const conn of conns) {
+                if (conn.from === b && conn.fromPortIndex === portIndex) return conn.fromRole || 'out';
+                if (conn.to === b && conn.toPortIndex === portIndex) return conn.toRole || 'in';
+            }
+            return null;
         };
-        checkPorts(this.game.network.getPortPositions(b, 'item'), 'item');
-        checkPorts(this.game.network.getPortPositions(b, 'energy'), 'energy');
-    }
 
-    if (bestBuilding) {
-        this.wireHoveredBuilding = bestBuilding;
-        this.wireHoveredPortIndex = bestPortIndex;
-        this.wireHoveredPortType = bestPortType;
-    } else {
-        this.wireHoveredBuilding = null;
-        this.wireHoveredPortIndex = -1;
-    }
-}
-// Добавить в BuildingManager:
-
-changeMode(reverse = false) {
-    // Меняем режим у призрака или у выделенного здания
-    if (this.ghost.visible) {
-        this._changeBuildingMode(this.ghost, reverse);
-    } else {
-        const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
-        const tile = this.game.map.worldToTile(wp.x, wp.y);
-        const b = this.getBuildingAt(tile.tx, tile.ty);
-        if (b) this._changeBuildingMode(b, reverse);
-    }
-}
-
-_changeBuildingMode(building, reverse) {
-    const mod = BUILDING_MODULES[building.type];
-    if (!mod) return;
-    // Если у модуля есть метод смены режима (кроме rotateGhost), вызываем его
-    if (mod.changeMode) {
-        mod.changeMode(building, this.game, reverse);
-    }
-    // Для резонатора смена кварка уже есть rotateGhost? Нет, уберём из rotateGhost.
-    // Добавим changeMode в quantum_resonator.js
-}
-/** Рисует подсветку найденного порта (вызывать после drawPorts для всех зданий) */
-drawWirePortHighlight(ctx) {
-    const portRadius = 5;
-    // Подсветка выбранного порта источника
-    if (this.wireSource && this.wireSourcePortIndex >= 0) {
-        const connectionType = this.game.hud.wireMode;
-        const portType = connectionType === 'energy' ? 'energy' : 'item';
-        const ports = this.game.network.getPortPositions(this.wireSource, portType);
-        if (ports && this.wireSourcePortIndex < ports.length) {
-            const port = ports[this.wireSourcePortIndex];
+        for (let i = 0; i < itemPorts.length; i++) {
+            const port = itemPorts[i];
             const px = port.worldX, py = port.worldY;
-            ctx.beginPath();
-            ctx.arc(px, py, portRadius + 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
-            ctx.fill();
-            ctx.strokeStyle = '#ffff00';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-        }
-    }
+            const role = getPortRole(building, port.index, 'item') || port.type;
 
-    // Подсветка порта под курсором (цель, если источник уже выбран)
-    if (this.wireHoveredBuilding && this.wireHoveredPortIndex >= 0) {
-        const building = this.wireHoveredBuilding;
-        // Не подсвечиваем, если это источник (уже подсвечен выше)
-        if (building === this.wireSource) return;
-
-        const portType = this.wireHoveredPortType || 'item';
-        const ports = this.game.network.getPortPositions(building, portType);
-        if (ports && this.wireHoveredPortIndex < ports.length) {
-            const port = ports[this.wireHoveredPortIndex];
-            const px = port.worldX, py = port.worldY;
-
-            // Определяем роль порта для цвета обводки
-            const getPortRole = (b, portIndex, pType) => {
-                const conns = this.game.network.connections.filter(c => {
-                    return pType === 'item' ? c.type === 'matter' : c.type === 'energy';
-                });
-                for (const conn of conns) {
-                    if (conn.from === b && conn.fromPortIndex === portIndex) return conn.fromRole || 'out';
-                    if (conn.to === b && conn.toPortIndex === portIndex) return conn.toRole || 'in';
-                }
-                return null;
-            };
-            const role = getPortRole(building, port.index, portType) || port.type;
             let strokeColor;
             if (role === 'in') strokeColor = '#00ff00';
             else if (role === 'out') strokeColor = '#0088ff';
             else strokeColor = '#888888';
 
             ctx.beginPath();
-            ctx.arc(px, py, portRadius + 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.arc(px, py, portRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#aaaaaa';
             ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px, py, portRadius, 0, Math.PI * 2);
             ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            if (port.accepts && port.accepts.length === 1) {
+                const res = port.accepts[0];
+                const color = RESOURCE_COLORS[res] || '#ffffff';
+                ctx.beginPath();
+                ctx.arc(px - portRadius - 2, py, 3, 0, Math.PI*2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 4px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText(res, px - portRadius - 2, py + 1.5);
+            } else if (port.produces) {
+                const res = port.produces;
+                const color = RESOURCE_COLORS[res] || '#ffffff';
+                ctx.beginPath();
+                ctx.arc(px + portRadius + 2, py, 3, 0, Math.PI*2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 4px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText(res, px + portRadius + 2, py + 1.5);
+            }
+        }
+
+        for (let i = 0; i < energyPorts.length; i++) {
+            const port = energyPorts[i];
+            const px = port.worldX, py = port.worldY;
+            const role = getPortRole(building, port.index, 'energy') || port.type;
+            let strokeColor = '#00ffff';
+            if (role === 'in') strokeColor = '#00ff00';
+            else if (role === 'out') strokeColor = '#0088ff';
+
+            ctx.beginPath();
+            ctx.arc(px, py, portRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#00ffff';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px, py, portRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
         }
     }
-}
+
+    rotateWirePort() {
+        if (!this.wireSource || this.game.selectedType !== 'wire') return;
+        const connectionType = this.game.hud.wireMode;
+        const portType = connectionType === 'energy' ? 'energy' : 'item';
+
+        if (this.wireSource) {
+            const ports = this.game.network.getPortPositions(this.wireSource, portType);
+            if (ports.length > 0) {
+                this.wireSourcePortIndex = (this.wireSourcePortIndex + 1) % ports.length;
+            }
+        }
+    }
+
+    _getPreferredSourcePort(building) {
+        const connectionType = this.game.hud.wireMode;
+        const portType = connectionType === 'energy' ? 'energy' : 'item';
+        const ports = this.game.network.getPortPositions(building, portType);
+        if (!ports.length) return 0;
+
+        let start = (this.wireHoveredPortIndex + 1) % ports.length;
+        for (let i = 0; i < ports.length; i++) {
+            const idx = (start + i) % ports.length;
+            const port = ports[idx];
+            const role = this.game.network.getConnectionRole(building, idx, portType);
+            const effectiveType = role || port.type;
+            if ((effectiveType === 'out' || effectiveType === 'any') &&
+                this.game.network.isPortFree(building, idx, connectionType)) {
+                return idx;
+            }
+        }
+
+        for (let i = 0; i < ports.length; i++) {
+            if (this.game.network.isPortFree(building, i, connectionType)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    updateWirePortHover() {
+        if (this.game.selectedType !== 'wire') {
+            this.wireHoveredBuilding = null;
+            this.wireHoveredPortIndex = -1;
+            return;
+        }
+
+        const mouseWorld = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+        const captureRadius = 13;
+        let bestDist = captureRadius;
+        let bestBuilding = null;
+        let bestPortIndex = -1;
+        let bestPortType = 'item';
+
+        for (const b of this.buildings) {
+            const checkPorts = (ports, type) => {
+                ports.forEach((port, idx) => {
+                    const dx = port.worldX - mouseWorld.x;
+                    const dy = port.worldY - mouseWorld.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestBuilding = b;
+                        bestPortIndex = idx;
+                        bestPortType = type;
+                    }
+                });
+            };
+            checkPorts(this.game.network.getPortPositions(b, 'item'), 'item');
+            checkPorts(this.game.network.getPortPositions(b, 'energy'), 'energy');
+        }
+
+        if (bestBuilding) {
+            this.wireHoveredBuilding = bestBuilding;
+            this.wireHoveredPortIndex = bestPortIndex;
+            this.wireHoveredPortType = bestPortType;
+        } else {
+            this.wireHoveredBuilding = null;
+            this.wireHoveredPortIndex = -1;
+        }
+    }
+
+    changeMode(reverse = false) {
+        if (this.ghost.visible) {
+            this._changeBuildingMode(this.ghost, reverse);
+        } else {
+            const wp = this.game.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
+            const tile = this.game.map.worldToTile(wp.x, wp.y);
+            const b = this.getBuildingAt(tile.tx, tile.ty);
+            if (b) this._changeBuildingMode(b, reverse);
+        }
+    }
+
+    _changeBuildingMode(building, reverse) {
+        const mod = BUILDING_MODULES[building.type];
+        if (!mod) return;
+        if (mod.changeMode) {
+            mod.changeMode(building, this.game, reverse);
+        }
+    }
+
+    drawWirePortHighlight(ctx) {
+        const portRadius = 5;
+        if (this.wireSource && this.wireSourcePortIndex >= 0) {
+            const connectionType = this.game.hud.wireMode;
+            const portType = connectionType === 'energy' ? 'energy' : 'item';
+            const ports = this.game.network.getPortPositions(this.wireSource, portType);
+            if (ports && this.wireSourcePortIndex < ports.length) {
+                const port = ports[this.wireSourcePortIndex];
+                const px = port.worldX, py = port.worldY;
+                ctx.beginPath();
+                ctx.arc(px, py, portRadius + 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+        }
+
+        if (this.wireHoveredBuilding && this.wireHoveredPortIndex >= 0) {
+            const building = this.wireHoveredBuilding;
+            if (building === this.wireSource) return;
+
+            const portType = this.wireHoveredPortType || 'item';
+            const ports = this.game.network.getPortPositions(building, portType);
+            if (ports && this.wireHoveredPortIndex < ports.length) {
+                const port = ports[this.wireHoveredPortIndex];
+                const px = port.worldX, py = port.worldY;
+
+                const getPortRole = (b, portIndex, pType) => {
+                    const conns = this.game.network.connections.filter(c => {
+                        return pType === 'item' ? c.type === 'matter' : c.type === 'energy';
+                    });
+                    for (const conn of conns) {
+                        if (conn.from === b && conn.fromPortIndex === portIndex) return conn.fromRole || 'out';
+                        if (conn.to === b && conn.toPortIndex === portIndex) return conn.toRole || 'in';
+                    }
+                    return null;
+                };
+                const role = getPortRole(building, port.index, portType) || port.type;
+                let strokeColor;
+                if (role === 'in') strokeColor = '#00ff00';
+                else if (role === 'out') strokeColor = '#0088ff';
+                else strokeColor = '#888888';
+
+                ctx.beginPath();
+                ctx.arc(px, py, portRadius + 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fill();
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+        }
+    }
 }

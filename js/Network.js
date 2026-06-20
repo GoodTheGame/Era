@@ -36,6 +36,8 @@ export class Network {
         this.packs = [];
         this.sendTimer = 0;
         this.sendInterval = 2.0;
+        this.wakeTimer = 0;
+        this.wakeInterval = 5.0; // раз в 5 секунд проверяем спящие линии
     }
 
     // Получить порты здания с абсолютными координатами
@@ -214,7 +216,8 @@ export class Network {
             resourceType,
             fromPortIndex, toPortIndex,
             fromRole, toRole,
-            strict
+            strict,
+            active: true     // новая линия сразу активна
         });
     }
 
@@ -362,6 +365,27 @@ export class Network {
         }
         this.packs = this.packs.filter(p => !p.done);
 
+        // Пробуждение спящих линий
+        this.wakeTimer += dt;
+        if (this.wakeTimer >= this.wakeInterval) {
+            this.wakeTimer = 0;
+            for (const conn of this.connections) {
+                if (!conn.active && conn.type === 'matter') {
+                    const sourceStock = this.isFactory(conn.from.type) || conn.from.type === 'electron_capture' || conn.from.type === 'fusion_press'
+                        ? conn.from.outputResources : conn.from.resources;
+                    const hasResources = sourceStock && Object.keys(sourceStock).some(q => {
+                        if (conn.resourceType && conn.resourceType !== q) return false;
+                        const toPort = this.getPortPositions(conn.to, 'item')[conn.toPortIndex];
+                        if (toPort && toPort.accepts && !toPort.accepts.includes(q)) return false;
+                        return this.canAcceptResource(conn.to, q);
+                    });
+                    if (hasResources) {
+                        conn.active = true;
+                    }
+                }
+            }
+        }
+
         this.sendTimer += dt;
         if (this.sendTimer >= this.sendInterval) {
             this.sendTimer -= this.sendInterval;
@@ -388,7 +412,7 @@ export class Network {
     sendFromBuilding(source) {
         const TRANSFER_LIMIT = 10;
         const tileSize = this.game.map.tileSize;
-        const conns = this.connections.filter(c => c.from === source && c.type !== 'energy' && c.fromRole !== 'in');
+        const conns = this.connections.filter(c => c.from === source && c.type !== 'energy' && c.fromRole !== 'in' && c.active);
         if (conns.length === 0) return;
         let stock;
         if (this.isFactory(source.type) || source.type === 'electron_capture' || source.type === 'fusion_press') {
@@ -463,6 +487,13 @@ export class Network {
                 }
             }
         }
+
+        // Если после отправки сток пуст, помечаем линии как спящие
+        if (!stock || Object.keys(stock).length === 0) {
+            for (const conn of conns) {
+                conn.active = false;
+            }
+        }
     }
 
     isPathClear(fromBuilding, toBuilding) {
@@ -494,6 +525,7 @@ export class Network {
         for (const conn of this.connections) {
             if (conn.from === building && conn.type === 'matter') {
                 conn.resourceType = newType;
+                conn.active = true; // разбудить
             }
         }
     }

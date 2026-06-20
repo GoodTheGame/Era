@@ -356,6 +356,8 @@ export class HUD {
         this.game.selectedType = type;
         this.updateActiveButton();
         if (type) this.game.buildingManager._updateGhostFromLastMouse();
+        if (this.game.factoryUI.visible) this.game.factoryUI.close();
+
     }
 
     updateActiveButton() {
