@@ -11,7 +11,7 @@ import { electronCaptureBuilding } from './buildings/electron_capture.js';
 import { fusionPressBuilding } from './buildings/fusion_press.js';
 import { energyBufferBuilding } from './buildings/energy_buffer.js';
 import { starBuilding } from './buildings/star.js';
-import { QUARK_COLORS } from './Network.js';
+import { RESOURCE_COLORS } from './resources.js';
 const BUILDING_MODULES = {
     'quantum_resonator': quantumResonatorBuilding,
     'gluon_extractor': gluonExtractorBuilding,
@@ -483,8 +483,7 @@ export class BuildingManager {
     if (port.accepts && port.accepts.length === 1) {
         // Одиночный ресурс на входе
         const res = port.accepts[0];
-        const color = QUARK_COLORS[res] || '#ffffff';  // QUARK_COLORS надо передать или определить локально
-        ctx.beginPath();
+        const color = RESOURCE_COLORS[res] || '#ffffff';        ctx.beginPath();
         ctx.arc(px - portRadius - 2, py, 3, 0, Math.PI*2);
         ctx.fillStyle = color;
         ctx.fill();
@@ -494,8 +493,7 @@ export class BuildingManager {
         ctx.fillText(res, px - portRadius - 2, py + 1.5);
     } else if (port.produces) {
         const res = port.produces;
-        const color = QUARK_COLORS[res] || '#ffffff';
-        ctx.beginPath();
+        const color = RESOURCE_COLORS[res] || '#ffffff';        ctx.beginPath();
         ctx.arc(px + portRadius + 2, py, 3, 0, Math.PI*2);
         ctx.fillStyle = color;
         ctx.fill();

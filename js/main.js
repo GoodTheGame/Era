@@ -8,6 +8,8 @@ import { spriteRenderer } from './SpriteRenderer.js';
 import { Network } from './Network.js';
 import { UIManager } from './UIManager.js';
 import { KeybindManager } from './config/keybindManager.js';
+import { FactoryUI } from './FactoryUI.js';
+
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
@@ -17,6 +19,7 @@ class Game {
         this.buildingManager = new BuildingManager(this);
         this.network = new Network(this);
         this.uiManager = new UIManager(this);
+        this.factoryUI = new FactoryUI(this);   // ← универсальный интерфейс фабрик
         this.hud = new HUD(this);
         this.selectedType = null;
         this.lastTime = 0;
@@ -24,10 +27,9 @@ class Game {
         this.input = { shiftKey: false };
         this.lastMouseX = 0;
         this.lastMouseY = 0;
-        this.globalAnimTime = 0;   // ← глобальный таймер для всех анимаций
+        this.globalAnimTime = 0;
         this.showRecipeInfo = false;
         this.keybindManager = new KeybindManager(this);
-
 
         this._spawnStar();
         this.camera.x = this.star.tx * this.map.tileSize + 2.5 * this.map.tileSize;
@@ -79,14 +81,38 @@ class Game {
             const tile = this.map.worldToTile(worldPos.x, worldPos.y);
             const building = this.buildingManager.getBuildingAt(tile.tx, tile.ty);
 
+            // Внутри mousedown, где уже есть this.factoryUI.visible
+            if (this.factoryUI.visible) {
+                const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
+                if (this.factoryUI.onClick(worldPos.x, worldPos.y)) {
+                    return;
+                } else {
+                    this.factoryUI.close();
+                    return;
+                }
+            }
+
+            // UI узла
             if (this.uiManager.isUIOpen()) {
                 this.uiManager.handleClick(worldPos.x, worldPos.y);
                 return;
             }
-
-            if (e.button === 0 && building && building.type === 'node' && !this.selectedType) {
-                this.uiManager.openNodeUI(building);
-                return;
+            // Закрытие UI фабрик при клике мимо окна
+                if (this.factoryUI.visible) {
+                    const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
+                    if (!this.factoryUI.hitTest(worldPos.x, worldPos.y)) {
+                        this.factoryUI.close();
+                    }
+                }
+            // Открытие UI узла или фабрики
+            if (e.button === 0 && building && !this.selectedType) {
+                if (building.type === 'node') {
+                    this.uiManager.openNodeUI(building);
+                    return;
+                }
+                if (this.factoryUI.open(building)) {
+                    return;
+                }
             }
 
             if (e.button === 0 && !e.shiftKey) {
@@ -115,11 +141,11 @@ class Game {
     }
 
     _update(dt) {
-        this.globalAnimTime += dt;   // ← обновляем глобальный таймер
+        this.globalAnimTime += dt;
         this.camera.update(dt);
         this.buildingManager.update(dt);
         this.network.update(dt);
-        // this.energyGrid.update(dt);
+        this.factoryUI.closeIfInvalid();   // ← добавить
 
     }
 
@@ -134,6 +160,11 @@ class Game {
         if (this.buildingManager.wireModeActive && this.selectedType === 'wire') {
             const worldPos = this.camera.screenToWorld(this.lastMouseX, this.lastMouseY);
             this.network.renderPreview(this.ctx, this.buildingManager.wireSource, worldPos.x, worldPos.y);
+        }
+
+        // Рендер UI фабрик
+        if (this.factoryUI.visible) {
+            this.factoryUI.render(this.ctx);
         }
 
         this.ctx.restore();
