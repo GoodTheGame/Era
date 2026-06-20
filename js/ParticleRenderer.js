@@ -13,7 +13,7 @@ const PARTICLE_DEFS = {
     n: { color: '#aa00ff', glow: '#dd88ff', type: 'neutron', name: 'n' },
     H: { color: '#22aaff', glow: '#88ddff', type: 'hydrogen', name: 'H' },
     He: { color: '#ffdd44', glow: '#ffeeaa', type: 'helium', name: 'He' },
-    energy: { color: '#00ccff', glow: '#88eeff', type: 'energy', name: '⚡' }   // ← ГОЛУБОЙ
+    energy: { color: '#00ccff', glow: '#88eeff', type: 'energy', name: '⚡' }
 };
 
 export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
@@ -31,13 +31,11 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
     if (pType === 'quark') {
         const pulse = 1 + 0.1 * Math.sin(phase * 2);
         const r = radius * pulse;
-        // Основа
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
 
-        // Внутренние глюонные точки
         for (let i = 0; i < 3; i++) {
             const angle = phase + (i * Math.PI * 2) / 3;
             const dist = r * 0.5;
@@ -49,9 +47,7 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
             ctx.fill();
         }
 
-        // Уникальные особенности
         if (['u', 'c', 't'].includes(type)) {
-            // Острые иголки
             ctx.strokeStyle = glow;
             ctx.lineWidth = 1;
             for (let i = 0; i < 4; i++) {
@@ -66,14 +62,12 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
                 ctx.stroke();
             }
         } else if (type === 's') {
-            // Кольцо Сатурна
             ctx.strokeStyle = glow;
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.ellipse(0, 0, r * 1.3, r * 0.3, 0, 0, Math.PI * 2);
             ctx.stroke();
         } else if (type === 'b') {
-            // Спираль внутри
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -87,7 +81,6 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
             }
             ctx.stroke();
         } else if (type === 'c') {
-            // Полосы
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
             for (let i = -1; i <= 1; i += 2) {
@@ -198,7 +191,7 @@ export function drawParticle(ctx, x, y, radius, type, animTimer = 0) {
         const flash = Math.sin(phase * 8) * 0.5 + 0.5;
         ctx.beginPath();
         ctx.arc(0, 0, radius * flash, 0, Math.PI * 2);
-        ctx.fillStyle = color;   // теперь #00ccff
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.shadowBlur = radius * 2;
         ctx.fill();

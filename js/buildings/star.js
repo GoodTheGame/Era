@@ -46,15 +46,16 @@ export const starBuilding = {
     rotateGhost(ghost, game, reverse) {
         ghost.rotation = (ghost.rotation + (reverse ? -1 : 1) + 4) % 4;
     },
+
     getItemPorts() {
         return [
-            { type: 'in', x: 0, y: 0.5 },
-            { type: 'in', x: 1, y: 0.5 }
+            { type: 'in', x: 0, y: 0.5, accepts: ['p'] },   // левый порт – только протоны
+            { type: 'in', x: 1, y: 0.5, accepts: ['n'] }    // правый порт – только нейтроны
         ];
     },
     getEnergyPorts() {
         return [
-            { type: 'in', x: 0.5, y: 0.5 }
+            { type: 'in', x: 0.5, y: 0.5 }   // центральный порт – энергия
         ];
     },
 

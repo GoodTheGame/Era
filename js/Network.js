@@ -37,10 +37,9 @@ export class Network {
         this.sendTimer = 0;
         this.sendInterval = 2.0;
         this.wakeTimer = 0;
-        this.wakeInterval = 5.0; // раз в 5 секунд проверяем спящие линии
+        this.wakeInterval = 5.0;
     }
 
-    // Получить порты здания с абсолютными координатами
     getPortPositions(building, type) {
         const tileSize = this.game.map.tileSize;
         const ports = type === 'energy' ? building.getEnergyPorts() : building.getItemPorts();
@@ -181,7 +180,6 @@ export class Network {
         const toPort = toPorts[toPortIndex];
         if (!fromPort || !toPort) return;
 
-        // Проверка совместимости ресурсов портов
         if (connectionType === 'matter') {
             const sourceRes = this.getSourceResourceType(from);
             if (fromPort.produces && toPort.accepts && toPort.accepts.length > 0) {
@@ -217,7 +215,7 @@ export class Network {
             fromPortIndex, toPortIndex,
             fromRole, toRole,
             strict,
-            active: true     // новая линия сразу активна
+            active: true
         });
     }
 
@@ -237,9 +235,7 @@ export class Network {
         return Math.max(dx, dy);
     }
 
-    removeConnection(conn) {
-        this.connections = this.connections.filter(c => c !== conn);
-    }
+    removeConnection(conn) { this.connections = this.connections.filter(c => c !== conn); }
     removeAllConnections(building) {
         this.connections = this.connections.filter(c => c.from !== building && c.to !== building);
         this.packs = this.packs.filter(p => p.from !== building && p.to !== building);
@@ -272,17 +268,11 @@ export class Network {
             leftCount = Math.ceil(pack.count / 2);
             rightCount = Math.floor(pack.count / 2);
         } else if (mode === 'priority_left') {
-            if (filter && pack.quarkType !== filter) {
-                rightCount = pack.count;
-            } else {
-                leftCount = pack.count;
-            }
+            if (filter && pack.quarkType !== filter) rightCount = pack.count;
+            else leftCount = pack.count;
         } else if (mode === 'priority_right') {
-            if (filter && pack.quarkType !== filter) {
-                leftCount = pack.count;
-            } else {
-                rightCount = pack.count;
-            }
+            if (filter && pack.quarkType !== filter) leftCount = pack.count;
+            else rightCount = pack.count;
         }
 
         const tileSize = this.game.map.tileSize;
@@ -312,10 +302,7 @@ export class Network {
             if (pack.distance <= 0) {
                 pack.done = true;
                 const to = pack.to;
-                if (to.type === 'quantum_router') {
-                    this.processRouter(to, pack);
-                    continue;
-                }
+                if (to.type === 'quantum_router') { this.processRouter(to, pack); continue; }
                 if (to.type === 'connector_energy') {
                     if (pack.quarkType !== 'energy') continue;
                     const outConns = this.connections.filter(c => c.from === to && c.type === 'energy');
@@ -330,11 +317,12 @@ export class Network {
                 }
                 if (this.canAcceptResource(to, pack.quarkType)) {
                     if (pack.quarkType === 'energy') {
+                        if (to.type === 'fusion_press') continue;
                         if (!to.resources) to.resources = {};
                         const cur = to.resources['energy'] || 0;
                         const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
                         const add = Math.min(pack.count, cap - cur);
-                        if (add > 0) to.resources['energy'] = cur + add;
+                        if (add > 0) to.resources['energy'] = Math.round((cur + add) * 10) / 10;
                     } else {
                         if (this.isFactory(to.type)) {
                             if (!to.inputResources) to.inputResources = {};
@@ -365,7 +353,6 @@ export class Network {
         }
         this.packs = this.packs.filter(p => !p.done);
 
-        // Пробуждение спящих линий
         this.wakeTimer += dt;
         if (this.wakeTimer >= this.wakeInterval) {
             this.wakeTimer = 0;
@@ -379,9 +366,7 @@ export class Network {
                         if (toPort && toPort.accepts && !toPort.accepts.includes(q)) return false;
                         return this.canAcceptResource(conn.to, q);
                     });
-                    if (hasResources) {
-                        conn.active = true;
-                    }
+                    if (hasResources) conn.active = true;
                 }
             }
         }
@@ -393,6 +378,9 @@ export class Network {
             for (const src of sources) {
                 if (src.type === 'connector_energy' || src.type === 'quantum_router') continue;
                 this.sendFromBuilding(src);
+                if (src.type === 'fusion_press' || src.type === 'energy_buffer') {
+                    this.sendEnergyFromBuilding(src);
+                }
             }
         }
     }
@@ -411,7 +399,6 @@ export class Network {
 
     sendFromBuilding(source) {
         const TRANSFER_LIMIT = 10;
-        const tileSize = this.game.map.tileSize;
         const conns = this.connections.filter(c => c.from === source && c.type !== 'energy' && c.fromRole !== 'in' && c.active);
         if (conns.length === 0) return;
         let stock;
@@ -435,7 +422,7 @@ export class Network {
                     conn.resourceType = q;
                 } else {
                     if (conn.resourceType && conn.resourceType !== q) {
-                        // оставляем старый, линия будет тёмно-серой
+                        // оставляем старый
                     } else {
                         conn.resourceType = q;
                     }
@@ -452,11 +439,8 @@ export class Network {
                 let count = perConn + (i < remainder ? 1 : 0);
                 if (count <= 0) continue;
                 const conn = validConns[i];
-
                 const toPort = this.getPortPositions(conn.to, 'item')[conn.toPortIndex];
-                if (toPort && toPort.accepts && !toPort.accepts.includes(q)) {
-                    continue;
-                }
+                if (toPort && toPort.accepts && !toPort.accepts.includes(q)) continue;
 
                 const to = conn.to;
                 let cap = STACK_SIZE;
@@ -475,25 +459,57 @@ export class Network {
                 const dist = Math.hypot(tp.worldX - fp.worldX, tp.worldY - fp.worldY);
                 this.packs.push(new Pack(source, to, q, count, dist, conn.fromPortIndex, conn.toPortIndex));
             }
-
             if (stock[q] <= 0) {
                 delete stock[q];
-                if (isSourceStrict) {
-                    for (const conn of conns) {
-                        if (conn.resourceType === q) {
-                            conn.resourceType = null;
-                        }
-                    }
+                if (isSourceStrict) for (const c of conns) if (c.resourceType === q) c.resourceType = null;
+            }
+        }
+        if (!stock || Object.keys(stock).length === 0) for (const c of conns) c.active = false;
+    }
+
+    sendEnergyFromBuilding(source) {
+        // Усреднение энергии между соседними буферами (только для energy_buffer)
+        if (source.type === 'energy_buffer') {
+            const neighbors = [];
+            for (const conn of this.connections) {
+                if (conn.type === 'energy') {
+                    if (conn.from === source && conn.to.type === 'energy_buffer') neighbors.push(conn.to);
+                    else if (conn.to === source && conn.from.type === 'energy_buffer') neighbors.push(conn.from);
+                }
+            }
+            if (neighbors.length > 0) {
+                let sum = source.resources?.['energy'] || 0;
+                for (const nb of neighbors) sum += nb.resources?.['energy'] || 0;
+                const avg = Math.round((sum / (neighbors.length + 1)) * 10) / 10;
+                if (source.resources) source.resources['energy'] = avg;
+                for (const nb of neighbors) if (nb.resources) nb.resources['energy'] = avg;
+            }
+        }
+
+        const energy = source.outputResources?.['energy'] ?? source.resources?.['energy'] ?? 0;
+        if (energy <= 0) return;
+        const conns = this.connections.filter(c => c.from === source && c.type === 'energy' && c.fromRole !== 'in');
+        if (conns.length === 0) return;
+
+        let remaining = energy;
+        for (const conn of conns) {
+            const to = conn.to;
+            if (to.type === 'fusion_press') continue;
+            const cur = to.resources?.['energy'] || 0;
+            const cap = to.type === 'star' ? 50 : NODE_CAPACITY;
+            const canAccept = Math.min(cap - cur, remaining);
+            if (canAccept > 0) {
+                const fp = this.getPortPositions(source, 'energy')[conn.fromPortIndex];
+                const tp = this.getPortPositions(to, 'energy')[conn.toPortIndex];
+                if (fp && tp) {
+                    const dist = Math.hypot(tp.worldX - fp.worldX, tp.worldY - fp.worldY);
+                    this.packs.push(new Pack(source, to, 'energy', canAccept, dist, conn.fromPortIndex, conn.toPortIndex));
+                    remaining = Math.round((remaining - canAccept) * 10) / 10;
                 }
             }
         }
-
-        // Если после отправки сток пуст, помечаем линии как спящие
-        if (!stock || Object.keys(stock).length === 0) {
-            for (const conn of conns) {
-                conn.active = false;
-            }
-        }
+        if (source.outputResources) source.outputResources['energy'] = remaining;
+        else if (source.resources) source.resources['energy'] = remaining;
     }
 
     isPathClear(fromBuilding, toBuilding) {
@@ -513,9 +529,7 @@ export class Network {
             const tile = this.game.map.worldToTile(wx, wy);
             const building = this.game.buildingManager.getBuildingAt(tile.tx, tile.ty);
             if (building && building !== fromBuilding && building !== toBuilding &&
-                !['node', 'quantum_router', 'star', 'connector_energy'].includes(building.type)) {
-                return false;
-            }
+                !['node', 'quantum_router', 'star', 'connector_energy'].includes(building.type)) return false;
         }
         return true;
     }
@@ -525,7 +539,7 @@ export class Network {
         for (const conn of this.connections) {
             if (conn.from === building && conn.type === 'matter') {
                 conn.resourceType = newType;
-                conn.active = true; // разбудить
+                conn.active = true;
             }
         }
     }
@@ -553,18 +567,9 @@ export class Network {
                         packTypes.add(pack.quarkType);
                     }
                 }
-                if (packTypes.size > 1) {
-                    strokeColor = '#555555';
-                } else if (packTypes.size === 1) {
-                    const singleType = packTypes.values().next().value;
-                    strokeColor = RESOURCE_COLORS[singleType] || MATTER_COLOR;
-                } else {
-                    if (conn.strict) {
-                        strokeColor = conn.resourceType ? (RESOURCE_COLORS[conn.resourceType] || MATTER_COLOR) : MATTER_COLOR;
-                    } else {
-                        strokeColor = conn.resourceType ? (RESOURCE_COLORS[conn.resourceType] || MATTER_COLOR) : MATTER_COLOR;
-                    }
-                }
+                if (packTypes.size > 1) strokeColor = '#555555';
+                else if (packTypes.size === 1) strokeColor = RESOURCE_COLORS[packTypes.values().next().value] || MATTER_COLOR;
+                else strokeColor = conn.strict ? (conn.resourceType ? RESOURCE_COLORS[conn.resourceType] || MATTER_COLOR : MATTER_COLOR) : MATTER_COLOR;
             }
 
             ctx.strokeStyle = strokeColor;
@@ -640,43 +645,33 @@ export class Network {
         const manager = this.game.buildingManager;
         if (manager.wireSource === fromBuilding && manager.wireSourcePortIndex >= 0) {
             const port = fromPorts[manager.wireSourcePortIndex];
-            if (port && !this.connections.some(c =>
-                c.from === fromBuilding && c.fromPortIndex === port.index && c.type === connectionType
-            )) {
+            if (port && !this.connections.some(c => c.from === fromBuilding && c.fromPortIndex === port.index && c.type === connectionType))
                 fromPos = port;
-            }
         }
         if (!fromPos) {
             for (const fp of fromPorts) {
                 if ((fp.type === 'out' || fp.type === 'any') && this.isPortFree(fromBuilding, fp.index, connectionType)) {
-                    fromPos = fp;
-                    break;
+                    fromPos = fp; break;
                 }
             }
         }
         if (!fromPos) return;
 
-        const targetBuilding = (manager.wireHoveredBuilding && manager.wireHoveredPortIndex >= 0)
-            ? manager.wireHoveredBuilding
-            : null;
-
+        const targetBuilding = (manager.wireHoveredBuilding && manager.wireHoveredPortIndex >= 0) ? manager.wireHoveredBuilding : null;
         let outOfRange = false;
         const maxDistTiles = connectionType === 'energy' ? 15 : 5;
 
         if (targetBuilding) {
-            const dist = this.rectDistance(this.getRect(fromBuilding), this.getRect(targetBuilding));
-            outOfRange = dist > maxDistTiles;
+            outOfRange = this.rectDistance(this.getRect(fromBuilding), this.getRect(targetBuilding)) > maxDistTiles;
         } else {
             const tile = this.game.map.worldToTile(mouseWorldX, mouseWorldY);
             const targetRect = { x1: tile.tx, y1: tile.ty, x2: tile.tx + 1, y2: tile.ty + 1 };
-            const dist = this.rectDistance(this.getRect(fromBuilding), targetRect);
-            outOfRange = dist > maxDistTiles;
+            outOfRange = this.rectDistance(this.getRect(fromBuilding), targetRect) > maxDistTiles;
         }
 
         let blocked = false;
-        if (connectionType === 'matter' && targetBuilding) {
-            blocked = !this.isPathClear(fromBuilding, targetBuilding);
-        }
+        if (connectionType === 'matter' && targetBuilding) blocked = !this.isPathClear(fromBuilding, targetBuilding);
+
         ctx.strokeStyle = outOfRange || blocked ? 'rgba(255, 50, 50, 0.8)' : (connectionType === 'energy' ? ENERGY_COLOR : MATTER_COLOR);
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 4]);

@@ -36,6 +36,7 @@ class Game {
         this._spawnStar();
         this.camera.x = this.star.tx * this.map.tileSize + 2.5 * this.map.tileSize;
         this.camera.y = this.star.ty * this.map.tileSize + 2.5 * this.map.tileSize;
+        this.star._refreshPorts();
 
         this._resize();
         window.addEventListener('resize', () => this._resize());
@@ -61,6 +62,7 @@ class Game {
 
     _spawnStar() {
         this.star = new Building(-2, -2, 'star', 0);
+        this.star._refreshPorts();
         this.buildingManager.buildings.push(this.star);
     }
 
@@ -88,19 +90,20 @@ class Game {
             this.buildingManager.setMousePosition(e.clientX, e.clientY);
             this.buildingManager.onMouseMove();
 
-            // Обновляем позицию drag preview
             if (this.dragPreview) {
                 this.dragPreview.x = e.clientX;
                 this.dragPreview.y = e.clientY;
             }
         });
 
+        // Единый обработчик mousedown (без дубликатов)
         this.canvas.addEventListener('mousedown', (e) => {
+            // Для перемещения камеры ничего не делаем – оно обрабатывается в Camera.js
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) return;
 
             const worldPos = this.camera.screenToWorld(e.clientX, e.clientY);
 
-            // Правая кнопка мыши для удаления из UI
+            // Правая кнопка – удаление ресурсов из UI
             if (e.button === 2) {
                 if (this.factoryUI.visible && this.factoryUI.hitTest(worldPos.x, worldPos.y)) {
                     this.factoryUI.onRightClick(worldPos.x, worldPos.y);
@@ -112,7 +115,7 @@ class Game {
                 }
             }
 
-            // Перетаскивание левой кнопкой
+            // Перетаскивание ресурсов из UI (левая кнопка)
             if (this.factoryUI.visible) {
                 if (this.factoryUI.onMouseDown(worldPos.x, worldPos.y)) {
                     const slot = this.factoryUI.dragging;
@@ -147,7 +150,7 @@ class Game {
             const tile = this.map.worldToTile(worldPos.x, worldPos.y);
             const building = this.buildingManager.getBuildingAt(tile.tx, tile.ty);
 
-            // Фабричный UI
+            // Клик по UI фабрики
             if (this.factoryUI.visible) {
                 if (this.factoryUI.onClick(worldPos.x, worldPos.y)) {
                     return;
@@ -157,7 +160,7 @@ class Game {
                 }
             }
 
-            // UI узла
+            // Клик по UI узла
             if (this.uiManager.isUIOpen()) {
                 this.uiManager.handleClick(worldPos.x, worldPos.y);
                 return;

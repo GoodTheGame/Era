@@ -130,7 +130,7 @@ export class FactoryUI {
             return true;
         }
 
-                // Кнопка смены рецепта
+        // Кнопка смены рецепта
         if (config && config.recipes && Object.keys(config.recipes).length > 1) {
             const rect = this._getRect();
             const ports = factory.getItemPorts();
@@ -342,7 +342,7 @@ export class FactoryUI {
             }
         });
 
-                // Иконка смены рецепта (только если рецептов больше одного)
+        // Кнопка смены рецепта (только если рецептов больше одного)
         if (config && config.recipes && Object.keys(config.recipes).length > 1) {
             const inputsEndX = leftX + inputPorts.length * (this.slotSize + this.padding) - this.padding;
             const outputsStartX = rightX;
@@ -364,6 +364,10 @@ export class FactoryUI {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('🔄', iconX + iconSize / 2, iconY + iconSize / 2);
+        }
+
+        if (this._hasEnergy(b)) {
+            this._renderEnergyBar(ctx, rect, b);
         }
     }
 

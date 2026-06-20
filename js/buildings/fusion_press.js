@@ -1,5 +1,6 @@
 // js/buildings/fusion_press.js
 import { drawParticle } from '../ParticleRenderer.js';
+import { RESOURCE_COLORS } from '../resources.js';
 
 export const fusionPressBuilding = {
     type: 'fusion_press',
@@ -101,13 +102,19 @@ export const fusionPressBuilding = {
             }
         }
 
-        const eCount = b.outputResources?.['energy'] || 0;
-        if (eCount > 0) {
-            ctx.fillStyle = '#ff8800';
-            ctx.font = `bold ${tileSize * 0.2}px "Segoe UI"`;
-            ctx.textAlign = 'right';
-            ctx.fillText(`⚡${eCount}`, x + w - 4, y + h - 10);
+        // Энерго-шкала пресса
+        if (!isGhost) {
+            const eCount = b.outputResources?.['energy'] || 0;
+            const maxEnergy = 1000;
+            const barWidth = w - 12;
+            const barHeight = 6;
+            const barX = x + 6;
+            const barY = y + h - 8;
+            ctx.fillStyle = '#111';
+            ctx.fillRect(barX, barY, barWidth, barHeight);
+            const fill = Math.min(eCount / maxEnergy, 1) * barWidth;
+            ctx.fillStyle = '#00ccff';
+            ctx.fillRect(barX, barY, fill, barHeight);
         }
-
     }
 };

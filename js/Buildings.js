@@ -44,7 +44,6 @@ export class Building {
         else if (type === 'quantum_resonator') this.quarkType = 0;
 
         const mod = BUILDING_MODULES[type];
-        // Гарантируем _factoryConfig
         if (mod && mod._factoryConfig) {
             this._factoryConfig = mod._factoryConfig;
         } else {
@@ -81,7 +80,6 @@ export class Building {
 
     _refreshPorts() {
         const mod = BUILDING_MODULES[this.type];
-        // Если у здания нет _factoryConfig, берём из модуля
         if (!this._factoryConfig && mod && mod._factoryConfig) {
             this._factoryConfig = mod._factoryConfig;
         }
@@ -253,7 +251,7 @@ export class BuildingManager {
 
         if (this.game.selectedType === 'wire') {
             const target = this.wireHoveredBuilding;
-            if (target && target.type !== 'star') {
+            if (target) {
                 const connectionType = this.game.hud.wireMode;
                 const portType = this.wireHoveredPortType || (connectionType === 'energy' ? 'energy' : 'item');
 
